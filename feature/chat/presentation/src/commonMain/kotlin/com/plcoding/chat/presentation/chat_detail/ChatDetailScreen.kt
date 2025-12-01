@@ -107,8 +107,8 @@ fun ChatDetailRoot(
         viewModel.onAction(ChatDetailAction.OnSelectChat(chatId))
     }
 
-    LaunchedEffect(chatId, state.messages) {
-        if(state.messages.isNotEmpty()) {
+    LaunchedEffect(chatId) {
+        if(chatId != null) {
             messageListState.scrollToItem(0)
         }
     }

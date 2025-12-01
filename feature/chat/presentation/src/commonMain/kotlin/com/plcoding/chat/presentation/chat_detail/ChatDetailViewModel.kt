@@ -293,10 +293,12 @@ class ChatDetailViewModel(
             newMessages,
             isNearBottom
         ) { currentMessages, newMessages, isNearBottom ->
-            val lastNewId = newMessages.lastOrNull()?.message?.id
-            val lastCurrentId = currentMessages.lastOrNull()?.id
+            val newestMessageId = newMessages.firstOrNull()?.message?.id
+            val currentNewestId = currentMessages
+                .firstOrNull { it is MessageUi.LocalUserMessage || it is MessageUi.OtherUserMessage }
+                ?.id
 
-            if (lastNewId != lastCurrentId && isNearBottom) {
+            if (newestMessageId != null && newestMessageId != currentNewestId && isNearBottom) {
                 eventChannel.send(ChatDetailEvent.OnNewMessage)
             }
         }.launchIn(viewModelScope)
