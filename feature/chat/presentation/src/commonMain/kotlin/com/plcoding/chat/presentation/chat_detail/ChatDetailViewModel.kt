@@ -295,7 +295,9 @@ class ChatDetailViewModel(
         ) { currentMessages, newMessages, isNearBottom ->
             val newestMessageId = newMessages.firstOrNull()?.message?.id
             val currentNewestId = currentMessages
-                .firstOrNull { it is MessageUi.LocalUserMessage || it is MessageUi.OtherUserMessage }
+                .asSequence()
+                .filterNot { it is MessageUi.DateSeparator }
+                .firstOrNull()
                 ?.id
 
             if (newestMessageId != null && newestMessageId != currentNewestId && isNearBottom) {
