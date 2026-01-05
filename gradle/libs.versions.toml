@@ -50,7 +50,7 @@ moko = "0.19.1"
 buildkonfig = "0.17.1"
 kermit = "2.0.6"
 
-projectApplicationId = "com.plcoding.chirp"
+projectApplicationId = "com.dating.aura"
 projectVersionName = "1.0"
 projectMinSdkVersion = "26"
 projectTargetSdkVersion = "36"
@@ -58,7 +58,7 @@ projectCompileSdkVersion = "36"
 projectVersionCode = "1"
 
 # Desktop Version
-desktopPackageName = "Chirp"
+desktopPackageName = "Aura"
 desktopPackageVersion = "1.0.0"
 runner = "1.7.0"
 junit = "1.3.0"
@@ -175,14 +175,14 @@ androidx-runner = { group = "androidx.test", name = "runner", version.ref = "run
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junit" }
 
 [plugins]
-convention-android-application = { id = "com.plcoding.convention.android.application", version = "unspecified" }
-convention-android-application-compose = { id = "com.plcoding.convention.android.application.compose", version = "unspecified" }
-convention-cmp-application = { id = "com.plcoding.convention.cmp.application", version = "unspecified" }
-convention-kmp-library = { id = "com.plcoding.convention.kmp.library", version = "unspecified" }
-convention-cmp-library = { id = "com.plcoding.convention.cmp.library", version = "unspecified" }
-convention-cmp-feature = { id = "com.plcoding.convention.cmp.feature", version = "unspecified" }
-convention-buildkonfig = { id = "com.plcoding.convention.buildkonfig", version = "unspecified" }
-convention-room = { id = "com.plcoding.convention.room", version = "unspecified" }
+convention-android-application = { id = "com.dating.convention.android.application", version = "unspecified" }
+convention-android-application-compose = { id = "com.dating.convention.android.application.compose", version = "unspecified" }
+convention-cmp-application = { id = "com.dating.convention.cmp.application", version = "unspecified" }
+convention-kmp-library = { id = "com.dating.convention.kmp.library", version = "unspecified" }
+convention-cmp-library = { id = "com.dating.convention.cmp.library", version = "unspecified" }
+convention-cmp-feature = { id = "com.dating.convention.cmp.feature", version = "unspecified" }
+convention-buildkonfig = { id = "com.dating.convention.buildkonfig", version = "unspecified" }
+convention-room = { id = "com.dating.convention.room", version = "unspecified" }
 
 # Android
 android-application = { id = "com.android.application", version.ref = "agp" }

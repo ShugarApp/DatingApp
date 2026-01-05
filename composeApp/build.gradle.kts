@@ -66,10 +66,10 @@ kotlin {
 
 compose.desktop {
     application {
-        mainClass = "com.plcoding.chirp.MainKt"
+        mainClass = "com.dating.aura.MainKt"
 
         nativeDistributions {
-            packageName = "com.plcoding.chirp"
+            packageName = "com.dating.aura"
         }
     }
 }

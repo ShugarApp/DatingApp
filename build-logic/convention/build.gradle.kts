@@ -4,7 +4,7 @@ plugins {
     `kotlin-dsl`
 }
 
-group = "com.plcoding.convention.buildlogic"
+group = "com.dating.convention.buildlogic"
 
 dependencies {
     compileOnly(libs.android.gradlePlugin)
@@ -38,35 +38,35 @@ tasks {
 gradlePlugin {
     plugins {
         register("androidApplication") {
-            id = "com.plcoding.convention.android.application"
+            id = "com.dating.convention.android.application"
             implementationClass = "AndroidApplicationConventionPlugin"
         }
         register("androidComposeApplication") {
-            id = "com.plcoding.convention.android.application.compose"
+            id = "com.dating.convention.android.application.compose"
             implementationClass = "AndroidApplicationComposeConventionPlugin"
         }
         register("cmpApplication") {
-            id = "com.plcoding.convention.cmp.application"
+            id = "com.dating.convention.cmp.application"
             implementationClass = "CmpApplicationConventionPlugin"
         }
         register("kmpLibrary") {
-            id = "com.plcoding.convention.kmp.library"
+            id = "com.dating.convention.kmp.library"
             implementationClass = "KmpLibraryConventionPlugin"
         }
         register("cmpLibrary") {
-            id = "com.plcoding.convention.cmp.library"
+            id = "com.dating.convention.cmp.library"
             implementationClass = "CmpLibraryConventionPlugin"
         }
         register("cmpFeature") {
-            id = "com.plcoding.convention.cmp.feature"
+            id = "com.dating.convention.cmp.feature"
             implementationClass = "CmpFeatureConventionPlugin"
         }
         register("buildKonfig") {
-            id = "com.plcoding.convention.buildkonfig"
+            id = "com.dating.convention.buildkonfig"
             implementationClass = "BuildKonfigConventionPlugin"
         }
         register("room") {
-            id = "com.plcoding.convention.room"
+            id = "com.dating.convention.room"
             implementationClass = "RoomConventionPlugin"
         }
     }

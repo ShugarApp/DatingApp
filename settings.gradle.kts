@@ -1,4 +1,4 @@
-rootProject.name = "Chirp"
+rootProject.name = "Aura"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
