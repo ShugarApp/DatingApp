@@ -23,8 +23,8 @@ import aura.feature.auth.presentation.generated.resources.login
 import aura.feature.auth.presentation.generated.resources.password
 import aura.feature.auth.presentation.generated.resources.welcome_back
 import com.dating.core.designsystem.components.brand.AppBrandLogo
-import com.dating.core.designsystem.components.buttons.ChirpButton
 import com.dating.core.designsystem.components.buttons.AppButtonStyle
+import com.dating.core.designsystem.components.buttons.ChirpButton
 import com.dating.core.designsystem.components.layouts.AppAdaptiveFormLayout
 import com.dating.core.designsystem.components.layouts.ChirpSnackbarScaffold
 import com.dating.core.designsystem.components.textfields.ChirpPasswordTextField
@@ -45,7 +45,7 @@ fun LoginRoot(
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     ObserveAsEvents(viewModel.events) { event ->
-        when(event) {
+        when (event) {
             LoginEvent.Success -> onLoginSuccess()
         }
     }
@@ -53,7 +53,7 @@ fun LoginRoot(
     LoginScreen(
         state = state,
         onAction = { action ->
-            when(action) {
+            when (action) {
                 LoginAction.OnForgotPasswordClick -> onForgotPasswordClick()
                 LoginAction.OnSignUpClick -> onCreateAccountClick()
                 else -> Unit
@@ -75,8 +75,7 @@ fun LoginScreen(
             logo = {
                 AppBrandLogo()
             },
-            modifier = Modifier
-                .fillMaxSize()
+            modifier = Modifier.fillMaxSize()
         ) {
             ChirpTextField(
                 state = state.emailTextFieldState,

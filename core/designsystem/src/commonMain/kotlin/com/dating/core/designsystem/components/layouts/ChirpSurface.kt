@@ -89,3 +89,32 @@ fun ChirpSurfacePreview() {
         )
     }
 }
+
+@Composable
+@Preview
+fun ChirpDarkSurfacePreview() {
+    AppTheme(darkTheme = true) {
+        ChirpSurface(
+            modifier = Modifier
+                .fillMaxSize(),
+            header = {
+                Icon(
+                    imageVector = vectorResource(Res.drawable.logo_chirp),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier
+                        .padding(vertical = 32.dp)
+                )
+            },
+            content = {
+                Text(
+                    text = "Welcome to Chirp!",
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier
+                        .padding(vertical = 40.dp)
+                        .align(Alignment.CenterHorizontally)
+                )
+            }
+        )
+    }
+}
