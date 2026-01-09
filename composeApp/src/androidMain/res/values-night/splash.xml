@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenBackground">#9B5CFF</item>
+        <item name="windowSplashScreenBackground">#0E0714</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground_dark</item>
         <item name="postSplashScreenTheme">@android:style/Theme.Material.NoActionBar</item>
     </style>
