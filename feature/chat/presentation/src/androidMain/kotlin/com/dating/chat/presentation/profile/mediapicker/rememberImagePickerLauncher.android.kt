@@ -15,6 +15,24 @@ actual fun rememberImagePickerLauncher(
 ): ImagePickerLauncher {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    
+    val fallbackLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        if(uri != null) {
+            val parser = ContentUriParser(context)
+            val mimeType = parser.getMimeType(uri)
+
+            scope.launch {
+                val data = PickedImageData(
+                    bytes = parser.readUri(uri) ?: return@launch,
+                    mimeType = mimeType
+                )
+                onResult(data)
+            }
+        }
+    }
+
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
@@ -35,11 +53,15 @@ actual fun rememberImagePickerLauncher(
     return remember {
         ImagePickerLauncher(
             onLaunch = {
-                photoPickerLauncher.launch(
-                    PickVisualMediaRequest(
-                        mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly
+                try {
+                    photoPickerLauncher.launch(
+                        PickVisualMediaRequest(
+                            mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly
+                        )
                     )
-                )
+                } catch (e: Exception) {
+                    fallbackLauncher.launch("image/*")
+                }
             }
         )
     }
