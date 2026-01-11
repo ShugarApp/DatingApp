@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -35,10 +34,14 @@ import aura.feature.chat.presentation.generated.resources.Res
 import aura.feature.chat.presentation.generated.resources.cancel
 import aura.feature.chat.presentation.generated.resources.contact_chirp_support_change_email
 import aura.feature.chat.presentation.generated.resources.current_password
+import aura.feature.chat.presentation.generated.resources.current_password
 import aura.feature.chat.presentation.generated.resources.delete
 import aura.feature.chat.presentation.generated.resources.delete_profile_picture
 import aura.feature.chat.presentation.generated.resources.delete_profile_picture_desc
+import aura.feature.chat.presentation.generated.resources.do_you_want_to_logout
+import aura.feature.chat.presentation.generated.resources.do_you_want_to_logout_desc
 import aura.feature.chat.presentation.generated.resources.email
+import aura.feature.chat.presentation.generated.resources.logout
 import aura.feature.chat.presentation.generated.resources.new_password
 import aura.feature.chat.presentation.generated.resources.password
 import aura.feature.chat.presentation.generated.resources.password_change_successful
@@ -58,6 +61,7 @@ import com.dating.core.designsystem.components.textfields.ChirpPasswordTextField
 import com.dating.core.designsystem.components.textfields.ChirpTextField
 import com.dating.core.designsystem.theme.extended
 import com.dating.core.presentation.util.clearFocusOnTap
+import com.dating.core.presentation.util.ObserveAsEvents
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -69,6 +73,12 @@ fun ProfileScreen(
     viewModel: ProfileViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+
+    ObserveAsEvents(viewModel.events) { event ->
+        when(event) {
+            ProfileEvent.OnLogoutSuccess -> onLogout()
+        }
+    }
 
     val launcher = rememberImagePickerLauncher { pickedImageData ->
         viewModel.onAction(ProfileAction.OnPictureSelected(
@@ -228,7 +238,9 @@ fun ProfileScreen(
             ) {
                 ChirpButton(
                     text = "Cerrar sesión",
-                    onClick = onLogout,
+                    onClick = {
+                        viewModel.onAction(ProfileAction.OnLogoutClick)
+                    },
                     style = AppButtonStyle.DESTRUCTIVE_SECONDARY,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -250,6 +262,24 @@ fun ProfileScreen(
                 onDismiss = {
                     viewModel.onAction(ProfileAction.OnDismissDeleteConfirmationDialogClick)
                 }
+            )
+        }
+
+        if(state.showLogoutConfirmationDialog) {
+            DestructiveConfirmationDialog(
+                title = stringResource(Res.string.do_you_want_to_logout),
+                description = stringResource(Res.string.do_you_want_to_logout_desc),
+                confirmButtonText = stringResource(Res.string.logout),
+                cancelButtonText = stringResource(Res.string.cancel),
+                onDismiss = {
+                    viewModel.onAction(ProfileAction.OnDismissLogoutConfirmationDialogClick)
+                },
+                onCancelClick = {
+                    viewModel.onAction(ProfileAction.OnDismissLogoutConfirmationDialogClick)
+                },
+                onConfirmClick = {
+                    viewModel.onAction(ProfileAction.OnConfirmLogoutClick)
+                },
             )
         }
     }

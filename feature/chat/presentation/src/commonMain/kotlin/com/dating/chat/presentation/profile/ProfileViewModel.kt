@@ -18,13 +18,16 @@ import com.dating.core.domain.util.onSuccess
 import com.dating.core.domain.validation.PasswordValidator
 import com.dating.core.presentation.util.UiText
 import com.dating.core.presentation.util.toUiText
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -36,6 +39,9 @@ class ProfileViewModel(
 ) : ViewModel() {
 
     private var hasLoadedInitialData = false
+
+    private val _events = Channel<ProfileEvent>()
+    val events = _events.receiveAsFlow()
 
     private val _state = MutableStateFlow(ProfileState())
     val state = combine(
@@ -73,7 +79,34 @@ class ProfileViewModel(
             is ProfileAction.OnDeletePictureClick -> showDeleteConfirmation()
             is ProfileAction.OnConfirmDeleteClick -> deleteProfilePicture()
             is ProfileAction.OnDismissDeleteConfirmationDialogClick -> dismissDeleteConfirmation()
+            ProfileAction.OnLogoutClick -> showLogoutConfirmation()
+            ProfileAction.OnConfirmLogoutClick -> logout()
+            ProfileAction.OnDismissLogoutConfirmationDialogClick -> dismissLogoutConfirmation()
             else -> Unit
+        }
+    }
+
+    private fun showLogoutConfirmation() {
+        _state.update { it.copy(
+            showLogoutConfirmationDialog = true
+        ) }
+    }
+
+    private fun dismissLogoutConfirmation() {
+        _state.update { it.copy(
+            showLogoutConfirmationDialog = false
+        ) }
+    }
+
+    private fun logout() {
+        dismissLogoutConfirmation()
+        viewModelScope.launch {
+            val authInfo = sessionStorage.observeAuthInfo().first()
+            val refreshToken = authInfo?.refreshToken ?: return@launch
+            
+            authService.logout(refreshToken)
+            sessionStorage.set(null)
+            _events.send(ProfileEvent.OnLogoutSuccess)
         }
     }
 
