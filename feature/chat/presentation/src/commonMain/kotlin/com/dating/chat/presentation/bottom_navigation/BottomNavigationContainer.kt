@@ -19,6 +19,10 @@ import com.dating.chat.presentation.profile.ProfileScreen
 fun BottomNavigationContainer(
     onLogout: () -> Unit,
     onNavigateToProfile: (String) -> Unit,
+    onEditProfile: () -> Unit,
+    onSettings: () -> Unit,
+    onVerification: () -> Unit,
+    onSubscriptions: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var selectedSection by rememberSaveable {
@@ -58,7 +62,11 @@ fun BottomNavigationContainer(
                 }
                 BottomNavSection.PROFILE -> {
                     ProfileScreen(
-                        onLogout = onLogout
+                        onLogout = onLogout,
+                        onEditProfile = onEditProfile,
+                        onSettings = onSettings,
+                        onVerification = onVerification,
+                        onSubscriptions = onSubscriptions
                     )
                 }
             }

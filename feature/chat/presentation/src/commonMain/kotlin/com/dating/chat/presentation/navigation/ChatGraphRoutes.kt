@@ -31,6 +31,18 @@ sealed interface ChatGraphRoutes {
 
     @Serializable
     data class ChatListDetailRoute(val chatId: String? = null) : ChatGraphRoutes
+
+    @Serializable
+    data object EditProfileRoute : ChatGraphRoutes
+
+    @Serializable
+    data object SettingsRoute : ChatGraphRoutes
+
+    @Serializable
+    data object VerificationRoute : ChatGraphRoutes
+
+    @Serializable
+    data object SubscriptionRoute : ChatGraphRoutes
 }
 
 fun NavGraphBuilder.chatGraph(
@@ -68,6 +80,18 @@ fun NavGraphBuilder.chatGraph(
                 onLogout = onLogout,
                 onNavigateToProfile = { userId ->
                     navController.navigate(ChatGraphRoutes.ProfileDetailRoute(userId))
+                },
+                onEditProfile = {
+                    navController.navigate(ChatGraphRoutes.EditProfileRoute)
+                },
+                onSettings = {
+                    navController.navigate(ChatGraphRoutes.SettingsRoute)
+                },
+                onVerification = {
+                    navController.navigate(ChatGraphRoutes.VerificationRoute)
+                },
+                onSubscriptions = {
+                    navController.navigate(ChatGraphRoutes.SubscriptionRoute)
                 }
             )
         }
@@ -78,6 +102,28 @@ fun NavGraphBuilder.chatGraph(
                 userId = route.userId,
                 onBack = { navController.popBackStack() }
             )
+        }
+
+        composable<ChatGraphRoutes.EditProfileRoute> {
+            com.dating.chat.presentation.profile.EditProfileScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+        
+        
+        composable<ChatGraphRoutes.SettingsRoute> {
+            com.dating.chat.presentation.profile.SettingsScreen(
+                onBack = { navController.popBackStack() },
+                onLogout = onLogout
+            )
+        }
+        
+        composable<ChatGraphRoutes.VerificationRoute> {
+            // Placeholder
+        }
+        
+        composable<ChatGraphRoutes.SubscriptionRoute> {
+            // Placeholder
         }
     }
 }

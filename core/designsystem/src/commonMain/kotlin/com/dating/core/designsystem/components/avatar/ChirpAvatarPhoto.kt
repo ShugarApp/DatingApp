@@ -22,7 +22,7 @@ import com.dating.core.designsystem.theme.extended
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 enum class AvatarSize(val dp: Dp) {
-    SMALL(40.dp), LARGE(60.dp)
+    SMALL(40.dp), LARGE(60.dp), PROFILE(120.dp)
 }
 
 @Composable

@@ -1,20 +1,29 @@
 package com.dating.chat.presentation.profile
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.CreditCard
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Help
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -26,41 +35,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import aura.feature.chat.presentation.generated.resources.Res
 import aura.feature.chat.presentation.generated.resources.cancel
-import aura.feature.chat.presentation.generated.resources.contact_chirp_support_change_email
-import aura.feature.chat.presentation.generated.resources.current_password
-import aura.feature.chat.presentation.generated.resources.current_password
-import aura.feature.chat.presentation.generated.resources.delete
-import aura.feature.chat.presentation.generated.resources.delete_profile_picture
-import aura.feature.chat.presentation.generated.resources.delete_profile_picture_desc
 import aura.feature.chat.presentation.generated.resources.do_you_want_to_logout
 import aura.feature.chat.presentation.generated.resources.do_you_want_to_logout_desc
-import aura.feature.chat.presentation.generated.resources.email
 import aura.feature.chat.presentation.generated.resources.logout
-import aura.feature.chat.presentation.generated.resources.new_password
-import aura.feature.chat.presentation.generated.resources.password
-import aura.feature.chat.presentation.generated.resources.password_change_successful
-import aura.feature.chat.presentation.generated.resources.password_hint
-import aura.feature.chat.presentation.generated.resources.profile_image
-import aura.feature.chat.presentation.generated.resources.save
-import aura.feature.chat.presentation.generated.resources.upload_image
-import com.dating.chat.presentation.profile.components.ProfileSectionLayout
-import com.dating.chat.presentation.profile.mediapicker.rememberImagePickerLauncher
 import com.dating.core.designsystem.components.avatar.AvatarSize
 import com.dating.core.designsystem.components.avatar.ChirpAvatarPhoto
-import com.dating.core.designsystem.components.brand.ChirpHorizontalDivider
-import com.dating.core.designsystem.components.buttons.AppButtonStyle
-import com.dating.core.designsystem.components.buttons.ChirpButton
 import com.dating.core.designsystem.components.dialogs.DestructiveConfirmationDialog
-import com.dating.core.designsystem.components.textfields.ChirpPasswordTextField
-import com.dating.core.designsystem.components.textfields.ChirpTextField
-import com.dating.core.designsystem.theme.extended
-import com.dating.core.presentation.util.clearFocusOnTap
 import com.dating.core.presentation.util.ObserveAsEvents
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -69,6 +56,10 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun ProfileScreen(
     onLogout: () -> Unit,
+    onEditProfile: () -> Unit,
+    onSettings: () -> Unit,
+    onVerification: () -> Unit,
+    onSubscriptions: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ProfileViewModel = koinViewModel()
 ) {
@@ -80,189 +71,121 @@ fun ProfileScreen(
         }
     }
 
-    val launcher = rememberImagePickerLauncher { pickedImageData ->
-        viewModel.onAction(ProfileAction.OnPictureSelected(
-            pickedImageData.bytes,
-            pickedImageData.mimeType
-        ))
-    }
-
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.fillMaxSize(),
+        containerColor = MaterialTheme.colorScheme.background, // Ensure dark background effectively
         topBar = {
+            // Minimal top bar or transparent to match design
             TopAppBar(
-                title = {
-                    Text(
-                        text = "Perfil",
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold
-                    )
-                },
+                title = {},
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
+                    containerColor = MaterialTheme.colorScheme.background
                 )
             )
         }
     ) { paddingValues ->
         Column(
             modifier = Modifier
-                .clearFocusOnTap()
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(MaterialTheme.colorScheme.surface)
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            ProfileSectionLayout(
-                headerText = stringResource(Res.string.profile_image)
+            // 1. Header (Avatar + Name)
+            Spacer(modifier = Modifier.height(20.dp))
+            Box(
+                contentAlignment = Alignment.BottomEnd
             ) {
-                Row {
-                    ChirpAvatarPhoto(
-                        displayText = state.userInitials,
-                        size = AvatarSize.LARGE,
-                        imageUrl = state.profilePictureUrl,
-                        onClick = {
-                            launcher.launch()
-                        }
-                    )
-                    Spacer(modifier = Modifier.width(20.dp))
-                    FlowRow(
-                        modifier = Modifier.weight(1f),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        ChirpButton(
-                            text = stringResource(Res.string.upload_image),
-                            onClick = {
-                                launcher.launch()
-                            },
-                            style = AppButtonStyle.SECONDARY,
-                            enabled = !state.isUploadingImage && !state.isDeletingImage,
-                            isLoading = state.isUploadingImage,
-                            leadingIcon = {
-                                Icon(
-                                    imageVector = Icons.Default.Send,
-                                    contentDescription = stringResource(Res.string.upload_image)
-                                )
-                            }
-                        )
-                        ChirpButton(
-                            text = stringResource(Res.string.delete),
-                            onClick = {
-                                viewModel.onAction(ProfileAction.OnDeletePictureClick)
-                            },
-                            style = AppButtonStyle.DESTRUCTIVE_SECONDARY,
-                            enabled = !state.isUploadingImage
-                                    && !state.isDeletingImage
-                                    && state.profilePictureUrl != null,
-                            isLoading = state.isDeletingImage,
-                            leadingIcon = {
-                                Icon(
-                                    imageVector = Icons.Default.Close,
-                                    contentDescription = stringResource(Res.string.delete)
-                                )
-                            }
-                        )
-                    }
-                }
-
-                if (state.imageError != null) {
-                    Text(
-                        text = "Loco",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-            }
-            ChirpHorizontalDivider()
-            ProfileSectionLayout(
-                headerText = stringResource(Res.string.email)
-            ) {
-                ChirpTextField(
-                    state = state.emailTextState,
-                    enabled = false,
-                    supportingText = stringResource(Res.string.contact_chirp_support_change_email)
+                ChirpAvatarPhoto(
+                    displayText = state.userInitials,
+                    size = AvatarSize.PROFILE,
+                    imageUrl = state.profilePictureUrl,
+                    onClick = {},
+                    // Add border if supported by component, otherwise wrap or assume theme handles it
+                )
+                // Optional: Verification Badge overlay if verified
+                 Icon(
+                    imageVector = Icons.Default.Verified,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier
+                        .size(32.dp)
+                        .background(MaterialTheme.colorScheme.background, shape = androidx.compose.foundation.shape.CircleShape)
+                        .padding(2.dp)
                 )
             }
-            ChirpHorizontalDivider()
-            ProfileSectionLayout(
-                headerText = stringResource(Res.string.password)
-            ) {
-                ChirpPasswordTextField(
-                    state = state.currentPasswordTextState,
-                    isPasswordVisible = state.isCurrentPasswordVisible,
-                    onToggleVisibilityClick = {
-                        viewModel.onAction(ProfileAction.OnToggleCurrentPasswordVisibility)
-                    },
-                    placeholder = stringResource(Res.string.current_password),
-                    isError = state.newPasswordError != null,
-                )
-                ChirpPasswordTextField(
-                    state = state.newPasswordTextState,
-                    isPasswordVisible = state.isNewPasswordVisible,
-                    onToggleVisibilityClick = {
-                        viewModel.onAction(ProfileAction.OnToggleNewPasswordVisibility)
-                    },
-                    placeholder = stringResource(Res.string.new_password),
-                    isError = state.newPasswordError != null,
-                    supportingText = state.newPasswordError?.asString()
-                        ?: stringResource(Res.string.password_hint)
-                )
-                if (state.isPasswordChangeSuccessful) {
-                    Text(
-                        text = stringResource(Res.string.password_change_successful),
-                        color = MaterialTheme.colorScheme.extended.success,
-                        style = MaterialTheme.typography.labelSmall,
-                        textAlign = TextAlign.End,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.End)
-                ) {
-                    ChirpButton(
-                        text = stringResource(Res.string.save),
-                        onClick = {
-                            viewModel.onAction(ProfileAction.OnChangePasswordClick)
-                        },
-                        enabled = state.canChangePassword,
-                        isLoading = state.isChangingPassword
-                    )
-                }
-            }
-            ChirpHorizontalDivider()
             
-            // Logout section
-            ProfileSectionLayout(
-                headerText = "Cuenta"
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            Text(
+                text = state.username, // In real app, might append ", Age" if available
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            
+            // Subtitle placeholder if needed (e.g. Job, Location)
+            // Text(
+            //     text = "Product Designer, NYC",
+            //     style = MaterialTheme.typography.bodyMedium,
+            //     color = MaterialTheme.colorScheme.onSurfaceVariant
+            // )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // 2. Action Buttons Row
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                ChirpButton(
-                    text = "Cerrar sesión",
-                    onClick = {
-                        viewModel.onAction(ProfileAction.OnLogoutClick)
-                    },
-                    style = AppButtonStyle.DESTRUCTIVE_SECONDARY,
-                    modifier = Modifier.fillMaxWidth()
+                ProfileActionButton(
+                    icon = Icons.Default.Edit,
+                    text = "EDIT",
+                    onClick = onEditProfile
+                )
+                ProfileActionButton(
+                    icon = Icons.Default.Settings,
+                    text = "SETTINGS",
+                    onClick = onSettings
+                )
+                ProfileActionButton(
+                    icon = Icons.Default.Verified,
+                    text = "VERIFY",
+                    onClick = onVerification
                 )
             }
-        }
 
-        if (state.showDeleteConfirmationDialog) {
-            DestructiveConfirmationDialog(
-                title = stringResource(Res.string.delete_profile_picture),
-                description = stringResource(Res.string.delete_profile_picture_desc),
-                confirmButtonText = stringResource(Res.string.delete),
-                cancelButtonText = stringResource(Res.string.cancel),
-                onConfirmClick = {
-                    viewModel.onAction(ProfileAction.OnConfirmDeleteClick)
-                },
-                onCancelClick = {
-                    viewModel.onAction(ProfileAction.OnDismissDeleteConfirmationDialogClick)
-                },
-                onDismiss = {
-                    viewModel.onAction(ProfileAction.OnDismissDeleteConfirmationDialogClick)
-                }
-            )
+            Spacer(modifier = Modifier.height(40.dp))
+
+            // 3. Menu List
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                ProfileMenuListItem(
+                    icon = Icons.Default.CreditCard,
+                    text = "Suscripciones",
+                    onClick = onSubscriptions
+                )
+                
+                // Add more items here if needed to match "Privacy", "Help" etc. from design
+                ProfileMenuListItem(
+                    icon = Icons.Default.Lock,
+                    text = "Privacidad",
+                    onClick = { /* Todo */ }
+                )
+                 ProfileMenuListItem(
+                    icon = Icons.Default.Help,
+                    text = "Ayuda y Soporte",
+                    onClick = { /* Todo */ }
+                )
+
+                // Add more items here if needed to match "Privacy", "Help" etc. from design
+            }
+            
+            Spacer(modifier = Modifier.padding(bottom = 30.dp))
         }
 
         if(state.showLogoutConfirmationDialog) {
@@ -282,5 +205,88 @@ fun ProfileScreen(
                 },
             )
         }
+    }
+}
+
+@Composable
+fun ProfileActionButton(
+    icon: ImageVector,
+    text: String,
+    onClick: () -> Unit
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.clickable { onClick() }
+    ) {
+        Box(
+            modifier = Modifier
+                .size(70.dp)
+                .background(
+                    color = MaterialTheme.colorScheme.surfaceContainerHigh, // Dark card color
+                    shape = RoundedCornerShape(24.dp)
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = text,
+                tint = MaterialTheme.colorScheme.primary, // Purple/accent
+                modifier = Modifier.size(28.dp)
+            )
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@Composable
+fun ProfileMenuListItem(
+    icon: ImageVector,
+    text: String,
+    onClick: () -> Unit,
+    textColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onSurface,
+    iconTint: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onSurfaceVariant
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+            .background(Color.Transparent), // Or add a background shape if desired
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+         Box(
+            modifier = Modifier
+                .size(48.dp)
+                .background(
+                    color = MaterialTheme.colorScheme.surfaceContainer,
+                    shape = RoundedCornerShape(12.dp)
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = iconTint,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+        Spacer(modifier = Modifier.width(16.dp))
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Medium,
+            color = textColor,
+            modifier = Modifier.weight(1f)
+        )
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
