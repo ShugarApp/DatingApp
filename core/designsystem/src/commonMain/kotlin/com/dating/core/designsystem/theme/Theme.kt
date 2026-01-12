@@ -131,7 +131,7 @@ val DarkExtendedColors = ExtendedColors(
 
     surfaceLower = ChirpBase1000,
     surfaceHigher = ChirpBase900,
-    surfaceOutline = ChirpBase100Alpha10Alt,
+    surfaceOutline = ChirpBase100Alpha10,
     overlay = ChirpBase1000Alpha80,
 
     accentBlue = ChirpBlue,

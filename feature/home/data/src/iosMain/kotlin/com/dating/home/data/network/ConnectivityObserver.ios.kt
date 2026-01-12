@@ -45,6 +45,6 @@ actual class ConnectivityObserver {
     }
 
     companion object {
-        private const val NW_PATH_MONITOR_LABEL = "com.dating.chat.data.network.ConnectivityObserver"
+        private const val NW_PATH_MONITOR_LABEL = "com.dating.home.data.network.ConnectivityObserver"
     }
 }

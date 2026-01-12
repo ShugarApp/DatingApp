@@ -24,7 +24,6 @@ val ChirpBase150 = Color(0xFFE6E0EF)
 val ChirpBase100 = Color(0xFFF4F1FA)
 val ChirpBase100Alpha10 = Color(0x1AF4F1FA)
 val ChirpBase1000Alpha14 = Color(0x240E0714)
-val ChirpBase100Alpha10Alt = Color(0x1AF4F1FA) // 10% de Base100 (lavanda claro)
 val ChirpBase0 = Color(0xFFFFFFFF)
 
 // Red Colors
