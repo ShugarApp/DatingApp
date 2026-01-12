@@ -45,6 +45,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dating.core.designsystem.components.avatar.AvatarSize
 import com.dating.core.designsystem.components.avatar.ChirpAvatarPhoto
+import com.dating.core.designsystem.components.cards.AccessCardItem
+import com.dating.core.designsystem.components.cards.AccessCardList
 import com.dating.core.designsystem.theme.extended
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -126,66 +128,34 @@ fun ProfileScreen(
             Spacer(modifier = Modifier.height(32.dp))
 
             // 4. SAFETY & LEGAL
-            ProfileSectionGroup(title = "SAFETY & LEGAL") {
-                ProfileMenuListItem(
+            AccessCardList(title = "SAFETY & LEGAL") {
+                AccessCardItem(
                     icon = Icons.Default.Security,
-                    text = "Safety Center",
-                    showChevron = true,
+                    title = "Safety Center",
                     onClick = { /* Todo */ }
                 )
-                ProfileMenuListItem(
+                AccessCardItem(
                     icon = Icons.Default.Lock, // Or Gavel/Policy
-                    text = "Privacy Policy",
-                    showChevron = true,
+                    title = "Privacy Policy",
                     onClick = { /* Todo */ }
                 )
             }
             Spacer(modifier = Modifier.height(24.dp))
 
             // 4. SUPPORT
-            ProfileSectionGroup(title = "SUPPORT") {
-                ProfileMenuListItem(
+            AccessCardList(title = "SUPPORT") {
+                AccessCardItem(
                     icon = Icons.Default.Help,
-                    text = "Help & Support",
-                    showChevron = true,
+                    title = "Help & Support",
                     onClick = { /* Todo */ }
                 )
-                ProfileMenuListItem(
+                AccessCardItem(
                     icon = Icons.Default.Favorite, // Heart/Hand
-                    text = "Community Guidelines",
-                    showChevron = true,
+                    title = "Community Guidelines",
                     onClick = { /* Todo */ }
                 )
             }
             Spacer(modifier = Modifier.padding(bottom = 30.dp))
-        }
-    }
-}
-
-@Composable
-fun ProfileSectionGroup(
-    title: String,
-    content: @Composable ColumnScope.() -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-    ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.labelSmall,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(start = 4.dp, bottom = 8.dp)
-        )
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(16.dp))
-                .background(MaterialTheme.colorScheme.surface)
-        ) {
-            content()
         }
     }
 }
@@ -230,55 +200,5 @@ fun ProfileDashboardCard(
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.extended.textPrimary
         )
-    }
-}
-
-@Composable
-fun ProfileMenuListItem(
-    icon: ImageVector,
-    text: String,
-    showChevron: Boolean = false,
-    onClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() }
-            .padding(horizontal = 16.dp, vertical = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // Icon with colored background square/squircle if needed, or simple icon
-        // Image implies icon in colored squircle
-        Box(
-            modifier = Modifier
-                .size(36.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(MaterialTheme.colorScheme.primaryContainer), // Slightly lighter than card
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary, // Helper or fixed
-                modifier = Modifier.size(18.dp)
-            )
-        }
-
-        Spacer(modifier = Modifier.width(16.dp))
-
-        Text(
-            text = text,
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.extended.textPrimary ,
-            modifier = Modifier.weight(1f)
-        )
-        if (showChevron) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary
-            )
-        }
     }
 }
