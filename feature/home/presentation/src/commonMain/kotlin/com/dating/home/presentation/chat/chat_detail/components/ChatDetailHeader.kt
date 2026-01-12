@@ -45,7 +45,6 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun ChatDetailHeader(
     chatUi: ChatUi?,
-    isDetailPresent: Boolean,
     isChatOptionsDropDownOpen: Boolean,
     onChatOptionsClick: () -> Unit,
     onDismissChatOptions: () -> Unit,
@@ -61,17 +60,15 @@ fun ChatDetailHeader(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        if (!isDetailPresent) {
-            ChirpIconButton(
-                onClick = onBackClick
-            ) {
-                Icon(
-                    imageVector = vectorResource(DesignSystemRes.drawable.arrow_left_icon),
-                    contentDescription = stringResource(Res.string.go_back),
-                    modifier = Modifier.size(20.dp),
-                    tint = MaterialTheme.colorScheme.extended.textSecondary
-                )
-            }
+        ChirpIconButton(
+            onClick = onBackClick
+        ) {
+            Icon(
+                imageVector = vectorResource(DesignSystemRes.drawable.arrow_left_icon),
+                contentDescription = stringResource(Res.string.go_back),
+                modifier = Modifier.size(20.dp),
+                tint = MaterialTheme.colorScheme.extended.textSecondary
+            )
         }
 
         if (chatUi != null) {
@@ -133,7 +130,6 @@ fun ChatDetailHeaderPreview() {
         ) {
             TopAppBarGeneric {
                 ChatDetailHeader(
-                    isDetailPresent = false,
                     isChatOptionsDropDownOpen = true,
                     chatUi = ChatUi(
                         id = "1",

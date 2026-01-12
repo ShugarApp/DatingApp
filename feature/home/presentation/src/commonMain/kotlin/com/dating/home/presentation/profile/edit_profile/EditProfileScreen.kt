@@ -56,11 +56,11 @@ import com.dating.core.designsystem.components.brand.ChirpHorizontalDivider
 import com.dating.core.designsystem.components.buttons.AppButtonStyle
 import com.dating.core.designsystem.components.buttons.ChirpButton
 import com.dating.core.designsystem.components.dialogs.DestructiveConfirmationDialog
+import com.dating.core.designsystem.components.header.AppCenterTopBar
 import com.dating.core.designsystem.components.textfields.ChirpPasswordTextField
 import com.dating.core.designsystem.components.textfields.ChirpTextField
 import com.dating.core.designsystem.theme.extended
 import com.dating.core.presentation.util.clearFocusOnTap
-import com.dating.home.presentation.profile.components.ProfileSectionLayout
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -83,25 +83,9 @@ fun EditProfileScreen(
     Scaffold(
         modifier = modifier,
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Editar Perfil",
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Atrás"
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                )
+            AppCenterTopBar(
+                title = "Editar Perfil",
+                onBack = onBack
             )
         }
     ) { paddingValues ->

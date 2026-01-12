@@ -43,6 +43,7 @@ import com.dating.core.designsystem.components.buttons.ChirpButton
 import com.dating.core.designsystem.components.cards.AccessCardItem
 import com.dating.core.designsystem.components.cards.AccessCardList
 import com.dating.core.designsystem.components.dialogs.DestructiveConfirmationDialog
+import com.dating.core.designsystem.components.header.AppCenterTopBar
 import com.dating.core.designsystem.theme.extended
 import com.dating.core.presentation.util.ObserveAsEvents
 import org.jetbrains.compose.resources.stringResource
@@ -68,27 +69,9 @@ fun SettingsScreen(
         modifier = modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        text = "Settings",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.extended.textPrimary
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = MaterialTheme.colorScheme.extended.textPrimary
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                )
+            AppCenterTopBar(
+                title = "Settings",
+                onBack = onBack,
             )
         }
     ) { paddingValues ->

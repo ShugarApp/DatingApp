@@ -30,7 +30,6 @@ fun NavGraphBuilder.homeGraph(
             val route = backStackEntry.toRoute<HomeGraphRoutes.ChatDetailRoute>()
             ChatDetailRoot(
                 chatId = route.chatId,
-                isDetailPresent = true,
                 onBack = { navController.popBackStack() },
                 onChatMembersClick = {
                     // TODO: Handle this navigation if needed, or pass a callback

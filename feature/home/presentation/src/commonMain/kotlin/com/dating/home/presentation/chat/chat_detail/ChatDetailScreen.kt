@@ -77,7 +77,6 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun ChatDetailRoot(
     chatId: String?,
-    isDetailPresent: Boolean,
     onBack: () -> Unit,
     onChatMembersClick: () -> Unit,
     viewModel: ChatDetailViewModel = koinViewModel()
@@ -114,7 +113,7 @@ fun ChatDetailRoot(
     }
 
     BackHandler(
-        enabled = !isDetailPresent
+        enabled = true
     ) {
         scope.launch {
             // Add artificial delay to prevent detail back animation from showing
@@ -128,7 +127,6 @@ fun ChatDetailRoot(
     ChatDetailScreen(
         state = state,
         messageListState = messageListState,
-        isDetailPresent = isDetailPresent,
         onAction = { action ->
             when (action) {
                 is ChatDetailAction.OnChatMembersClick -> onChatMembersClick()
@@ -145,7 +143,6 @@ fun ChatDetailRoot(
 fun ChatDetailScreen(
     state: ChatDetailState,
     messageListState: LazyListState,
-    isDetailPresent: Boolean,
     snackbarState: SnackbarHostState,
     onAction: (ChatDetailAction) -> Unit,
 ) {
@@ -243,7 +240,6 @@ fun ChatDetailScreen(
                         ) {
                             ChatDetailHeader(
                                 chatUi = state.chatUi,
-                                isDetailPresent = isDetailPresent,
                                 isChatOptionsDropDownOpen = state.isChatOptionsOpen,
                                 onChatOptionsClick = {
                                     onAction(ChatDetailAction.OnChatOptionsClick)
@@ -383,7 +379,6 @@ private fun ChatDetailEmptyPreview() {
     AppTheme {
         ChatDetailScreen(
             state = ChatDetailState(),
-            isDetailPresent = false,
             onAction = {},
             messageListState = rememberLazyListState(),
             snackbarState = remember { SnackbarHostState() }
@@ -454,7 +449,6 @@ private fun ChatDetailMessagesPreview() {
                     }
                 }
             ),
-            isDetailPresent = true,
             onAction = {},
             snackbarState = remember { SnackbarHostState() }
         )

@@ -82,10 +82,8 @@ fun ChatListDetailAdaptiveLayout(
         },
         detailPane = {
             AnimatedPane {
-                val listPane = scaffoldNavigator.scaffoldValue[ListDetailPaneScaffoldRole.List]
                 ChatDetailRoot(
                     chatId = sharedState.selectedChatId,
-                    isDetailPresent = detailPane == PaneAdaptedValue.Expanded && listPane == PaneAdaptedValue.Expanded,
                     onChatMembersClick = {
                         chatListDetailViewModel.onAction(ChatListDetailAction.OnManageChatClick)
                     },
