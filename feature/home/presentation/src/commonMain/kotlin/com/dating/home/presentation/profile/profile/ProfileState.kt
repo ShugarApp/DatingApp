@@ -10,7 +10,6 @@ data class ProfileState(
     val isUploadingImage: Boolean = false,
     val isDeletingImage: Boolean = false,
     val showDeleteConfirmationDialog: Boolean = false,
-    val showLogoutConfirmationDialog: Boolean = false,
     val imageError: UiText? = null,
     val emailTextState: TextFieldState = TextFieldState(),
     val currentPasswordTextState: TextFieldState = TextFieldState(),
@@ -22,7 +21,3 @@ data class ProfileState(
     val canChangePassword: Boolean = false,
     val isPasswordChangeSuccessful: Boolean = false
 )
-
-sealed interface ProfileEvent {
-    data object OnLogoutSuccess: ProfileEvent
-}

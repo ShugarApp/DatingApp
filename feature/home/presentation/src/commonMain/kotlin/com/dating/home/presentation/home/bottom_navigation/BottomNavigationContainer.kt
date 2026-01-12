@@ -17,7 +17,6 @@ import com.dating.home.presentation.profile.profile.ProfileScreen
 
 @Composable
 fun BottomNavigationContainer(
-    onLogout: () -> Unit,
     onNavigateToProfile: (String) -> Unit,
     onEditProfile: () -> Unit,
     onSettings: () -> Unit,
@@ -41,7 +40,7 @@ fun BottomNavigationContainer(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(bottom = paddingValues.calculateBottomPadding())
         ) {
             when (selectedSection) {
                 BottomNavSection.FEED -> {
@@ -58,7 +57,6 @@ fun BottomNavigationContainer(
 
                 BottomNavSection.PROFILE -> {
                     ProfileScreen(
-                        onLogout = onLogout,
                         onEditProfile = onEditProfile,
                         onSettings = onSettings,
                         onVerification = onVerification,

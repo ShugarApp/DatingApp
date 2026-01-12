@@ -43,7 +43,6 @@ fun NavGraphBuilder.homeGraph(
             )
         ) { backStackEntry ->
             BottomNavigationContainer(
-                onLogout = onLogout,
                 onNavigateToProfile = { userId ->
                     navController.navigate(HomeGraphRoutes.ProfileDetailRoute(userId))
                 },

@@ -40,9 +40,6 @@ class ProfileViewModel(
 
     private var hasLoadedInitialData = false
 
-    private val _events = Channel<ProfileEvent>()
-    val events = _events.receiveAsFlow()
-
     private val _state = MutableStateFlow(ProfileState())
     val state = combine(
         _state,
@@ -79,34 +76,7 @@ class ProfileViewModel(
             is ProfileAction.OnDeletePictureClick -> showDeleteConfirmation()
             is ProfileAction.OnConfirmDeleteClick -> deleteProfilePicture()
             is ProfileAction.OnDismissDeleteConfirmationDialogClick -> dismissDeleteConfirmation()
-            ProfileAction.OnLogoutClick -> showLogoutConfirmation()
-            ProfileAction.OnConfirmLogoutClick -> logout()
-            ProfileAction.OnDismissLogoutConfirmationDialogClick -> dismissLogoutConfirmation()
             else -> Unit
-        }
-    }
-
-    private fun showLogoutConfirmation() {
-        _state.update { it.copy(
-            showLogoutConfirmationDialog = true
-        ) }
-    }
-
-    private fun dismissLogoutConfirmation() {
-        _state.update { it.copy(
-            showLogoutConfirmationDialog = false
-        ) }
-    }
-
-    private fun logout() {
-        dismissLogoutConfirmation()
-        viewModelScope.launch {
-            val authInfo = sessionStorage.observeAuthInfo().first()
-            val refreshToken = authInfo?.refreshToken ?: return@launch
-            
-            authService.logout(refreshToken)
-            sessionStorage.set(null)
-            _events.send(ProfileEvent.OnLogoutSuccess)
         }
     }
 

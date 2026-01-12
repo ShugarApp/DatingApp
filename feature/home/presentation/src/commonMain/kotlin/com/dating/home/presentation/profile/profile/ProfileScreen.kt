@@ -43,23 +43,14 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import aura.feature.home.presentation.generated.resources.Res
-import aura.feature.home.presentation.generated.resources.cancel
-import aura.feature.home.presentation.generated.resources.do_you_want_to_logout
-import aura.feature.home.presentation.generated.resources.do_you_want_to_logout_desc
-import aura.feature.home.presentation.generated.resources.logout
 import com.dating.core.designsystem.components.avatar.AvatarSize
 import com.dating.core.designsystem.components.avatar.ChirpAvatarPhoto
-import com.dating.core.designsystem.components.dialogs.DestructiveConfirmationDialog
 import com.dating.core.designsystem.theme.extended
-import com.dating.core.presentation.util.ObserveAsEvents
-import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
-    onLogout: () -> Unit,
     onEditProfile: () -> Unit,
     onSettings: () -> Unit,
     onVerification: () -> Unit,
@@ -69,14 +60,8 @@ fun ProfileScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    ObserveAsEvents(viewModel.events) { event ->
-        when (event) {
-            ProfileEvent.OnLogoutSuccess -> onLogout()
-        }
-    }
-
     Scaffold(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize().padding(top = 32.dp),
         containerColor = MaterialTheme.colorScheme.background,
     ) { paddingValues ->
         Column(
@@ -104,7 +89,6 @@ fun ProfileScreen(
             Text(
                 text = "${state.username}, 26",
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.extended.textPrimary
             )
             Spacer(modifier = Modifier.height(32.dp))
@@ -117,24 +101,24 @@ fun ProfileScreen(
                 ProfileDashboardCard(
                     icon = Icons.Default.Edit,
                     text = "Edit Profile",
-                    iconColor = Color(0xFFE91E63), // Pinkish
-                    iconBgColor = Color(0xFF2D0C18), // Dark Pink bg
+                    iconColor = MaterialTheme.colorScheme.primary,
+                    iconBgColor = MaterialTheme.colorScheme.primaryContainer,
                     onClick = onEditProfile,
                     modifier = Modifier.weight(1f)
                 )
                 ProfileDashboardCard(
                     icon = Icons.Default.Verified, // Boost/Bolt icon
                     text = "Verify",
-                    iconColor = Color(0xFF9C27B0), // Purple
-                    iconBgColor = Color(0xFF1F0A2B), // Dark Purple bg
+                    iconColor = MaterialTheme.colorScheme.primary,
+                    iconBgColor = MaterialTheme.colorScheme.primaryContainer,
                     onClick = onVerification,
                     modifier = Modifier.weight(1f)
                 )
                 ProfileDashboardCard(
                     icon = Icons.Default.Settings,
                     text = "Settings",
-                    iconColor = Color(0xFFFFFFFF), // White/Grey
-                    iconBgColor = Color(0xFF2C2C2C), // Dark Grey bg
+                    iconColor = MaterialTheme.colorScheme.primary,
+                    iconBgColor = MaterialTheme.colorScheme.primaryContainer,
                     onClick = onSettings,
                     modifier = Modifier.weight(1f)
                 )
@@ -175,24 +159,6 @@ fun ProfileScreen(
             }
             Spacer(modifier = Modifier.padding(bottom = 30.dp))
         }
-
-        if (state.showLogoutConfirmationDialog) {
-            DestructiveConfirmationDialog(
-                title = stringResource(Res.string.do_you_want_to_logout),
-                description = stringResource(Res.string.do_you_want_to_logout_desc),
-                confirmButtonText = stringResource(Res.string.logout),
-                cancelButtonText = stringResource(Res.string.cancel),
-                onDismiss = {
-                    viewModel.onAction(ProfileAction.OnDismissLogoutConfirmationDialogClick)
-                },
-                onCancelClick = {
-                    viewModel.onAction(ProfileAction.OnDismissLogoutConfirmationDialogClick)
-                },
-                onConfirmClick = {
-                    viewModel.onAction(ProfileAction.OnConfirmLogoutClick)
-                },
-            )
-        }
     }
 }
 
@@ -210,14 +176,14 @@ fun ProfileSectionGroup(
             text = title,
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.extended.textPlaceholder,
+            color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(start = 4.dp, bottom = 8.dp)
         )
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(16.dp))
-                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)) // Dark Card Bg
+                .background(MaterialTheme.colorScheme.surface)
         ) {
             content()
         }
@@ -239,7 +205,7 @@ fun ProfileDashboardCard(
         modifier = modifier
             .aspectRatio(1f) // Square-ish
             .clip(RoundedCornerShape(24.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+            .background(MaterialTheme.colorScheme.surface)
             .clickable { onClick() }
             .padding(8.dp)
     ) {
@@ -262,7 +228,7 @@ fun ProfileDashboardCard(
             text = text,
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.extended.textPrimary
         )
     }
 }
@@ -287,13 +253,13 @@ fun ProfileMenuListItem(
             modifier = Modifier
                 .size(36.dp)
                 .clip(RoundedCornerShape(8.dp))
-                .background(MaterialTheme.colorScheme.surface), // Slightly lighter than card
+                .background(MaterialTheme.colorScheme.primaryContainer), // Slightly lighter than card
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant, // Helper or fixed
+                tint = MaterialTheme.colorScheme.primary, // Helper or fixed
                 modifier = Modifier.size(18.dp)
             )
         }
@@ -304,14 +270,14 @@ fun ProfileMenuListItem(
             text = text,
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurface,
+            color = MaterialTheme.colorScheme.extended.textPrimary ,
             modifier = Modifier.weight(1f)
         )
         if (showChevron) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                tint = MaterialTheme.colorScheme.primary
             )
         }
     }
