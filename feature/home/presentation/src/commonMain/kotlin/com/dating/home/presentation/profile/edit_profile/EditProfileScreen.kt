@@ -49,8 +49,8 @@ import aura.feature.home.presentation.generated.resources.save
 import aura.feature.home.presentation.generated.resources.upload_image
 import com.dating.home.presentation.profile.components.ProfileSectionLayout
 import com.dating.home.presentation.profile.mediapicker.rememberImagePickerLauncher
-import com.dating.home.presentation.profile.profile_hub.ProfileViewModel
-import com.dating.home.presentation.profile.profile_hub.ProfileAction
+import com.dating.home.presentation.profile.profile.ProfileViewModel
+import com.dating.home.presentation.profile.profile.ProfileAction
 import com.dating.core.designsystem.components.avatar.AvatarSize
 import com.dating.core.designsystem.components.avatar.ChirpAvatarPhoto
 import com.dating.core.designsystem.components.brand.ChirpHorizontalDivider

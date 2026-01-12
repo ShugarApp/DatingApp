@@ -5,8 +5,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.dating.auth.presentation.navigation.AuthGraphRoutes
 import com.dating.auth.presentation.navigation.authGraph
-import com.dating.home.presentation.navigation.HomeGraphRoutes
-import com.dating.home.presentation.navigation.homeGraph
+import com.dating.home.presentation.home.navigation.HomeGraphRoutes
+import com.dating.home.presentation.home.navigation.homeGraph
 
 @Composable
 fun NavigationRoot(
@@ -20,7 +20,7 @@ fun NavigationRoot(
         authGraph(
             navController = navController,
             onLoginSuccess = {
-                navController.navigate(HomeGraphRoutes.Graph) {
+                navController.navigate(HomeGraphRoutes.Home) {
                     popUpTo(AuthGraphRoutes.Graph) {
                         inclusive = true
                     }
@@ -31,7 +31,7 @@ fun NavigationRoot(
             navController = navController,
             onLogout = {
                 navController.navigate(AuthGraphRoutes.Graph) {
-                    popUpTo(HomeGraphRoutes.Graph) {
+                    popUpTo(HomeGraphRoutes.Home) {
                         inclusive = true
                     }
                 }

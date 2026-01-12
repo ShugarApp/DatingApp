@@ -7,7 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import com.dating.auth.presentation.navigation.AuthGraphRoutes
-import com.dating.home.presentation.navigation.HomeGraphRoutes
+import com.dating.home.presentation.home.navigation.HomeGraphRoutes
 import com.dating.aura.navigation.DeepLinkListener
 import com.dating.aura.navigation.NavigationRoot
 import com.dating.core.designsystem.theme.AppTheme
@@ -51,7 +51,7 @@ fun App(
             NavigationRoot(
                 navController = navController,
                 startDestination = if(state.isLoggedIn) {
-                    HomeGraphRoutes.Graph
+                    HomeGraphRoutes.Home
                 } else {
                     AuthGraphRoutes.Graph
                 }
