@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import aura.core.designsystem.generated.resources.Res as DesignSystemRes
 import aura.core.designsystem.generated.resources.arrow_left_icon
 import aura.core.designsystem.generated.resources.dots_icon
 import aura.core.designsystem.generated.resources.log_out_icon
@@ -27,20 +28,19 @@ import aura.feature.chat.presentation.generated.resources.open_chat_options_menu
 import aura.feature.chat.presentation.generated.resources.users_icon
 import com.dating.chat.domain.models.ChatMessage
 import com.dating.chat.domain.models.ChatMessageDeliveryStatus
-import com.dating.chat.presentation.components.ChatHeader
 import com.dating.chat.presentation.components.ChatItemHeaderRow
 import com.dating.chat.presentation.model.ChatUi
 import com.dating.core.designsystem.components.avatar.ChatParticipantUi
 import com.dating.core.designsystem.components.buttons.ChirpIconButton
 import com.dating.core.designsystem.components.dropdown.ChirpDropDownMenu
 import com.dating.core.designsystem.components.dropdown.DropDownItem
+import com.dating.core.designsystem.components.header.TopAppBarGeneric
 import com.dating.core.designsystem.theme.AppTheme
 import com.dating.core.designsystem.theme.extended
+import kotlin.time.Clock
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import kotlin.time.Clock
-import aura.core.designsystem.generated.resources.Res as DesignSystemRes
 
 @Composable
 fun ChatDetailHeader(
@@ -48,7 +48,7 @@ fun ChatDetailHeader(
     isDetailPresent: Boolean,
     isChatOptionsDropDownOpen: Boolean,
     onChatOptionsClick: () -> Unit,
-    onDismissChatOptions: ()  -> Unit,
+    onDismissChatOptions: () -> Unit,
     onManageChatClick: () -> Unit,
     onLeaveChatClick: () -> Unit,
     onBackClick: () -> Unit,
@@ -57,13 +57,11 @@ fun ChatDetailHeader(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(
-                color = MaterialTheme.colorScheme.surface
-            ),
+            .background(color = MaterialTheme.colorScheme.surface),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        if(!isDetailPresent) {
+        if (!isDetailPresent) {
             ChirpIconButton(
                 onClick = onBackClick
             ) {
@@ -76,7 +74,7 @@ fun ChatDetailHeader(
             }
         }
 
-        if(chatUi != null) {
+        if (chatUi != null) {
             val isGroupChat = chatUi.otherParticipants.size > 1
             ChatItemHeaderRow(
                 chat = chatUi,
@@ -133,7 +131,7 @@ fun ChatDetailHeaderPreview() {
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            ChatHeader {
+            TopAppBarGeneric {
                 ChatDetailHeader(
                     isDetailPresent = false,
                     isChatOptionsDropDownOpen = true,
@@ -160,7 +158,7 @@ fun ChatDetailHeaderPreview() {
                             id = "1",
                             chatId = "1",
                             content = "This is a last chat message that was sent by Philipp " +
-                                    "and goes over multiple lines to showcase the ellipsis",
+                                "and goes over multiple lines to showcase the ellipsis",
                             createdAt = Clock.System.now(),
                             senderId = "1",
                             deliveryStatus = ChatMessageDeliveryStatus.SENT

@@ -1,4 +1,4 @@
-package com.dating.chat.presentation.components
+package com.dating.core.designsystem.components.header
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,13 +12,13 @@ import androidx.compose.ui.unit.dp
 import com.dating.core.designsystem.components.brand.ChirpHorizontalDivider
 
 @Composable
-fun ChatHeader(
+fun TopAppBarGeneric(
     modifier: Modifier = Modifier,
+    divider: Boolean = true,
     content: @Composable () -> Unit
 ) {
     Column(
-        modifier = modifier
-            .fillMaxWidth()
+        modifier = modifier.fillMaxWidth()
     ) {
         Box(
             modifier = Modifier
@@ -32,6 +32,6 @@ fun ChatHeader(
         ) {
             content()
         }
-        ChirpHorizontalDivider()
+        if (divider) ChirpHorizontalDivider()
     }
 }

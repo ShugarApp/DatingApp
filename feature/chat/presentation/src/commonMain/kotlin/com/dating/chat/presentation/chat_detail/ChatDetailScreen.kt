@@ -53,7 +53,7 @@ import com.dating.chat.presentation.chat_detail.components.MessageBannerListener
 import com.dating.chat.presentation.chat_detail.components.MessageBox
 import com.dating.chat.presentation.chat_detail.components.MessageList
 import com.dating.chat.presentation.chat_detail.components.PaginationScrollListener
-import com.dating.chat.presentation.components.ChatHeader
+import com.dating.core.designsystem.components.header.TopAppBarGeneric
 import com.dating.chat.presentation.components.EmptySection
 import com.dating.chat.presentation.model.ChatUi
 import com.dating.chat.presentation.model.MessageUi
@@ -209,7 +209,6 @@ fun ChatDetailScreen(
         Box(
             modifier = Modifier
                 .clearFocusOnTap()
-                .padding(innerPadding)
                 .then(
                     if (configuration.isWideScreen) {
                         Modifier.padding(horizontal = 8.dp)
@@ -233,7 +232,8 @@ fun ChatDetailScreen(
                                 .fillMaxSize()
                         )
                     } else {
-                        ChatHeader(
+                        TopAppBarGeneric(
+                            divider = true,
                             modifier = Modifier
                                 .onSizeChanged {
                                     headerHeight = with(density) {

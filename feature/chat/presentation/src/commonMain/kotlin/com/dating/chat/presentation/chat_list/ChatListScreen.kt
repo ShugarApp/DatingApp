@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -30,7 +31,7 @@ import aura.feature.chat.presentation.generated.resources.Res
 import aura.feature.chat.presentation.generated.resources.create_chat
 import aura.feature.chat.presentation.generated.resources.no_chats
 import aura.feature.chat.presentation.generated.resources.no_chats_subtitle
-import com.dating.chat.presentation.chat_list.components.ChatListHeader
+import com.dating.core.designsystem.components.header.MainTopAppBar
 import com.dating.chat.presentation.chat_list.components.ChatListItemUi
 import com.dating.chat.presentation.components.EmptySection
 import com.dating.core.designsystem.components.brand.ChirpHorizontalDivider
@@ -72,6 +73,7 @@ fun ChatListRoot(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatListScreen(
     state: ChatListState,
@@ -102,11 +104,11 @@ fun ChatListScreen(
         }
     ) { innerPadding ->
         Column(
-            modifier = Modifier.fillMaxSize().padding(top = 16.dp),
+            modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            ChatListHeader()
+            MainTopAppBar(title = "Chats")
             when {
                 state.isLoading -> {
                     CircularProgressIndicator(
