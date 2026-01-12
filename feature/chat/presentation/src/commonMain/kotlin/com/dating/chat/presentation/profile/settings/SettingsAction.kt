@@ -1,4 +1,4 @@
-package com.dating.chat.presentation.profile
+package com.dating.chat.presentation.profile.settings
 
 sealed interface SettingsAction {
     data object OnLogoutClick: SettingsAction

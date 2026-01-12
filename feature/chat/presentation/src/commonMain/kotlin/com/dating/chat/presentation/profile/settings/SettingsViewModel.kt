@@ -1,4 +1,4 @@
-package com.dating.chat.presentation.profile
+package com.dating.chat.presentation.profile.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

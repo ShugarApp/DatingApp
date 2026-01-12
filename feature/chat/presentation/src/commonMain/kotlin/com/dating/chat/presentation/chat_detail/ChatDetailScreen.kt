@@ -64,15 +64,15 @@ import com.dating.core.presentation.util.ObserveAsEvents
 import com.dating.core.presentation.util.UiText
 import com.dating.core.presentation.util.clearFocusOnTap
 import com.dating.core.presentation.util.currentDeviceConfiguration
+import kotlin.time.Clock
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
-import kotlin.time.Clock
-import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
 
 @Composable
 fun ChatDetailRoot(
@@ -108,7 +108,7 @@ fun ChatDetailRoot(
     }
 
     LaunchedEffect(chatId) {
-        if(chatId != null) {
+        if (chatId != null) {
             messageListState.scrollToItem(0)
         }
     }
@@ -196,8 +196,7 @@ fun ChatDetailScreen(
     val density = LocalDensity.current
 
     Scaffold(
-        modifier = Modifier
-            .fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         containerColor = if (!configuration.isWideScreen) {
             MaterialTheme.colorScheme.surface
         } else {
@@ -346,7 +345,7 @@ fun ChatDetailScreen(
                 enter = fadeIn(),
                 exit = fadeOut()
             ) {
-                if(state.bannerState.formattedDate != null) {
+                if (state.bannerState.formattedDate != null) {
                     DateChip(
                         date = state.bannerState.formattedDate.asString()
                     )
@@ -426,7 +425,7 @@ private fun ChatDetailMessagesPreview() {
                         id = "1",
                         chatId = "1",
                         content = "This is a last chat message that was sent by Philipp " +
-                                "and goes over multiple lines to showcase the ellipsis",
+                            "and goes over multiple lines to showcase the ellipsis",
                         createdAt = Clock.System.now(),
                         senderId = "1",
                         deliveryStatus = ChatMessageDeliveryStatus.SENT

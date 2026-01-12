@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import com.dating.chat.presentation.chat_list_detail.ChatListDetailAdaptiveLayout
 import com.dating.chat.presentation.feed.FeedRoot
 import com.dating.chat.presentation.matches.MatchesRoot
-import com.dating.chat.presentation.profile.ProfileScreen
+import com.dating.chat.presentation.profile.profile_hub.ProfileScreen
 
 @Composable
 fun BottomNavigationContainer(
@@ -47,19 +47,19 @@ fun BottomNavigationContainer(
         ) {
             when (selectedSection) {
                 BottomNavSection.FEED -> {
-                    FeedRoot(
-                        onNavigateToProfile = onNavigateToProfile
-                    )
+                    FeedRoot(onNavigateToProfile = onNavigateToProfile)
                 }
+
                 BottomNavSection.MATCHES -> {
                     MatchesRoot()
                 }
+
                 BottomNavSection.MESSAGES -> {
                     ChatListDetailAdaptiveLayout(
                         initialChatId = null,
-                        onLogout = onLogout
                     )
                 }
+
                 BottomNavSection.PROFILE -> {
                     ProfileScreen(
                         onLogout = onLogout,

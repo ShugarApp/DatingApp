@@ -1,4 +1,4 @@
-package com.dating.chat.presentation.profile
+package com.dating.chat.presentation.profile.profile_hub
 
 import androidx.compose.foundation.text.input.TextFieldState
 import com.dating.core.presentation.util.UiText

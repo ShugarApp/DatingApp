@@ -54,11 +54,6 @@ class ChatListDetailViewModel(
                     ) }
                 }
             }
-            ChatListDetailAction.OnProfileSettingsClick -> {
-                _state.update { it.copy(
-                    dialogState = DialogState.Profile
-                ) }
-            }
         }
     }
 }

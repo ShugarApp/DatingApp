@@ -22,7 +22,6 @@ import com.dating.chat.presentation.chat_detail.ChatDetailRoot
 import com.dating.chat.presentation.chat_list.ChatListRoot
 import com.dating.chat.presentation.create_chat.CreateChatRoot
 import com.dating.chat.presentation.manage_chat.ManageChatRoot
-import com.dating.chat.presentation.profile.ProfileDetailRoot
 import com.dating.core.designsystem.theme.extended
 import com.dating.core.presentation.util.DialogSheetScopedViewModel
 import kotlinx.coroutines.launch
@@ -31,7 +30,6 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun ChatListDetailAdaptiveLayout(
     initialChatId: String?,
-    onLogout: () -> Unit,
     chatListDetailViewModel: ChatListDetailViewModel = koinViewModel()
 ) {
     val sharedState by chatListDetailViewModel.state.collectAsStateWithLifecycle()
@@ -42,7 +40,7 @@ fun ChatListDetailAdaptiveLayout(
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(initialChatId) {
-        if(initialChatId != null) {
+        if (initialChatId != null) {
             chatListDetailViewModel.onAction(ChatListDetailAction.OnSelectChat(initialChatId))
             scaffoldNavigator.navigateTo(ListDetailPaneScaffoldRole.Detail)
         }
@@ -57,7 +55,7 @@ fun ChatListDetailAdaptiveLayout(
 
     val detailPane = scaffoldNavigator.scaffoldValue[ListDetailPaneScaffoldRole.Detail]
     LaunchedEffect(detailPane, sharedState.selectedChatId) {
-        if(detailPane == PaneAdaptedValue.Hidden && sharedState.selectedChatId != null) {
+        if (detailPane == PaneAdaptedValue.Hidden && sharedState.selectedChatId != null) {
             chatListDetailViewModel.onAction(ChatListDetailAction.OnSelectChat(null))
         }
     }
@@ -65,8 +63,7 @@ fun ChatListDetailAdaptiveLayout(
     ListDetailPaneScaffold(
         directive = scaffoldDirective,
         value = scaffoldNavigator.scaffoldValue,
-        modifier = Modifier
-            .background(MaterialTheme.colorScheme.extended.surfaceLower),
+        modifier = Modifier.background(MaterialTheme.colorScheme.extended.surfaceLower),
         listPane = {
             AnimatedPane {
                 ChatListRoot(
@@ -79,13 +76,9 @@ fun ChatListDetailAdaptiveLayout(
                             )
                         }
                     },
-                    onSuccessfulLogout = onLogout,
                     onCreateChatClick = {
                         chatListDetailViewModel.onAction(ChatListDetailAction.OnCreateChatClick)
-                    },
-                    onProfileSettingsClick = {
-                        chatListDetailViewModel.onAction(ChatListDetailAction.OnProfileSettingsClick)
-                    },
+                    }
                 )
             }
         },
@@ -100,7 +93,7 @@ fun ChatListDetailAdaptiveLayout(
                     },
                     onBack = {
                         scope.launch {
-                            if(scaffoldNavigator.canNavigateBack()) {
+                            if (scaffoldNavigator.canNavigateBack()) {
                                 scaffoldNavigator.navigateBack()
                             }
                         }
@@ -135,16 +128,6 @@ fun ChatListDetailAdaptiveLayout(
             onMembersAdded = {
                 chatListDetailViewModel.onAction(ChatListDetailAction.OnDismissCurrentDialog)
             },
-            onDismiss = {
-                chatListDetailViewModel.onAction(ChatListDetailAction.OnDismissCurrentDialog)
-            }
-        )
-    }
-
-    DialogSheetScopedViewModel(
-        visible = sharedState.dialogState is DialogState.Profile
-    ) {
-        ProfileDetailRoot(
             onDismiss = {
                 chatListDetailViewModel.onAction(ChatListDetailAction.OnDismissCurrentDialog)
             }

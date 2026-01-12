@@ -22,17 +22,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import aura.feature.chat.presentation.generated.resources.Res
-import aura.feature.chat.presentation.generated.resources.cancel
 import aura.feature.chat.presentation.generated.resources.create_chat
-import aura.feature.chat.presentation.generated.resources.do_you_want_to_logout
-import aura.feature.chat.presentation.generated.resources.do_you_want_to_logout_desc
-import aura.feature.chat.presentation.generated.resources.logout
 import aura.feature.chat.presentation.generated.resources.no_chats
 import aura.feature.chat.presentation.generated.resources.no_chats_subtitle
 import com.dating.chat.presentation.chat_list.components.ChatListHeader
@@ -40,13 +35,10 @@ import com.dating.chat.presentation.chat_list.components.ChatListItemUi
 import com.dating.chat.presentation.components.EmptySection
 import com.dating.core.designsystem.components.brand.ChirpHorizontalDivider
 import com.dating.core.designsystem.components.buttons.ChirpFloatingActionButton
-import com.dating.core.designsystem.components.dialogs.DestructiveConfirmationDialog
 import com.dating.core.designsystem.theme.AppTheme
 import com.dating.core.designsystem.theme.extended
 import com.dating.core.presentation.permissions.Permission
 import com.dating.core.presentation.permissions.rememberPermissionController
-import com.dating.core.presentation.util.ObserveAsEvents
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
@@ -55,9 +47,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun ChatListRoot(
     selectedChatId: String?,
     onChatClick: (String?) -> Unit,
-    onSuccessfulLogout: () -> Unit,
     onCreateChatClick: () -> Unit,
-    onProfileSettingsClick: () -> Unit,
     viewModel: ChatListViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -68,27 +58,12 @@ fun ChatListRoot(
         viewModel.onAction(ChatListAction.OnSelectChat(selectedChatId))
     }
 
-    val scope = rememberCoroutineScope()
-    ObserveAsEvents(viewModel.events) { event ->
-        when(event) {
-            is ChatListEvent.OnLogoutError -> {
-                scope.launch {
-                    snackbarHostState.showSnackbar(
-                        message = event.error.asStringAsync()
-                    )
-                }
-            }
-            ChatListEvent.OnLogoutSuccess -> onSuccessfulLogout()
-        }
-    }
-
     ChatListScreen(
         state = state,
         onAction = { action ->
-            when(action) {
+            when (action) {
                 is ChatListAction.OnSelectChat -> onChatClick(action.chatId)
                 ChatListAction.OnCreateChatClick -> onCreateChatClick()
-                ChatListAction.OnProfileSettingsClick -> onProfileSettingsClick()
                 else -> Unit
             }
             viewModel.onAction(action)
@@ -109,8 +84,7 @@ fun ChatListScreen(
     }
 
     Scaffold(
-        modifier = Modifier
-            .fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.extended.surfaceLower,
         contentWindowInsets = WindowInsets.safeDrawing,
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -128,34 +102,18 @@ fun ChatListScreen(
         }
     ) { innerPadding ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
+            modifier = Modifier.fillMaxSize().padding(top = 16.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            ChatListHeader(
-                localParticipant = state.localParticipant,
-                isUserMenuOpen = state.isUserMenuOpen,
-                onUserAvatarClick = {
-                    onAction(ChatListAction.OnUserAvatarClick)
-                },
-                onLogoutClick = {
-                    onAction(ChatListAction.OnLogoutClick)
-                },
-                onDismissMenu = {
-                    onAction(ChatListAction.OnDismissUserMenu)
-                },
-                onProfileSettingsClick = {
-                    onAction(ChatListAction.OnProfileSettingsClick)
-                }
-            )
+            ChatListHeader()
             when {
                 state.isLoading -> {
                     CircularProgressIndicator(
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
+
                 state.chats.isEmpty() -> {
                     EmptySection(
                         title = stringResource(Res.string.no_chats),
@@ -168,6 +126,7 @@ fun ChatListScreen(
                             )
                     )
                 }
+
                 else -> {
                     LazyColumn(
                         modifier = Modifier
@@ -193,24 +152,6 @@ fun ChatListScreen(
                 }
             }
         }
-    }
-
-    if(state.showLogoutConfirmation) {
-        DestructiveConfirmationDialog(
-            title = stringResource(Res.string.do_you_want_to_logout),
-            description = stringResource(Res.string.do_you_want_to_logout_desc),
-            confirmButtonText = stringResource(Res.string.logout),
-            cancelButtonText = stringResource(Res.string.cancel),
-            onDismiss = {
-                onAction(ChatListAction.OnDismissLogoutDialog)
-            },
-            onCancelClick = {
-                onAction(ChatListAction.OnDismissLogoutDialog)
-            },
-            onConfirmClick = {
-                onAction(ChatListAction.OnConfirmLogout)
-            },
-        )
     }
 }
 

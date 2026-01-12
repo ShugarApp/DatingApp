@@ -7,6 +7,8 @@ import androidx.navigation.navDeepLink
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import com.dating.chat.presentation.bottom_navigation.BottomNavigationContainer
+import com.dating.chat.presentation.profile.edit_profile.EditProfileScreen
+import com.dating.chat.presentation.profile.settings.SettingsScreen
 import com.dating.chat.presentation.profile_detail.ProfileDetailScreen
 import kotlinx.serialization.Serializable
 
@@ -105,14 +107,14 @@ fun NavGraphBuilder.chatGraph(
         }
 
         composable<ChatGraphRoutes.EditProfileRoute> {
-            com.dating.chat.presentation.profile.EditProfileScreen(
+            EditProfileScreen(
                 onBack = { navController.popBackStack() }
             )
         }
         
         
         composable<ChatGraphRoutes.SettingsRoute> {
-            com.dating.chat.presentation.profile.SettingsScreen(
+            SettingsScreen(
                 onBack = { navController.popBackStack() },
                 onLogout = onLogout
             )

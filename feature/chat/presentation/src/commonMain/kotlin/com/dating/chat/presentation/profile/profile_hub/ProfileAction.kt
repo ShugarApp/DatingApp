@@ -1,4 +1,4 @@
-package com.dating.chat.presentation.profile
+package com.dating.chat.presentation.profile.profile_hub
 
 sealed interface ProfileAction {
     data object OnDismiss: ProfileAction

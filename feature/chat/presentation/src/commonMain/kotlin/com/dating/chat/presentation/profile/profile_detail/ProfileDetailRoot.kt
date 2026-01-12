@@ -1,4 +1,4 @@
-package com.dating.chat.presentation.profile
+package com.dating.chat.presentation.profile.profile_detail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.draganddrop.dragAndDropTarget
@@ -50,6 +50,9 @@ import com.dating.chat.presentation.profile.components.ProfileHeaderSection
 import com.dating.chat.presentation.profile.components.ProfileSectionLayout
 import com.dating.chat.presentation.profile.mediapicker.rememberDragAndDropTarget
 import com.dating.chat.presentation.profile.mediapicker.rememberImagePickerLauncher
+import com.dating.chat.presentation.profile.profile_hub.ProfileAction
+import com.dating.chat.presentation.profile.profile_hub.ProfileState
+import com.dating.chat.presentation.profile.profile_hub.ProfileViewModel
 import com.dating.core.designsystem.components.avatar.AvatarSize
 import com.dating.core.designsystem.components.avatar.ChirpAvatarPhoto
 import com.dating.core.designsystem.components.brand.ChirpHorizontalDivider
@@ -188,8 +191,8 @@ fun ProfileDetailScreen(
                         },
                         style = AppButtonStyle.DESTRUCTIVE_SECONDARY,
                         enabled = !state.isUploadingImage
-                                && !state.isDeletingImage
-                                && state.profilePictureUrl != null,
+                            && !state.isDeletingImage
+                            && state.profilePictureUrl != null,
                         isLoading = state.isDeletingImage,
                         leadingIcon = {
                             Icon(
@@ -278,7 +281,7 @@ fun ProfileDetailScreen(
         if(deviceConfiguration in listOf(
                 DeviceConfiguration.MOBILE_PORTRAIT,
                 DeviceConfiguration.MOBILE_LANDSCAPE
-        )) {
+            )) {
             Spacer(modifier = Modifier.weight(1f))
         }
     }

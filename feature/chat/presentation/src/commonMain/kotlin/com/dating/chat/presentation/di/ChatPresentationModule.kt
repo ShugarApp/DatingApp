@@ -7,8 +7,8 @@ import com.dating.chat.presentation.create_chat.CreateChatViewModel
 import com.dating.chat.presentation.feed.FeedViewModel
 import com.dating.chat.presentation.manage_chat.ManageChatViewModel
 import com.dating.chat.presentation.matches.MatchesViewModel
-import com.dating.chat.presentation.profile.ProfileViewModel
-import com.dating.chat.presentation.profile.SettingsViewModel
+import com.dating.chat.presentation.profile.profile_hub.ProfileViewModel
+import com.dating.chat.presentation.profile.settings.SettingsViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 

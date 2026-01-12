@@ -1,4 +1,4 @@
-package com.dating.chat.presentation.profile
+package com.dating.chat.presentation.profile.edit_profile
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -49,6 +49,8 @@ import aura.feature.chat.presentation.generated.resources.save
 import aura.feature.chat.presentation.generated.resources.upload_image
 import com.dating.chat.presentation.profile.components.ProfileSectionLayout
 import com.dating.chat.presentation.profile.mediapicker.rememberImagePickerLauncher
+import com.dating.chat.presentation.profile.profile_hub.ProfileViewModel
+import com.dating.chat.presentation.profile.profile_hub.ProfileAction
 import com.dating.core.designsystem.components.avatar.AvatarSize
 import com.dating.core.designsystem.components.avatar.ChirpAvatarPhoto
 import com.dating.core.designsystem.components.brand.ChirpHorizontalDivider
