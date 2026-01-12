@@ -8,6 +8,7 @@ import com.dating.chat.presentation.feed.FeedViewModel
 import com.dating.chat.presentation.manage_chat.ManageChatViewModel
 import com.dating.chat.presentation.matches.MatchesViewModel
 import com.dating.chat.presentation.profile.ProfileViewModel
+import com.dating.chat.presentation.profile.SettingsViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
@@ -18,6 +19,7 @@ val chatPresentationModule = module {
     viewModelOf(::ChatDetailViewModel)
     viewModelOf(::ManageChatViewModel)
     viewModelOf(::ProfileViewModel)
+    viewModelOf(::SettingsViewModel)
     viewModelOf(::FeedViewModel)
     viewModelOf(::MatchesViewModel)
 }

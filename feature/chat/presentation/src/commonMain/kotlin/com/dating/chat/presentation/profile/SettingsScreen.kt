@@ -69,13 +69,13 @@ fun SettingsScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: ProfileViewModel = koinViewModel()
+    viewModel: SettingsViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     ObserveAsEvents(viewModel.events) { event ->
         when(event) {
-            ProfileEvent.OnLogoutSuccess -> onLogout()
+            SettingsEvent.OnLogoutSuccess -> onLogout()
         }
     }
 
@@ -190,7 +190,7 @@ fun SettingsScreen(
             // Logout Button
             ChirpButton(
                 text = stringResource(Res.string.logout),
-                onClick = { viewModel.onAction(ProfileAction.OnLogoutClick) },
+                onClick = { viewModel.onAction(SettingsAction.OnLogoutClick) },
                 style = AppButtonStyle.DESTRUCTIVE_SECONDARY,
                 leadingIcon = {
                      Icon(
@@ -222,13 +222,13 @@ fun SettingsScreen(
                 confirmButtonText = stringResource(Res.string.logout),
                 cancelButtonText = stringResource(Res.string.cancel),
                 onDismiss = {
-                    viewModel.onAction(ProfileAction.OnDismissLogoutConfirmationDialogClick)
+                    viewModel.onAction(SettingsAction.OnDismissLogoutConfirmationDialogClick)
                 },
                 onCancelClick = {
-                    viewModel.onAction(ProfileAction.OnDismissLogoutConfirmationDialogClick)
+                    viewModel.onAction(SettingsAction.OnDismissLogoutConfirmationDialogClick)
                 },
                 onConfirmClick = {
-                    viewModel.onAction(ProfileAction.OnConfirmLogoutClick)
+                    viewModel.onAction(SettingsAction.OnConfirmLogoutClick)
                 },
             )
         }
