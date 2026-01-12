@@ -30,6 +30,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun ChatListDetailAdaptiveLayout(
     initialChatId: String?,
+    onNavigateToChatDetail: (String) -> Unit,
     chatListDetailViewModel: ChatListDetailViewModel = koinViewModel()
 ) {
     val sharedState by chatListDetailViewModel.state.collectAsStateWithLifecycle()
@@ -68,12 +69,9 @@ fun ChatListDetailAdaptiveLayout(
             AnimatedPane {
                 ChatListRoot(
                     selectedChatId = sharedState.selectedChatId,
-                    onChatClick = {
-                        chatListDetailViewModel.onAction(ChatListDetailAction.OnSelectChat(it))
-                        scope.launch {
-                            scaffoldNavigator.navigateTo(
-                                ListDetailPaneScaffoldRole.Detail
-                            )
+                    onChatClick = { chatId ->
+                        if (chatId != null) {
+                            onNavigateToChatDetail(chatId)
                         }
                     },
                     onCreateChatClick = {
@@ -109,10 +107,7 @@ fun ChatListDetailAdaptiveLayout(
         CreateChatRoot(
             onChatCreated = { chat ->
                 chatListDetailViewModel.onAction(ChatListDetailAction.OnDismissCurrentDialog)
-                chatListDetailViewModel.onAction(ChatListDetailAction.OnSelectChat(chat.id))
-                scope.launch {
-                    scaffoldNavigator.navigateTo(ListDetailPaneScaffoldRole.Detail)
-                }
+                onNavigateToChatDetail(chat.id)
             },
             onDismiss = {
                 chatListDetailViewModel.onAction(ChatListDetailAction.OnDismissCurrentDialog)

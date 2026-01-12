@@ -10,6 +10,7 @@ import com.dating.home.presentation.home.bottom_navigation.BottomNavigationConta
 import com.dating.home.presentation.profile.edit_profile.EditProfileScreen
 import com.dating.home.presentation.profile.settings.SettingsScreen
 import com.dating.home.presentation.detail.ProfileDetailScreen
+import com.dating.home.presentation.chat.chat_detail.ChatDetailRoot
 
 fun NavGraphBuilder.homeGraph(
     navController: NavController,
@@ -19,32 +20,31 @@ fun NavGraphBuilder.homeGraph(
         startDestination = HomeGraphRoutes.BottomNavContainer(null)
         //startDestination = HomeGraphRoutes.ChatListDetailRoute(null)
     ) {
-        /*
-        composable<HomeGraphRoutes.ChatListDetailRoute>(
+        composable<HomeGraphRoutes.ChatDetailRoute>(
             deepLinks = listOf(
                 navDeepLink {
                     uriPattern = "chirp://chat_detail/{chatId}"
                 }
             )
         ) { backStackEntry ->
-            val route = backStackEntry.toRoute<HomeGraphRoutes.ChatListDetailRoute>()
-            ChatListDetailAdaptiveLayout(
-                initialChatId = route.chatId,
-                onLogout = onLogout
+            val route = backStackEntry.toRoute<HomeGraphRoutes.ChatDetailRoute>()
+            ChatDetailRoot(
+                chatId = route.chatId,
+                isDetailPresent = true,
+                onBack = { navController.popBackStack() },
+                onChatMembersClick = {
+                    // TODO: Handle this navigation if needed, or pass a callback
+                }
             )
         }
-        */
 
-        composable<HomeGraphRoutes.BottomNavContainer>(
-            deepLinks = listOf(
-                navDeepLink {
-                    uriPattern = "chirp://chat_detail/{chatId}"
-                }
-            )
-        ) { backStackEntry ->
+        composable<HomeGraphRoutes.BottomNavContainer> { backStackEntry ->
             BottomNavigationContainer(
                 onNavigateToProfile = { userId ->
                     navController.navigate(HomeGraphRoutes.ProfileDetailRoute(userId))
+                },
+                onNavigateToChatDetail = { chatId ->
+                    navController.navigate(HomeGraphRoutes.ChatDetailRoute(chatId))
                 },
                 onEditProfile = {
                     navController.navigate(HomeGraphRoutes.EditProfileRoute)

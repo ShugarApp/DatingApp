@@ -12,10 +12,8 @@ sealed interface HomeGraphRoutes {
     @Serializable
     data class ProfileDetailRoute(val userId: String) : HomeGraphRoutes
 
-    /*
     @Serializable
-    data class ChatListDetailRoute(val chatId: String? = null) : HomeGraphRoutes
-    */
+    data class ChatDetailRoute(val chatId: String? = null) : HomeGraphRoutes
 
     @Serializable
     data object EditProfileRoute : HomeGraphRoutes

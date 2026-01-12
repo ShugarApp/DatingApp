@@ -18,6 +18,7 @@ import com.dating.home.presentation.profile.profile.ProfileScreen
 @Composable
 fun BottomNavigationContainer(
     onNavigateToProfile: (String) -> Unit,
+    onNavigateToChatDetail: (String) -> Unit,
     onEditProfile: () -> Unit,
     onSettings: () -> Unit,
     onVerification: () -> Unit,
@@ -52,7 +53,10 @@ fun BottomNavigationContainer(
                 }
 
                 BottomNavSection.MESSAGES -> {
-                    ChatListDetailAdaptiveLayout(initialChatId = null, )
+                    ChatListDetailAdaptiveLayout(
+                        initialChatId = null,
+                        onNavigateToChatDetail = onNavigateToChatDetail
+                    )
                 }
 
                 BottomNavSection.PROFILE -> {
