@@ -22,7 +22,7 @@ import com.dating.chat.presentation.chat_detail.ChatDetailRoot
 import com.dating.chat.presentation.chat_list.ChatListRoot
 import com.dating.chat.presentation.create_chat.CreateChatRoot
 import com.dating.chat.presentation.manage_chat.ManageChatRoot
-import com.dating.chat.presentation.profile.ProfileRoot
+import com.dating.chat.presentation.profile.ProfileDetailRoot
 import com.dating.core.designsystem.theme.extended
 import com.dating.core.presentation.util.DialogSheetScopedViewModel
 import kotlinx.coroutines.launch
@@ -144,7 +144,7 @@ fun ChatListDetailAdaptiveLayout(
     DialogSheetScopedViewModel(
         visible = sharedState.dialogState is DialogState.Profile
     ) {
-        ProfileRoot(
+        ProfileDetailRoot(
             onDismiss = {
                 chatListDetailViewModel.onAction(ChatListDetailAction.OnDismissCurrentDialog)
             }

@@ -55,6 +55,10 @@ import aura.feature.chat.presentation.generated.resources.do_you_want_to_logout
 import aura.feature.chat.presentation.generated.resources.do_you_want_to_logout_desc
 import aura.feature.chat.presentation.generated.resources.logout
 import com.dating.core.designsystem.components.dialogs.DestructiveConfirmationDialog
+import com.dating.core.designsystem.theme.extended
+import com.dating.core.designsystem.components.buttons.ChirpButton
+import com.dating.core.designsystem.components.buttons.AppButtonStyle
+import androidx.compose.ui.text.style.TextAlign
 import com.dating.core.presentation.util.ObserveAsEvents
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -77,7 +81,7 @@ fun SettingsScreen(
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        containerColor = Color(0xFF101010), // Ultra dark background
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
@@ -85,7 +89,7 @@ fun SettingsScreen(
                         text = "Settings",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                 },
                 navigationIcon = {
@@ -93,12 +97,12 @@ fun SettingsScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = Color.White
+                            tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color(0xFF101010)
+                    containerColor = MaterialTheme.colorScheme.background
                 )
             )
         }
@@ -120,62 +124,31 @@ fun SettingsScreen(
             ) {
                 Column {
                     Text(
-                        text = state.username, // Display actual username
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        text = state.username,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onBackground
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.Verified,
-                            contentDescription = null,
-                            tint = Color(0xFF00BFFF), // Cyan/Blue
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = "Verified Profile",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Color(0xFF888888)
-                        )
-                    }
                 }
+
+                Spacer(modifier = Modifier.weight(1f))
                 
-                // Premium Badge
-                Surface(
-                    color = Color(0xFF003333), // Dark Teal
-                    shape = RoundedCornerShape(50),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF008080))
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Verified, // Placeholder for medal/premium icon
-                            contentDescription = null,
-                            tint = Color(0xFF00CED1),
-                            modifier = Modifier.size(14.dp)
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = "PREMIUM",
-                            style = MaterialTheme.typography.labelSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF00CED1)
-                        )
-                    }
+                IconButton(onClick = onBack) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack, // Standard icon
+                        contentDescription = "Back",
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
                 }
             }
 
-            Spacer(modifier = Modifier.height(30.dp))
+            Spacer(modifier = Modifier.height(24.dp))
             
             Text(
                 text = "ACCOUNT SETTINGS",
-                style = MaterialTheme.typography.labelMedium,
-                color = Color(0xFF666666),
-                fontWeight = FontWeight.SemiBold
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.extended.textPlaceholder,
+                fontWeight = FontWeight.Bold
             )
             
             Spacer(modifier = Modifier.height(16.dp))
@@ -186,8 +159,8 @@ fun SettingsScreen(
                     icon = Icons.Default.Star,
                     title = "Manage Subscription",
                     subtitle = "PRO PLAN ACTIVE",
-                    subtitleColor = Color(0xFF00CED1),
-                    iconBgColor = Color(0xFF1A2626) // Dark Tealish
+                    subtitleColor = MaterialTheme.colorScheme.extended.accentTeal,
+                    iconBgColor = MaterialTheme.colorScheme.surfaceVariant
                 )
                 SettingsItem(
                     icon = Icons.Default.Security,
@@ -215,41 +188,31 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(40.dp))
 
             // Logout Button
-            Button(
+            ChirpButton(
+                text = stringResource(Res.string.logout),
                 onClick = { viewModel.onAction(ProfileAction.OnLogoutClick) },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF220000), // Very dark red
-                    contentColor = Color(0xFFFF4444)
-                ),
-                shape = RoundedCornerShape(16.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-                    .padding(bottom = 8.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF440000))
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
+                style = AppButtonStyle.DESTRUCTIVE_SECONDARY,
+                leadingIcon = {
+                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.Logout,
                         contentDescription = null,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(18.dp)
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "Log Out",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+            
+            Spacer(modifier = Modifier.height(16.dp))
             
             Text(
                 text = "VERSION 2.4.0 (1024)",
-                modifier = Modifier.fillMaxWidth().padding(bottom = 20.dp),
-                color = Color(0xFF444444),
                 style = MaterialTheme.typography.labelSmall,
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                color = MaterialTheme.colorScheme.extended.textDisabled,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
             )
+            
+            Spacer(modifier = Modifier.height(16.dp))
         }
         
         if(state.showLogoutConfirmationDialog) {
@@ -278,16 +241,16 @@ fun SettingsItem(
     title: String,
     subtitle: String? = null,
     subtitleColor: Color = Color.Unspecified,
-    iconBgColor: Color = Color(0xFF1E1E1E), // Default Dark Grey
+    iconBgColor: Color = MaterialTheme.colorScheme.surfaceVariant,
     badgeCount: Int? = null,
     onClick: () -> Unit = {}
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(72.dp)
+            .height(60.dp)
             .clip(RoundedCornerShape(16.dp))
-            .background(Color(0xFF111111)) // Slightly lighter than bg
+            .background(MaterialTheme.colorScheme.surface)
             .clickable { onClick() }
             .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -295,7 +258,7 @@ fun SettingsItem(
         // Icon Box
         Box(
             modifier = Modifier
-                .size(40.dp)
+                .size(36.dp)
                 .clip(CircleShape)
                 .background(iconBgColor),
             contentAlignment = Alignment.Center
@@ -303,8 +266,8 @@ fun SettingsItem(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = Color(0xFFCCCCCC),
-                modifier = Modifier.size(20.dp)
+                tint = MaterialTheme.colorScheme.extended.textSecondary,
+                modifier = Modifier.size(18.dp)
             )
         }
         
@@ -314,8 +277,8 @@ fun SettingsItem(
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Medium,
-                color = Color.White
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface
             )
             if (subtitle != null) {
                 Spacer(modifier = Modifier.height(2.dp))
@@ -333,14 +296,14 @@ fun SettingsItem(
                 modifier = Modifier
                     .size(24.dp)
                     .clip(CircleShape)
-                    .background(Color(0xFF00CED1)),
+                    .background(MaterialTheme.colorScheme.extended.accentTeal),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = badgeCount.toString(),
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
             Spacer(modifier = Modifier.width(12.dp))
@@ -349,7 +312,7 @@ fun SettingsItem(
         Icon(
             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
             contentDescription = null,
-            tint = Color(0xFF444444)
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }
