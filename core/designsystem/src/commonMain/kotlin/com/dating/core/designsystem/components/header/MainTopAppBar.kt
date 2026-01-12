@@ -27,7 +27,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun MainTopAppBar(
     title: String,
-    containerColor: Color = MaterialTheme.colorScheme.surface,
+    containerColor: Color = MaterialTheme.colorScheme.background,
 ) {
     TopAppBarGeneric(
         divider = false,
@@ -41,7 +41,7 @@ fun MainTopAppBar(
             Icon(
                 imageVector = vectorResource(DesignSystemRes.drawable.logo_chirp),
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.tertiary
+                tint = MaterialTheme.colorScheme.primary
             )
             Text(
                 text = title,

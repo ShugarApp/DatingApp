@@ -5,19 +5,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -25,7 +20,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -58,7 +52,7 @@ fun FeedScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
+                .padding(top = paddingValues.calculateTopPadding()),
             contentAlignment = Alignment.Center
         ) {
             if (state.isLoading) {
@@ -71,13 +65,13 @@ fun FeedScreen(
                 // So we want state.feedItems[0] to be on top? No, usually 0 is current.
                 // In a Box, later children cover earlier ones.
                 // So we should iterate reversed, or just take the first few and draw them in reverse order.
-                
+
                 val visibleItems = state.feedItems.take(3).reversed()
-                
+
                 visibleItems.forEach { feedItem ->
                     // Only the top card (last in this reversed list, so index 0 of original list) is swipeable
                     val isTopCard = feedItem == state.feedItems.first()
-                    
+
                     if (isTopCard) {
                         SwipeableCard(
                             onSwipeLeft = { onAction(FeedAction.OnPass(feedItem.id)) },
@@ -93,12 +87,10 @@ fun FeedScreen(
                         // Background cards (not swipeable)
                         Card(
                             modifier = Modifier
-                                .padding(16.dp)
-                                .offset(y = 10.dp), // Slight offset for stack effect
-                             colors = CardDefaults.cardColors(
+                                .padding(16.dp),
+                            colors = CardDefaults.cardColors(
                                 containerColor = MaterialTheme.colorScheme.surfaceContainer
-                            ),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                            )
                         ) {
                             FeedCardContent(feedItem = feedItem, onClick = {})
                         }
@@ -128,84 +120,45 @@ fun FeedCardContent(
                 .fillMaxWidth()
                 .background(Color.LightGray)
         ) {
-             if (feedItem.imageUrl != null) {
+            if (feedItem.imageUrl != null) {
                 AsyncImage(
                     model = feedItem.imageUrl,
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )
-             } else {
-                 // Placeholder
-                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                     Icon(
-                         imageVector = Icons.Default.Info, 
-                         contentDescription = null,
-                         modifier = Modifier.size(64.dp),
-                         tint = Color.Gray
-                     )
-                 }
-             }
-             
-             // Name Overlay
-             Column(
-                 modifier = Modifier
-                     .align(Alignment.BottomStart)
-                     .fillMaxWidth()
-                     .background(Color.Black.copy(alpha = 0.4f))
-                     .padding(16.dp)
-             ) {
-                 Text(
-                     text = "${feedItem.userName}, 25", // Hardcoded age for now as it's not in model
-                     style = MaterialTheme.typography.headlineMedium,
-                     color = Color.White,
-                     fontWeight = FontWeight.Bold
-                 )
-                 Text(
-                     text = feedItem.content,
-                     style = MaterialTheme.typography.bodyMedium,
-                     color = Color.White.copy(alpha = 0.8f),
-                     maxLines = 2,
-                     overflow = TextOverflow.Ellipsis
-                 )
-             }
-        }
-        
-        // Action Buttons Area
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(
-                onClick = { /* Pass action logic handled by parent swipe */ },
-                modifier = Modifier
-                    .size(60.dp)
-                    .background(Color.White, CircleShape)
-                    .padding(4.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = "Pass",
-                    tint = Color.Red,
-                    modifier = Modifier.size(32.dp)
-                )
+            } else {
+                // Placeholder
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = Icons.Default.Info,
+                        contentDescription = null,
+                        modifier = Modifier.size(64.dp),
+                        tint = Color.Gray
+                    )
+                }
             }
-            
-            IconButton(
-                onClick = { /* Like action logic handled by parent swipe */ },
+
+            // Name Overlay
+            Column(
                 modifier = Modifier
-                    .size(60.dp)
-                    .background(Color.White, CircleShape)
-                    .padding(4.dp)
+                    .align(Alignment.BottomStart)
+                    .fillMaxWidth()
+                    .background(Color.Black.copy(alpha = 0.4f))
+                    .padding(16.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Default.Favorite,
-                    contentDescription = "Like",
-                    tint = Color.Green,
-                    modifier = Modifier.size(32.dp)
+                Text(
+                    text = "${feedItem.userName}, 25",
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = feedItem.content,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.White.copy(alpha = 0.8f),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }
