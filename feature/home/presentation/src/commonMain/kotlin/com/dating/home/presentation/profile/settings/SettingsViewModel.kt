@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 
 class SettingsViewModel(
     private val authService: AuthService,
-    private val sessionStorage: SessionStorage,
+    private val sessionStorage: SessionStorage
 ) : ViewModel() {
 
     private val _events = Channel<SettingsEvent>()
@@ -27,7 +27,7 @@ class SettingsViewModel(
         _state,
         sessionStorage.observeAuthInfo()
     ) { currentState, authInfo ->
-        if(authInfo != null) {
+        if (authInfo != null) {
             currentState.copy(
                 username = authInfo.user.username
             )
@@ -48,15 +48,19 @@ class SettingsViewModel(
     }
 
     private fun showLogoutConfirmation() {
-        _state.update { it.copy(
-            showLogoutConfirmationDialog = true
-        ) }
+        _state.update {
+            it.copy(
+                showLogoutConfirmationDialog = true
+            )
+        }
     }
 
     private fun dismissLogoutConfirmation() {
-        _state.update { it.copy(
-            showLogoutConfirmationDialog = false
-        ) }
+        _state.update {
+            it.copy(
+                showLogoutConfirmationDialog = false
+            )
+        }
     }
 
     private fun logout() {
@@ -64,7 +68,6 @@ class SettingsViewModel(
         viewModelScope.launch {
             val authInfo = sessionStorage.observeAuthInfo().first()
             val refreshToken = authInfo?.refreshToken ?: return@launch
-            
             authService.logout(refreshToken)
             sessionStorage.set(null)
             _events.send(SettingsEvent.OnLogoutSuccess)

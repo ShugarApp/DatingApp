@@ -234,7 +234,7 @@ fun ChatDetailScreen(
                     } else {
                         TopAppBarGeneric(
                             divider = true,
-                            modifier = Modifier
+                            modifier = Modifier.padding(top = 32.dp)
                                 .onSizeChanged {
                                     headerHeight = with(density) {
                                         it.height.toDp()

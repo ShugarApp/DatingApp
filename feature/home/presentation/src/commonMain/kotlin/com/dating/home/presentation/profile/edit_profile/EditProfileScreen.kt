@@ -47,7 +47,6 @@ import aura.feature.home.presentation.generated.resources.password_hint
 import aura.feature.home.presentation.generated.resources.profile_image
 import aura.feature.home.presentation.generated.resources.save
 import aura.feature.home.presentation.generated.resources.upload_image
-import com.dating.home.presentation.profile.components.ProfileSectionLayout
 import com.dating.home.presentation.profile.mediapicker.rememberImagePickerLauncher
 import com.dating.home.presentation.profile.profile.ProfileViewModel
 import com.dating.home.presentation.profile.profile.ProfileAction
@@ -61,6 +60,7 @@ import com.dating.core.designsystem.components.textfields.ChirpPasswordTextField
 import com.dating.core.designsystem.components.textfields.ChirpTextField
 import com.dating.core.designsystem.theme.extended
 import com.dating.core.presentation.util.clearFocusOnTap
+import com.dating.home.presentation.profile.components.ProfileSectionLayout
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -109,7 +109,7 @@ fun EditProfileScreen(
             modifier = Modifier
                 .clearFocusOnTap()
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(top = paddingValues.calculateTopPadding())
                 .background(MaterialTheme.colorScheme.surface)
                 .verticalScroll(rememberScrollState())
         ) {
