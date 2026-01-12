@@ -1,0 +1,16 @@
+package com.dating.home.domain.participant
+
+import com.dating.home.domain.models.ChatParticipant
+import com.dating.core.domain.util.DataError
+import com.dating.core.domain.util.EmptyResult
+import com.dating.core.domain.util.Result
+
+interface ChatParticipantRepository {
+    suspend fun fetchLocalParticipant(): Result<ChatParticipant, DataError>
+    suspend fun uploadProfilePicture(
+        imageBytes: ByteArray,
+        mimeType: String
+    ): EmptyResult<DataError.Remote>
+
+    suspend fun deleteProfilePicture(): EmptyResult<DataError.Remote>
+}

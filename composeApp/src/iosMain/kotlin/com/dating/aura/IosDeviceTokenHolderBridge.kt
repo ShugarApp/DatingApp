@@ -1,6 +1,6 @@
 package com.dating.aura
 
-import com.dating.chat.data.notification.IosDeviceTokenHolder
+import com.dating.home.data.notification.IosDeviceTokenHolder
 
 object IosDeviceTokenHolderBridge {
     fun updateToken(token: String) {

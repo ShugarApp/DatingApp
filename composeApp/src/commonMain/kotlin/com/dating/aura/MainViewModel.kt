@@ -2,8 +2,8 @@ package com.dating.aura
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dating.chat.domain.notification.DeviceTokenService
-import com.dating.chat.domain.notification.PushNotificationService
+import com.dating.home.domain.notification.DeviceTokenService
+import com.dating.home.domain.notification.PushNotificationService
 import com.dating.core.data.util.PlatformUtils
 import com.dating.core.domain.auth.SessionStorage
 import kotlinx.coroutines.channels.Channel

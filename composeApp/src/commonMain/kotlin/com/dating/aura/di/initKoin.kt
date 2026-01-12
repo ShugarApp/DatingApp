@@ -1,8 +1,8 @@
 package com.dating.aura.di
 
 import com.dating.auth.presentation.di.authPresentationModule
-import com.dating.chat.data.di.chatDataModule
-import com.dating.chat.presentation.di.chatPresentationModule
+import com.dating.home.data.di.homeDataModule
+import com.dating.home.presentation.di.homePresentationModule
 import com.dating.core.data.di.coreDataModule
 import com.dating.core.presentation.di.corePresentationModule
 import org.koin.core.context.startKoin
@@ -15,9 +15,9 @@ fun initKoin(config: KoinAppDeclaration? = null) {
             coreDataModule,
             authPresentationModule,
             appModule,
-            chatPresentationModule,
+            homePresentationModule,
             corePresentationModule,
-            chatDataModule
+            homeDataModule
         )
     }
 }

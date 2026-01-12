@@ -1,7 +1,7 @@
 package com.dating.aura
 
 import androidx.compose.ui.window.Notification
-import com.dating.chat.data.notification.DesktopNotifier
+import com.dating.home.data.notification.DesktopNotifier
 import com.dating.aura.windows.WindowState
 import com.dating.core.domain.preferences.ThemePreference
 import com.dating.core.domain.preferences.ThemePreferences

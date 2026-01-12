@@ -26,10 +26,10 @@ kotlin {
             implementation(projects.feature.auth.domain)
             implementation(projects.feature.auth.presentation)
 
-            implementation(projects.feature.chat.data)
-            implementation(projects.feature.chat.database)
-            implementation(projects.feature.chat.domain)
-            implementation(projects.feature.chat.presentation)
+            implementation(projects.feature.home.data)
+            implementation(projects.feature.home.database)
+            implementation(projects.feature.home.domain)
+            implementation(projects.feature.home.presentation)
 
             implementation(libs.jetbrains.compose.navigation)
             implementation(libs.bundles.koin.common)
