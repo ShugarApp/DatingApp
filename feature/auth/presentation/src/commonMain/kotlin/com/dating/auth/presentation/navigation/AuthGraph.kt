@@ -8,6 +8,7 @@ import androidx.navigation.navigation
 import com.dating.auth.presentation.email_verification.EmailVerificationRoot
 import com.dating.auth.presentation.forgot_password.ForgotPasswordRoot
 import com.dating.auth.presentation.login.LoginRoot
+import com.dating.auth.presentation.onboarding.OnboardingScreen
 import com.dating.auth.presentation.register.RegisterRoot
 import com.dating.auth.presentation.register_success.RegisterSuccessRoot
 import com.dating.auth.presentation.reset_password.ResetPasswordRoot
@@ -17,8 +18,18 @@ fun NavGraphBuilder.authGraph(
     onLoginSuccess: () -> Unit,
 ) {
     navigation<AuthGraphRoutes.Graph>(
-        startDestination = AuthGraphRoutes.Login
+        startDestination = AuthGraphRoutes.Onboarding
     ) {
+        composable<AuthGraphRoutes.Onboarding> {
+            OnboardingScreen(
+                onLoginClick = {
+                    navController.navigate(AuthGraphRoutes.Login)
+                },
+                onCreateAccountClick = {
+                    navController.navigate(AuthGraphRoutes.Register)
+                }
+            )
+        }
         composable<AuthGraphRoutes.Login> {
             LoginRoot(
                 onLoginSuccess = onLoginSuccess,
@@ -91,7 +102,11 @@ fun NavGraphBuilder.authGraph(
             )
         }
         composable<AuthGraphRoutes.ForgotPassword> {
-            ForgotPasswordRoot()
+            ForgotPasswordRoot(
+                onBackClick = {
+                    navController.popBackStack()
+                }
+            )
         }
         composable<AuthGraphRoutes.ResetPassword>(
             deepLinks = listOf(

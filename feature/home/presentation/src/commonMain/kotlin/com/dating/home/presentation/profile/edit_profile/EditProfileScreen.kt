@@ -83,8 +83,7 @@ fun EditProfileScreen(
                 ChirpButton(
                     text = "Save",
                     onClick = { onBack() },
-                    modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
-                    style = AppButtonStyle.PRIMARY_PURPLE
+                    modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth()
                 )
             }
         }

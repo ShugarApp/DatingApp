@@ -41,37 +41,42 @@ fun ChirpButton(
     isLoading: Boolean = false,
     leadingIcon: @Composable (() -> Unit)? = null
 ) {
-    val colors = when(style) {
+    val colors = when (style) {
         AppButtonStyle.PRIMARY -> ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.extended.textPrimary,
-            disabledContainerColor = MaterialTheme.colorScheme.extended.disabledFill,
-            disabledContentColor = MaterialTheme.colorScheme.extended.textDisabled
-        )
-        AppButtonStyle.PRIMARY_PURPLE -> ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.extended.textTertiary,
             disabledContainerColor = MaterialTheme.colorScheme.extended.disabledFill,
             disabledContentColor = MaterialTheme.colorScheme.extended.textDisabled
         )
+
+        AppButtonStyle.PRIMARY_PURPLE -> ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.extended.textPrimary,
+            disabledContainerColor = MaterialTheme.colorScheme.extended.disabledFill,
+            disabledContentColor = MaterialTheme.colorScheme.extended.textDisabled
+        )
+
         AppButtonStyle.DESTRUCTIVE_PRIMARY -> ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.error,
             contentColor = MaterialTheme.colorScheme.onError,
             disabledContainerColor = MaterialTheme.colorScheme.extended.disabledFill,
             disabledContentColor = MaterialTheme.colorScheme.extended.textDisabled
         )
+
         AppButtonStyle.SECONDARY -> ButtonDefaults.buttonColors(
             containerColor = Color.Transparent,
             contentColor = MaterialTheme.colorScheme.extended.textSecondary,
             disabledContainerColor = Color.Transparent,
             disabledContentColor = MaterialTheme.colorScheme.extended.textDisabled
         )
+
         AppButtonStyle.DESTRUCTIVE_SECONDARY -> ButtonDefaults.buttonColors(
             containerColor = Color.Transparent,
             contentColor = MaterialTheme.colorScheme.error,
             disabledContainerColor = Color.Transparent,
             disabledContentColor = MaterialTheme.colorScheme.extended.textDisabled
         )
+
         AppButtonStyle.TEXT -> ButtonDefaults.buttonColors(
             containerColor = Color.Transparent,
             contentColor = MaterialTheme.colorScheme.tertiary,
@@ -89,7 +94,7 @@ fun ChirpButton(
         style == AppButtonStyle.SECONDARY -> defaultBorderStroke
         style == AppButtonStyle.DESTRUCTIVE_PRIMARY && !enabled -> defaultBorderStroke
         style == AppButtonStyle.DESTRUCTIVE_SECONDARY -> {
-            val borderColor = if(enabled) {
+            val borderColor = if (enabled) {
                 MaterialTheme.colorScheme.extended.destructiveSecondaryOutline
             } else {
                 MaterialTheme.colorScheme.extended.disabledOutline
@@ -99,6 +104,7 @@ fun ChirpButton(
                 color = borderColor
             )
         }
+
         else -> null
     }
 
@@ -119,7 +125,7 @@ fun ChirpButton(
                 modifier = Modifier
                     .size(15.dp)
                     .alpha(
-                        alpha = if(isLoading) 1f else 0f
+                        alpha = if (isLoading) 1f else 0f
                     ),
                 strokeWidth = 1.5.dp,
                 color = Color.Black
@@ -131,7 +137,7 @@ fun ChirpButton(
                 ),
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.alpha(
-                    if(isLoading) 0f else 1f
+                    if (isLoading) 0f else 1f
                 )
             ) {
                 leadingIcon?.invoke()

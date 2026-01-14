@@ -46,7 +46,7 @@ fun ChirpTextField(
         BasicTextField(
             state = state,
             enabled = enabled,
-            lineLimits = if(singleLine) {
+            lineLimits = if (singleLine) {
                 TextFieldLineLimits.SingleLine
             } else {
                 TextFieldLineLimits.MultiLine(
@@ -55,7 +55,7 @@ fun ChirpTextField(
                 )
             },
             textStyle = MaterialTheme.typography.bodyMedium.copy(
-                color = if(enabled) {
+                color = if (enabled) {
                     MaterialTheme.colorScheme.onSurface
                 } else {
                     MaterialTheme.colorScheme.extended.textPlaceholder
@@ -69,11 +69,10 @@ fun ChirpTextField(
             modifier = styleModifier,
             decorator = { innerBox ->
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     contentAlignment = if (singleLine) Alignment.CenterStart else Alignment.TopStart
                 ) {
-                    if(state.text.isEmpty() && placeholder != null) {
+                    if (state.text.isEmpty() && placeholder != null) {
                         Text(
                             text = placeholder,
                             color = MaterialTheme.colorScheme.extended.textPlaceholder,

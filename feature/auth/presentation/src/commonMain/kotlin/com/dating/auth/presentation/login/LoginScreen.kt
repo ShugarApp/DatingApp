@@ -1,16 +1,25 @@
 package com.dating.auth.presentation.login
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -25,11 +34,11 @@ import aura.feature.auth.presentation.generated.resources.welcome_back
 import com.dating.core.designsystem.components.brand.AppBrandLogo
 import com.dating.core.designsystem.components.buttons.AppButtonStyle
 import com.dating.core.designsystem.components.buttons.ChirpButton
-import com.dating.core.designsystem.components.layouts.AppAdaptiveFormLayout
 import com.dating.core.designsystem.components.layouts.ChirpSnackbarScaffold
 import com.dating.core.designsystem.components.textfields.ChirpPasswordTextField
 import com.dating.core.designsystem.components.textfields.ChirpTextField
 import com.dating.core.designsystem.theme.AppTheme
+import com.dating.core.designsystem.theme.extended
 import com.dating.core.presentation.util.ObserveAsEvents
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -69,24 +78,47 @@ fun LoginScreen(
     onAction: (LoginAction) -> Unit,
 ) {
     ChirpSnackbarScaffold {
-        AppAdaptiveFormLayout(
-            headerText = stringResource(Res.string.welcome_back),
-            errorText = state.error?.asString(),
-            logo = {
-                AppBrandLogo()
-            },
-            modifier = Modifier.fillMaxSize()
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .verticalScroll(rememberScrollState()) // Enable scrolling
+                .padding(horizontal = 24.dp)
+                .imePadding(), // Padding for keyboard
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
+            // Logo
+            AppBrandLogo(
+                modifier = Modifier.size(80.dp)
+            )
+            
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Welcome Text
+            Text(
+                text = stringResource(Res.string.welcome_back),
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    fontWeight = FontWeight.Bold
+                ),
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+            
+            Spacer(modifier = Modifier.height(48.dp))
+
+            // Inputs
             ChirpTextField(
                 state = state.emailTextFieldState,
                 placeholder = stringResource(Res.string.email_placeholder),
                 keyboardType = KeyboardType.Email,
                 singleLine = true,
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.background),
                 title = stringResource(Res.string.email)
             )
+
             Spacer(modifier = Modifier.height(16.dp))
+
             ChirpPasswordTextField(
                 state = state.passwordTextFieldState,
                 placeholder = stringResource(Res.string.password),
@@ -95,22 +127,25 @@ fun LoginScreen(
                     onAction(LoginAction.OnTogglePasswordVisibility)
                 },
                 title = stringResource(Res.string.password),
-                modifier = Modifier
-                    .fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
             )
+
             Spacer(modifier = Modifier.height(8.dp))
+
             Text(
                 text = stringResource(Res.string.forgot_password),
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.tertiary,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.extended.textSecondary,
                 modifier = Modifier
                     .align(Alignment.End)
                     .clickable {
                         onAction(LoginAction.OnForgotPasswordClick)
                     }
             )
-            Spacer(modifier = Modifier.height(24.dp))
 
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Buttons
             ChirpButton(
                 text = stringResource(Res.string.login),
                 onClick = {
@@ -118,18 +153,18 @@ fun LoginScreen(
                 },
                 enabled = state.canLogin,
                 isLoading = state.isLoggingIn,
-                modifier = Modifier
-                    .fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(8.dp))
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             ChirpButton(
                 text = stringResource(Res.string.create_account),
                 onClick = {
                     onAction(LoginAction.OnSignUpClick)
                 },
                 style = AppButtonStyle.SECONDARY,
-                modifier = Modifier
-                    .fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
             )
         }
     }

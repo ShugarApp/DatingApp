@@ -23,4 +23,7 @@ sealed interface AuthGraphRoutes {
 
     @Serializable
     data class EmailVerification(val token: String): AuthGraphRoutes
+
+    @Serializable
+    data object Onboarding: AuthGraphRoutes
 }

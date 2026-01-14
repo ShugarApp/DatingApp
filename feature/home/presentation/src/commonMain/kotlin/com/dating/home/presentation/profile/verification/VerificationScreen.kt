@@ -128,8 +128,7 @@ fun VerificationScreen(
             ChirpButton(
                 text = "Begin Verification",
                 onClick = { /* TODO: Start verification flow */ },
-                modifier = Modifier.fillMaxWidth(),
-                style = AppButtonStyle.PRIMARY_PURPLE
+                modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(24.dp))
