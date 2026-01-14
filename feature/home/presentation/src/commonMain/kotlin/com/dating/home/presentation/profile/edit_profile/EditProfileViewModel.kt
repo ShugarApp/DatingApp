@@ -40,6 +40,12 @@ class EditProfileViewModel(
                 companyTextState = TextFieldState("Spotify"),
                 educationTextState = TextFieldState("University of Arts"),
                 locationTextState = TextFieldState("New York, USA"),
+                
+                heightTextState = TextFieldState("175 cm"),
+                zodiacTextState = TextFieldState("Leo"),
+                smokingTextState = TextFieldState("Reviewing"),
+                drinkingTextState = TextFieldState("Socially"),
+                
                 selectedInterests = listOf("Design", "Music", "Coffee", "Hiking"),
                 photos = listOf(authInfo.user.profilePictureUrl, null, null, null, null, null)
             )

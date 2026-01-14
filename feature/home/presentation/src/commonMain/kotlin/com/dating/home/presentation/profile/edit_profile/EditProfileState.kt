@@ -17,6 +17,12 @@ data class EditProfileState(
     val educationTextState: TextFieldState = TextFieldState(),
     val locationTextState: TextFieldState = TextFieldState(),
     
+    // Personal Info
+    val heightTextState: TextFieldState = TextFieldState(),
+    val zodiacTextState: TextFieldState = TextFieldState(),
+    val smokingTextState: TextFieldState = TextFieldState(),
+    val drinkingTextState: TextFieldState = TextFieldState(),
+    
     val selectedInterests: List<String> = emptyList(),
     val availableInterests: List<String> = listOf(
         "Photography", "Hiking", "Art", "Sushi", "Travel", 

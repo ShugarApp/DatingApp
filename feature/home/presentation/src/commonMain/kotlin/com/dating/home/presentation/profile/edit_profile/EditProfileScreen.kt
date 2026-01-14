@@ -169,13 +169,35 @@ fun EditProfileScreen(
             )
 
             Spacer(modifier = Modifier.height(24.dp))
-
-            SectionTitle(title = "Location")
+            
+            SectionTitle(title = "Personal Information")
             Spacer(modifier = Modifier.height(12.dp))
-            ChirpTextField(
-                state = state.locationTextState,
-                placeholder = "Add location"
-            )
+            
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                ChirpTextField(
+                    state = state.heightTextState,
+                    placeholder = "Height",
+                    modifier = Modifier.weight(1f)
+                )
+                ChirpTextField(
+                    state = state.zodiacTextState,
+                    placeholder = "Zodiac",
+                    modifier = Modifier.weight(1f)
+                )
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                ChirpTextField(
+                    state = state.smokingTextState,
+                    placeholder = "Smoking",
+                    modifier = Modifier.weight(1f)
+                )
+                ChirpTextField(
+                    state = state.drinkingTextState,
+                    placeholder = "Drinking",
+                    modifier = Modifier.weight(1f)
+                )
+            }
 
             Spacer(modifier = Modifier.height(100.dp)) // Bottom padding for sticky button
         }
