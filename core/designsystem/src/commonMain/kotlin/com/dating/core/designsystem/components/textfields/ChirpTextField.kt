@@ -8,6 +8,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,6 +21,7 @@ import com.dating.core.designsystem.theme.AppTheme
 import com.dating.core.designsystem.theme.extended
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun ChirpTextField(
     state: TextFieldState,
@@ -32,6 +34,7 @@ fun ChirpTextField(
     minLines: Int = 1,
     maxLines: Int = Int.MAX_VALUE,
     enabled: Boolean = true,
+    inputTransformation: InputTransformation? = null,
     keyboardType: KeyboardType = KeyboardType.Text,
     onFocusChanged: (Boolean) -> Unit = {},
 ) {
@@ -54,6 +57,7 @@ fun ChirpTextField(
                     maxHeightInLines = maxLines
                 )
             },
+            inputTransformation = inputTransformation,
             textStyle = MaterialTheme.typography.bodyMedium.copy(
                 color = if (enabled) {
                     MaterialTheme.colorScheme.onSurface

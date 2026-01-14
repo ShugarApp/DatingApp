@@ -73,12 +73,44 @@ class RegisterViewModel(
             isEmailValidFlow,
             isUsernameValidFlow,
             isPasswordValidFlow,
-            isRegisteringFlow
-        ) { isEmailValid, isUsernameValid, isPasswordValid, isRegistering ->
-            val allValid = isEmailValid && isUsernameValid && isPasswordValid
-            _state.update { it.copy(
-                canRegister = !isRegistering && allValid
-            ) }
+            isRegisteringFlow,
+            state.map { it.currentStep }.distinctUntilChanged(),
+            snapshotFlow { state.value.nameTextState.text.toString() }.distinctUntilChanged(),
+            snapshotFlow { state.value.birthDateTextState.text.toString() }.distinctUntilChanged(),
+            state.map { it.selectedGender }, // can't use distinctUntilChanged easily on nullable, or maybe ok
+            state.map { it.selectedInterest },
+            state.map { it.selectedLookingFor }
+        ) { values ->
+            val isEmailValid = values[0] as Boolean
+            val isUsernameValid = values[1] as Boolean
+            val isPasswordValid = values[2] as Boolean
+            val isRegistering = values[3] as Boolean
+            val currentStep = values[4] as RegisterStep
+            val name = values[5] as String
+            val birthDate = values[6] as String
+            val gender = values[7] as String?
+            val interest = values[8] as String?
+            val lookingFor = values[9] as String?
+
+            _state.update { 
+                when(currentStep) {
+                    RegisterStep.Credentials -> {
+                         it.copy(canProceed = isEmailValid && isPasswordValid)
+                    }
+                    RegisterStep.BasicInfo -> {
+                        it.copy(canProceed = isUsernameValid)
+                    }
+                    RegisterStep.BirthDate -> {
+                        it.copy(canProceed = birthDate.length == 10)
+                    }
+                    RegisterStep.GenderInterest -> {
+                        it.copy(canProceed = gender != null && interest != null)
+                    }
+                    RegisterStep.LookingFor -> {
+                         it.copy(canRegister = !isRegistering && lookingFor != null)
+                    }
+                }
+            }
         }.launchIn(viewModelScope)
     }
 
@@ -86,17 +118,66 @@ class RegisterViewModel(
         when (action) {
             RegisterAction.OnLoginClick -> Unit
             RegisterAction.OnRegisterClick -> register()
+            RegisterAction.OnNextClick -> onNextClick()
+            RegisterAction.OnBackClick -> onBackClick()
             RegisterAction.OnTogglePasswordVisibilityClick -> {
                 _state.update { it.copy(
                     isPasswordVisible = !it.isPasswordVisible
                 ) }
             }
+            is RegisterAction.OnGenderSelect -> {
+                _state.update { it.copy(selectedGender = action.gender) }
+                validateStep(RegisterStep.GenderInterest)
+            }
+            is RegisterAction.OnInterestSelect -> {
+                _state.update { it.copy(selectedInterest = action.interest) }
+                validateStep(RegisterStep.GenderInterest)
+            }
+            is RegisterAction.OnLookingForSelect -> {
+                _state.update { it.copy(selectedLookingFor = action.lookingFor) }
+                validateStep(RegisterStep.LookingFor)
+            }
             else -> Unit
         }
     }
 
+
+    private fun onNextClick() {
+        val currentStep = state.value.currentStep
+        if (validateStep(currentStep)) {
+            val nextStep = when(currentStep) {
+                RegisterStep.Credentials -> RegisterStep.BasicInfo
+                RegisterStep.BasicInfo -> RegisterStep.BirthDate
+                RegisterStep.BirthDate -> RegisterStep.GenderInterest
+                RegisterStep.GenderInterest -> RegisterStep.LookingFor
+                RegisterStep.LookingFor -> RegisterStep.LookingFor // Max step
+            }
+            _state.update { it.copy(currentStep = nextStep) }
+            validateStep(nextStep) // Validate next step initial state
+        }
+    }
+
+    private fun onBackClick() {
+        val currentStep = state.value.currentStep
+        if (currentStep == RegisterStep.Credentials) {
+            viewModelScope.launch {
+                eventChannel.send(RegisterEvent.OnBack)
+            }
+        } else {
+             val previousStep = when(currentStep) {
+                RegisterStep.BasicInfo -> RegisterStep.Credentials
+                RegisterStep.BirthDate -> RegisterStep.BasicInfo
+                RegisterStep.GenderInterest -> RegisterStep.BirthDate
+                RegisterStep.LookingFor -> RegisterStep.GenderInterest
+                else -> RegisterStep.Credentials
+            }
+            _state.update { it.copy(currentStep = previousStep) }
+        }
+    }
+
     private fun register() {
-        if (!validateFormInputs()) {
+         // Final validation checks everything
+         if (!validateStep(RegisterStep.LookingFor)) { // Ensure last step is valid
             return
         }
 
@@ -145,36 +226,63 @@ class RegisterViewModel(
         }
     }
 
-    private fun validateFormInputs(): Boolean {
+    private fun validateStep(step: RegisterStep): Boolean {
+        // We only clear errors that are relevant to the current or previous validation attempt
+        // actually clearing all might be too aggressive if we want to keep state errors, 
+        // but for now it resets "dirty" error states.
         clearAllTextFieldErrors()
-
+        
         val currentState = state.value
-        val email = currentState.emailTextState.text.toString()
-        val username = currentState.usernameTextState.text.toString()
-        val password = currentState.passwordTextState.text.toString()
-
-        val isEmailValid = EmailValidator.validate(email)
-        val passwordValidationState = PasswordValidator.validate(password)
-        val isUsernameValid = username.length in 3..20
-
-        val emailError = if (!isEmailValid) {
-            UiText.Resource(Res.string.error_invalid_email)
-        } else null
-        val usernameError = if (!isUsernameValid) {
-            UiText.Resource(Res.string.error_invalid_username)
-        } else null
-        val passwordError = if (!passwordValidationState.isValidPassword) {
-            UiText.Resource(Res.string.error_invalid_password)
-        } else null
-
-        _state.update {
-            it.copy(
-                emailError = emailError,
-                usernameError = usernameError,
-                passwordError = passwordError
-            )
+        
+        return when(step) {
+            RegisterStep.Credentials -> {
+                val email = currentState.emailTextState.text.toString()
+                val password = currentState.passwordTextState.text.toString()
+                val isEmailValid = EmailValidator.validate(email)
+                val passwordValidationState = PasswordValidator.validate(password)
+                
+                 val emailError = if (!isEmailValid) UiText.Resource(Res.string.error_invalid_email) else null
+                 val passwordError = if (!passwordValidationState.isValidPassword) UiText.Resource(Res.string.error_invalid_password) else null
+                 
+                 _state.update { it.copy(emailError = emailError, passwordError = passwordError, canProceed = isEmailValid && passwordValidationState.isValidPassword) }
+                 isEmailValid && passwordValidationState.isValidPassword
+            }
+            RegisterStep.BasicInfo -> {
+                val username = currentState.usernameTextState.text.toString()
+                val isUsernameValid = username.length in 3..20
+                
+                val usernameError = if (!isUsernameValid) UiText.Resource(Res.string.error_invalid_username) else null
+                
+                _state.update { it.copy(usernameError = usernameError, canProceed = isUsernameValid) }
+                isUsernameValid
+            }
+            RegisterStep.BirthDate -> {
+                val birthDate = currentState.birthDateTextState.text.toString()
+                val isValid = birthDate.length == 10
+                _state.update { it.copy(canProceed = isValid) }
+                isValid
+            }
+            RegisterStep.GenderInterest -> {
+                val hasGender = currentState.selectedGender != null
+                val hasInterest = currentState.selectedInterest != null
+                val isValid = hasGender && hasInterest
+                _state.update { it.copy(canProceed = isValid) }
+                isValid
+            }
+            RegisterStep.LookingFor -> {
+                 val hasLookingFor = currentState.selectedLookingFor != null
+                 val isValid = hasLookingFor
+                 _state.update { it.copy(canRegister = isValid) }
+                 isValid
+            }
         }
-
-        return isUsernameValid && isEmailValid && passwordValidationState.isValidPassword
+    }
+    
+    // Helper to reactively validate without setting errors immediately (optional optimization)
+    // For now we reuse validateStep but rely on the `observeValidationStates` flow for real-time button updates
+    private fun checkValidation(step: RegisterStep) {
+        // Logic similar to validateStep but without setting errors, just updating canProceed
+        // ... omitted for brevity, we will rely on key events calling checkValidation or validateStep
+        // Or better yet, updated observeValidationStates
     }
 }

@@ -1,8 +1,18 @@
 package com.dating.auth.presentation.register
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,6 +22,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -26,19 +40,35 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import aura.feature.auth.presentation.generated.resources.Res
+import aura.feature.auth.presentation.generated.resources.about_you
+import aura.feature.auth.presentation.generated.resources.back
+import aura.feature.auth.presentation.generated.resources.basic_info
+import aura.feature.auth.presentation.generated.resources.birth_date
+import aura.feature.auth.presentation.generated.resources.birth_date_placeholder
+import aura.feature.auth.presentation.generated.resources.create_account
 import aura.feature.auth.presentation.generated.resources.email
 import aura.feature.auth.presentation.generated.resources.email_placeholder
+import aura.feature.auth.presentation.generated.resources.gender
+import aura.feature.auth.presentation.generated.resources.gender_female
+import aura.feature.auth.presentation.generated.resources.gender_male
+import aura.feature.auth.presentation.generated.resources.gender_non_binary
+import aura.feature.auth.presentation.generated.resources.interest_casual
+import aura.feature.auth.presentation.generated.resources.interest_friends
+import aura.feature.auth.presentation.generated.resources.interest_relationship
+import aura.feature.auth.presentation.generated.resources.interested_in
 import aura.feature.auth.presentation.generated.resources.login
+import aura.feature.auth.presentation.generated.resources.looking_for
+import aura.feature.auth.presentation.generated.resources.next
 import aura.feature.auth.presentation.generated.resources.password
 import aura.feature.auth.presentation.generated.resources.password_hint
 import aura.feature.auth.presentation.generated.resources.register
 import aura.feature.auth.presentation.generated.resources.username
 import aura.feature.auth.presentation.generated.resources.username_hint
 import aura.feature.auth.presentation.generated.resources.username_placeholder
-import aura.feature.auth.presentation.generated.resources.welcome_to_chirp
 import com.dating.core.designsystem.components.brand.AppBrandLogo
 import com.dating.core.designsystem.components.buttons.AppButtonStyle
 import com.dating.core.designsystem.components.buttons.ChirpButton
+import com.dating.core.designsystem.components.chips.ChirpChip
 import com.dating.core.designsystem.components.layouts.ChirpSnackbarScaffold
 import com.dating.core.designsystem.components.textfields.ChirpPasswordTextField
 import com.dating.core.designsystem.components.textfields.ChirpTextField
@@ -52,7 +82,8 @@ import org.koin.compose.viewmodel.koinViewModel
 fun RegisterRoot(
     viewModel: RegisterViewModel = koinViewModel(),
     onRegisterSuccess: (String) -> Unit,
-    onLoginClick: () -> Unit
+    onLoginClick: () -> Unit,
+    onBackClick: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -61,6 +92,9 @@ fun RegisterRoot(
         when(event) {
             is RegisterEvent.Success -> {
                 onRegisterSuccess(event.email)
+            }
+            RegisterEvent.OnBack -> {
+                onBackClick()
             }
         }
     }
@@ -78,6 +112,7 @@ fun RegisterRoot(
     )
 }
 
+@OptIn(ExperimentalLayoutApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun RegisterScreen(
     state: RegisterState,
@@ -87,119 +122,292 @@ fun RegisterScreen(
     ChirpSnackbarScaffold(
         snackbarHostState = snackbarHostState
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp)
-                .imePadding(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            // Logo
-            AppBrandLogo(modifier = Modifier.size(80.dp))
-            
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // Title
-            Text(
-                text = stringResource(Res.string.welcome_to_chirp),
-                style = MaterialTheme.typography.headlineMedium.copy(
-                    fontWeight = FontWeight.Bold
-                ),
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
-
-             if (state.registrationError != null) {
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = state.registrationError.asString(),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.error,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
+        Box(modifier = Modifier.fillMaxSize()) {
+            // Back Button
+            IconButton(
+                onClick = { onAction(RegisterAction.OnBackClick) },
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(top = 48.dp, start = 16.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = stringResource(Res.string.back),
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
             }
             
-            Spacer(modifier = Modifier.height(32.dp))
+            // Scaled Progress Indicator
+            val progress = when(state.currentStep) {
+                RegisterStep.Credentials -> 0.2f
+                RegisterStep.BasicInfo -> 0.4f
+                RegisterStep.BirthDate -> 0.6f
+                RegisterStep.GenderInterest -> 0.8f
+                RegisterStep.LookingFor -> 1.0f
+            }
+            
+            androidx.compose.material3.LinearProgressIndicator(
+                progress = { progress },
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = 96.dp) // Below back button approximate area
+                    .fillMaxWidth(0.9f)
+                    .height(4.dp),
+                color = MaterialTheme.colorScheme.primary,
+                trackColor = MaterialTheme.colorScheme.surfaceVariant,
+            )
 
-            // Inputs
-            ChirpTextField(
-                state = state.usernameTextState,
-                placeholder = stringResource(Res.string.username_placeholder),
-                title = stringResource(Res.string.username),
-                supportingText = state.usernameError?.asString()
-                    ?: stringResource(Res.string.username_hint),
-                isError = state.usernameError != null,
-                onFocusChanged = { isFocused ->
-                    onAction(RegisterAction.OnInputTextFocusGain)
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            ChirpTextField(
-                state = state.emailTextState,
-                placeholder = stringResource(Res.string.email_placeholder),
-                title = stringResource(Res.string.email),
-                supportingText = state.emailError?.asString(),
-                isError = state.emailError != null,
-                onFocusChanged = { isFocused ->
-                    onAction(RegisterAction.OnInputTextFocusGain)
-                },
-                keyboardType = KeyboardType.Email,
-                modifier = Modifier.fillMaxWidth()
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            ChirpPasswordTextField(
-                state = state.passwordTextState,
-                placeholder = stringResource(Res.string.password),
-                title = stringResource(Res.string.password),
-                supportingText = state.passwordError?.asString()
-                    ?: stringResource(Res.string.password_hint),
-                isError = state.passwordError != null,
-                onFocusChanged = { isFocused ->
-                    onAction(RegisterAction.OnInputTextFocusGain)
-                },
-                onToggleVisibilityClick = {
-                    onAction(RegisterAction.OnTogglePasswordVisibilityClick)
-                },
-                isPasswordVisible = state.isPasswordVisible,
-                modifier = Modifier.fillMaxWidth()
-            )
-            
-            Spacer(modifier = Modifier.height(32.dp))
+            AnimatedContent(
+                targetState = state.currentStep,
+                transitionSpec = {
+                    if (targetState > initialState) {
+                        slideInHorizontally { it } + fadeIn() togetherWith
+                                slideOutHorizontally { -it } + fadeOut()
+                    } else {
+                        slideInHorizontally { -it } + fadeIn() togetherWith
+                                slideOutHorizontally { it } + fadeOut()
+                    }
+                }
+            ) { step ->
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.background)
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 24.dp)
+                        .imePadding(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    // Logo
+                    AppBrandLogo(modifier = Modifier.size(80.dp))
 
-            // Buttons
-            ChirpButton(
-                text = stringResource(Res.string.register),
-                onClick = {
-                    onAction(RegisterAction.OnRegisterClick)
-                },
-                enabled = state.canRegister,
-                isLoading = state.isRegistering,
-                modifier = Modifier.fillMaxWidth()
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            ChirpButton(
-                text = stringResource(Res.string.login),
-                onClick = {
-                    onAction(RegisterAction.OnLoginClick)
-                },
-                style = AppButtonStyle.SECONDARY,
-                modifier = Modifier.fillMaxWidth()
-            )
-            
-            Spacer(modifier = Modifier.height(32.dp))
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    if (state.registrationError != null) {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = state.registrationError.asString(),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.error,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+
+                    when (step) {
+                        RegisterStep.Credentials -> {
+                            // Title
+                            Text(
+                                text = stringResource(Res.string.create_account),
+                                style = MaterialTheme.typography.headlineMedium.copy(
+                                    fontWeight = FontWeight.Bold
+                                ),
+                                color = MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.align(Alignment.CenterHorizontally)
+                            )
+                            
+                            Spacer(modifier = Modifier.height(32.dp))
+
+                            // Inputs
+                            ChirpTextField(
+                                state = state.emailTextState,
+                                placeholder = stringResource(Res.string.email_placeholder),
+                                title = stringResource(Res.string.email),
+                                supportingText = state.emailError?.asString(),
+                                isError = state.emailError != null,
+                                onFocusChanged = { 
+                                    onAction(RegisterAction.OnInputTextFocusGain)
+                                },
+                                keyboardType = KeyboardType.Email,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            ChirpPasswordTextField(
+                                state = state.passwordTextState,
+                                placeholder = stringResource(Res.string.password),
+                                title = stringResource(Res.string.password),
+                                supportingText = state.passwordError?.asString()
+                                    ?: stringResource(Res.string.password_hint),
+                                isError = state.passwordError != null,
+                                onFocusChanged = { 
+                                    onAction(RegisterAction.OnInputTextFocusGain)
+                                },
+                                onToggleVisibilityClick = {
+                                    onAction(RegisterAction.OnTogglePasswordVisibilityClick)
+                                },
+                                isPasswordVisible = state.isPasswordVisible,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+
+                            Spacer(modifier = Modifier.height(32.dp))
+
+
+                        }
+
+                        RegisterStep.BasicInfo -> {
+                            StepTitle(stringResource(Res.string.basic_info))
+                            
+                            ChirpTextField(
+                                state = state.usernameTextState,
+                                placeholder = stringResource(Res.string.username_placeholder),
+                                title = stringResource(Res.string.username),
+                                supportingText = state.usernameError?.asString()
+                                    ?: stringResource(Res.string.username_hint),
+                                isError = state.usernameError != null,
+                                onFocusChanged = { 
+                                    onAction(RegisterAction.OnInputTextFocusGain)
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                        RegisterStep.BirthDate -> {
+                            StepTitle(stringResource(Res.string.birth_date))
+                            
+                            ChirpTextField(
+                                state = state.birthDateTextState,
+                                placeholder = stringResource(Res.string.birth_date_placeholder),
+                                title = stringResource(Res.string.birth_date),
+                                inputTransformation = DateInputTransformation,
+                                keyboardType = KeyboardType.Number,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                        RegisterStep.GenderInterest -> {
+                            StepTitle(stringResource(Res.string.about_you))
+                            
+                            SectionSelection(
+                                title = stringResource(Res.string.gender),
+                                options = listOf(
+                                    stringResource(Res.string.gender_male),
+                                    stringResource(Res.string.gender_female),
+                                    stringResource(Res.string.gender_non_binary)
+                                ),
+                                selectedOption = state.selectedGender,
+                                onOptionSelected = { onAction(RegisterAction.OnGenderSelect(it)) }
+                            )
+
+                            Spacer(modifier = Modifier.height(24.dp))
+
+                            SectionSelection(
+                                title = stringResource(Res.string.interested_in),
+                                options = listOf(
+                                    stringResource(Res.string.gender_male),
+                                    stringResource(Res.string.gender_female),
+                                    "Everyone"
+                                ),
+                                selectedOption = state.selectedInterest,
+                                onOptionSelected = { onAction(RegisterAction.OnInterestSelect(it)) }
+                            )
+                        }
+                        RegisterStep.LookingFor -> {
+                            StepTitle(stringResource(Res.string.looking_for))
+                            
+                            SectionSelection(
+                                title = stringResource(Res.string.looking_for),
+                                options = listOf(
+                                    stringResource(Res.string.interest_relationship),
+                                    stringResource(Res.string.interest_casual),
+                                    stringResource(Res.string.interest_friends)
+                                ),
+                                selectedOption = state.selectedLookingFor,
+                                onOptionSelected = { onAction(RegisterAction.OnLookingForSelect(it)) }
+                            )
+                        }
+                    }
+                    
+                    // Error message
+                    if (state.registrationError != null) {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = state.registrationError.asString(),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.error,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    // Navigation Buttons
+                    if (step == RegisterStep.LookingFor) {
+                        ChirpButton(
+                            text = stringResource(Res.string.register),
+                            onClick = { onAction(RegisterAction.OnRegisterClick) },
+                            enabled = state.canRegister, // Final register check
+                            isLoading = state.isRegistering,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    } else {
+                        ChirpButton(
+                            text = stringResource(Res.string.next),
+                            onClick = { onAction(RegisterAction.OnNextClick) },
+                            enabled = state.canProceed, // Granular step check
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    if(step == RegisterStep.Credentials) {
+                        ChirpButton(
+                            text = stringResource(Res.string.login),
+                            onClick = { onAction(RegisterAction.OnLoginClick) },
+                            style = AppButtonStyle.SECONDARY,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                    
+                    Spacer(modifier = Modifier.height(32.dp))
+                }
+            }
         }
     }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun SectionSelection(
+    title: String,
+    options: List<String>,
+    selectedOption: String?,
+    onOptionSelected: (String) -> Unit
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            options.forEach { option ->
+                ChirpChip(
+                    text = option,
+                    isSelected = option == selectedOption,
+                    onClick = { onOptionSelected(option) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun StepTitle(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+        color = MaterialTheme.colorScheme.onSurface,
+        textAlign = TextAlign.Center,
+        modifier = Modifier.padding(bottom = 32.dp)
+    )
 }
 
 @Preview

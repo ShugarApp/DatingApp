@@ -46,4 +46,24 @@
     <string name="reset_password_successfully">
         Your password has successfully been changed. You can now log in with your new password.
     </string>
+    <!-- Registration - Step 2 -->
+    <string name="name">Name</string>
+    <string name="name_placeholder">Your Name</string>
+    <string name="birth_date">Birth Date</string>
+    <string name="birth_date_placeholder">DD/MM/YYYY</string>
+    <string name="gender">Gender</string>
+    <string name="interested_in">Interested In</string>
+    <string name="looking_for">Looking For</string>
+    <string name="basic_info">Basic Info</string>
+    <string name="about_you">About You</string>
+    <string name="next">Next</string>
+    <string name="back">Back</string>
+    
+    <!-- Options -->
+    <string name="gender_male">Male</string>
+    <string name="gender_female">Female</string>
+    <string name="gender_non_binary">Non-binary</string>
+    <string name="interest_relationship">Relationship</string>
+    <string name="interest_casual">Casual</string>
+    <string name="interest_friends">Friends</string>
 </resources>
