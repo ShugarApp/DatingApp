@@ -34,7 +34,7 @@ import aura.feature.auth.presentation.generated.resources.welcome_back
 import com.dating.core.designsystem.components.brand.AppBrandLogo
 import com.dating.core.designsystem.components.buttons.AppButtonStyle
 import com.dating.core.designsystem.components.buttons.ChirpButton
-import com.dating.core.designsystem.components.layouts.ChirpSnackbarScaffold
+import com.dating.core.designsystem.components.layouts.AuthSnackbarScaffold
 import com.dating.core.designsystem.components.textfields.ChirpPasswordTextField
 import com.dating.core.designsystem.components.textfields.ChirpTextField
 import com.dating.core.designsystem.theme.AppTheme
@@ -77,7 +77,7 @@ fun LoginScreen(
     state: LoginState,
     onAction: (LoginAction) -> Unit,
 ) {
-    ChirpSnackbarScaffold {
+    AuthSnackbarScaffold {
         Column(
             modifier = Modifier
                 .fillMaxSize()

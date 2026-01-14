@@ -29,13 +29,12 @@ fun ChirpSurface(
     content: @Composable ColumnScope.() -> Unit
 ) {
     Surface(
-        color = MaterialTheme.colorScheme.background,
+        color = MaterialTheme.colorScheme.surface,
         modifier = modifier
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxSize()
+            modifier = Modifier.fillMaxSize()
         ) {
             header()
             Surface(

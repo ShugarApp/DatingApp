@@ -14,11 +14,11 @@ import aura.feature.auth.presentation.generated.resources.resend_verification_em
 import aura.feature.auth.presentation.generated.resources.resent_verification_email
 import aura.feature.auth.presentation.generated.resources.verification_email_sent_to_x
 import com.dating.core.designsystem.components.brand.ChirpSuccessIcon
-import com.dating.core.designsystem.components.buttons.ChirpButton
 import com.dating.core.designsystem.components.buttons.AppButtonStyle
+import com.dating.core.designsystem.components.buttons.ChirpButton
+import com.dating.core.designsystem.components.layouts.AuthSnackbarScaffold
 import com.dating.core.designsystem.components.layouts.ChirpAdaptiveResultLayout
 import com.dating.core.designsystem.components.layouts.ChirpSimpleResultLayout
-import com.dating.core.designsystem.components.layouts.ChirpSnackbarScaffold
 import com.dating.core.designsystem.theme.AppTheme
 import com.dating.core.presentation.util.ObserveAsEvents
 import org.jetbrains.compose.resources.getString
@@ -36,7 +36,7 @@ fun RegisterSuccessRoot(
     val snackbarHostState = remember { SnackbarHostState() }
 
     ObserveAsEvents(viewModel.events) { event ->
-        when(event) {
+        when (event) {
             is RegisterSuccessEvent.ResendVerificationEmailSuccess -> {
                 snackbarHostState.showSnackbar(
                     message = getString(
@@ -50,7 +50,7 @@ fun RegisterSuccessRoot(
     RegisterSuccessScreen(
         state = state,
         onAction = { action ->
-            when(action) {
+            when (action) {
                 is RegisterSuccessAction.OnLoginClick -> onLoginClick()
                 else -> Unit
             }
@@ -66,7 +66,7 @@ fun RegisterSuccessScreen(
     onAction: (RegisterSuccessAction) -> Unit,
     snackbarHostState: SnackbarHostState
 ) {
-    ChirpSnackbarScaffold(
+    AuthSnackbarScaffold(
         snackbarHostState = snackbarHostState
     ) {
         ChirpAdaptiveResultLayout {
@@ -85,8 +85,7 @@ fun RegisterSuccessScreen(
                         onClick = {
                             onAction(RegisterSuccessAction.OnLoginClick)
                         },
-                        modifier = Modifier
-                            .fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth()
                     )
                 },
                 secondaryButton = {
@@ -95,11 +94,10 @@ fun RegisterSuccessScreen(
                         onClick = {
                             onAction(RegisterSuccessAction.OnResendVerificationEmailClick)
                         },
-                        modifier = Modifier
-                            .fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth(),
                         enabled = !state.isResendingVerificationEmail,
                         isLoading = state.isResendingVerificationEmail,
-                        style = AppButtonStyle.SECONDARY
+                        style = AppButtonStyle.TEXT
                     )
                 },
                 secondaryError = state.resendVerificationError?.asString()

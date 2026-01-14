@@ -15,12 +15,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun ChirpSnackbarScaffold(
+fun AuthSnackbarScaffold(
     snackbarHostState: SnackbarHostState? = null,
     modifier: Modifier = Modifier,
+    topBar: (@Composable () -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
     Scaffold(
+        topBar = {
+            topBar?.invoke()
+        },
         modifier = modifier,
         contentWindowInsets = WindowInsets.statusBars
             .union(WindowInsets.displayCutout)

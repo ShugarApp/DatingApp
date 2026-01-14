@@ -7,9 +7,7 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -21,11 +19,9 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -34,6 +30,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -41,7 +39,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import aura.feature.auth.presentation.generated.resources.Res
 import aura.feature.auth.presentation.generated.resources.about_you
-import aura.feature.auth.presentation.generated.resources.back
 import aura.feature.auth.presentation.generated.resources.basic_info
 import aura.feature.auth.presentation.generated.resources.birth_date
 import aura.feature.auth.presentation.generated.resources.birth_date_placeholder
@@ -69,7 +66,8 @@ import com.dating.core.designsystem.components.brand.AppBrandLogo
 import com.dating.core.designsystem.components.buttons.AppButtonStyle
 import com.dating.core.designsystem.components.buttons.ChirpButton
 import com.dating.core.designsystem.components.chips.ChirpChip
-import com.dating.core.designsystem.components.layouts.ChirpSnackbarScaffold
+import com.dating.core.designsystem.components.header.AppCenterTopBar
+import com.dating.core.designsystem.components.layouts.AuthSnackbarScaffold
 import com.dating.core.designsystem.components.textfields.ChirpPasswordTextField
 import com.dating.core.designsystem.components.textfields.ChirpTextField
 import com.dating.core.designsystem.theme.AppTheme
@@ -89,10 +87,11 @@ fun RegisterRoot(
     val snackbarHostState = remember { SnackbarHostState() }
 
     ObserveAsEvents(viewModel.events) { event ->
-        when(event) {
+        when (event) {
             is RegisterEvent.Success -> {
                 onRegisterSuccess(event.email)
             }
+
             RegisterEvent.OnBack -> {
                 onBackClick()
             }
@@ -102,7 +101,7 @@ fun RegisterRoot(
     RegisterScreen(
         state = state,
         onAction = { action ->
-            when(action) {
+            when (action) {
                 is RegisterAction.OnLoginClick -> onLoginClick()
                 else -> Unit
             }
@@ -119,73 +118,87 @@ fun RegisterScreen(
     onAction: (RegisterAction) -> Unit,
     snackbarHostState: SnackbarHostState
 ) {
-    ChirpSnackbarScaffold(
+    AuthSnackbarScaffold(
+        topBar = {
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                AppCenterTopBar(
+                    title = "",
+                    containerColor = MaterialTheme.colorScheme.background,
+                    onBack = { onAction(RegisterAction.OnBackClick) }
+                )
+                // PROGRESS SECTION (Hide on Credentials step)
+                if (state.currentStep != RegisterStep.Credentials) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    val totalSteps = 5
+                    val currentStepIndex = when (state.currentStep) {
+                        RegisterStep.Credentials -> 1
+                        RegisterStep.BasicInfo -> 2
+                        RegisterStep.BirthDate -> 3
+                        RegisterStep.GenderInterest -> 4
+                        RegisterStep.LookingFor -> 5
+                    }
+                    val animatedProgress by androidx.compose.animation.core.animateFloatAsState(
+                        targetValue = currentStepIndex / totalSteps.toFloat(),
+                        label = "ProgressAnimation"
+                    )
+
+                    LinearProgressIndicator(
+                        progress = { animatedProgress },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(6.dp)
+                            .clip(RoundedCornerShape(3.dp)),
+                        color = MaterialTheme.colorScheme.primary,
+                        trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                        strokeCap = StrokeCap.Round,
+                        gapSize = 0.dp,
+                        drawStopIndicator = {}
+                    )
+                }
+            }
+        },
         snackbarHostState = snackbarHostState
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            // Back Button
-            IconButton(
-                onClick = { onAction(RegisterAction.OnBackClick) },
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .padding(top = 48.dp, start = 16.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(Res.string.back),
-                    tint = MaterialTheme.colorScheme.onSurface
-                )
-            }
-            
-            // Scaled Progress Indicator
-            val progress = when(state.currentStep) {
-                RegisterStep.Credentials -> 0.2f
-                RegisterStep.BasicInfo -> 0.4f
-                RegisterStep.BirthDate -> 0.6f
-                RegisterStep.GenderInterest -> 0.8f
-                RegisterStep.LookingFor -> 1.0f
-            }
-            
-            androidx.compose.material3.LinearProgressIndicator(
-                progress = { progress },
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(top = 96.dp) // Below back button approximate area
-                    .fillMaxWidth(0.9f)
-                    .height(4.dp),
-                color = MaterialTheme.colorScheme.primary,
-                trackColor = MaterialTheme.colorScheme.surfaceVariant,
-            )
-
+        /***/
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .imePadding()
+        ) {
+            // ──────────────── CONTENT ────────────────
             AnimatedContent(
                 targetState = state.currentStep,
                 transitionSpec = {
                     if (targetState > initialState) {
                         slideInHorizontally { it } + fadeIn() togetherWith
-                                slideOutHorizontally { -it } + fadeOut()
+                            slideOutHorizontally { -it } + fadeOut()
                     } else {
                         slideInHorizontally { -it } + fadeIn() togetherWith
-                                slideOutHorizontally { it } + fadeOut()
+                            slideOutHorizontally { it } + fadeOut()
                     }
-                }
+                },
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
             ) { step ->
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.background)
                         .verticalScroll(rememberScrollState())
-                        .padding(horizontal = 24.dp)
-                        .imePadding(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                        .padding(horizontal = 24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Logo
-                    AppBrandLogo(modifier = Modifier.size(80.dp))
 
                     Spacer(modifier = Modifier.height(32.dp))
 
+                    if (state.currentStep == RegisterStep.Credentials) {
+                        AppBrandLogo(modifier = Modifier.size(80.dp))
+                        Spacer(modifier = Modifier.height(32.dp))
+                    }
+
                     if (state.registrationError != null) {
-                        Spacer(modifier = Modifier.height(16.dp))
                         Text(
                             text = state.registrationError.asString(),
                             style = MaterialTheme.typography.bodyMedium,
@@ -193,31 +206,28 @@ fun RegisterScreen(
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth()
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
                     }
 
                     when (step) {
+
                         RegisterStep.Credentials -> {
-                            // Title
                             Text(
                                 text = stringResource(Res.string.create_account),
-                                style = MaterialTheme.typography.headlineMedium.copy(
-                                    fontWeight = FontWeight.Bold
-                                ),
                                 color = MaterialTheme.colorScheme.onSurface,
+                                style = MaterialTheme.typography.headlineMedium,
                                 modifier = Modifier.align(Alignment.CenterHorizontally)
                             )
-                            
+
                             Spacer(modifier = Modifier.height(32.dp))
 
-                            // Inputs
                             ChirpTextField(
                                 state = state.emailTextState,
                                 placeholder = stringResource(Res.string.email_placeholder),
                                 title = stringResource(Res.string.email),
                                 supportingText = state.emailError?.asString(),
                                 isError = state.emailError != null,
-                                onFocusChanged = { 
+                                onFocusChanged = {
                                     onAction(RegisterAction.OnInputTextFocusGain)
                                 },
                                 keyboardType = KeyboardType.Email,
@@ -230,10 +240,9 @@ fun RegisterScreen(
                                 state = state.passwordTextState,
                                 placeholder = stringResource(Res.string.password),
                                 title = stringResource(Res.string.password),
-                                supportingText = state.passwordError?.asString()
-                                    ?: stringResource(Res.string.password_hint),
+                                supportingText = state.passwordError?.asString() ?: stringResource(Res.string.password_hint),
                                 isError = state.passwordError != null,
-                                onFocusChanged = { 
+                                onFocusChanged = {
                                     onAction(RegisterAction.OnInputTextFocusGain)
                                 },
                                 onToggleVisibilityClick = {
@@ -242,15 +251,11 @@ fun RegisterScreen(
                                 isPasswordVisible = state.isPasswordVisible,
                                 modifier = Modifier.fillMaxWidth()
                             )
-
-                            Spacer(modifier = Modifier.height(32.dp))
-
-
                         }
 
                         RegisterStep.BasicInfo -> {
                             StepTitle(stringResource(Res.string.basic_info))
-                            
+
                             ChirpTextField(
                                 state = state.usernameTextState,
                                 placeholder = stringResource(Res.string.username_placeholder),
@@ -258,15 +263,16 @@ fun RegisterScreen(
                                 supportingText = state.usernameError?.asString()
                                     ?: stringResource(Res.string.username_hint),
                                 isError = state.usernameError != null,
-                                onFocusChanged = { 
+                                onFocusChanged = {
                                     onAction(RegisterAction.OnInputTextFocusGain)
                                 },
                                 modifier = Modifier.fillMaxWidth()
                             )
                         }
+
                         RegisterStep.BirthDate -> {
                             StepTitle(stringResource(Res.string.birth_date))
-                            
+
                             ChirpTextField(
                                 state = state.birthDateTextState,
                                 placeholder = stringResource(Res.string.birth_date_placeholder),
@@ -276,9 +282,10 @@ fun RegisterScreen(
                                 modifier = Modifier.fillMaxWidth()
                             )
                         }
+
                         RegisterStep.GenderInterest -> {
                             StepTitle(stringResource(Res.string.about_you))
-                            
+
                             SectionSelection(
                                 title = stringResource(Res.string.gender),
                                 options = listOf(
@@ -287,7 +294,9 @@ fun RegisterScreen(
                                     stringResource(Res.string.gender_non_binary)
                                 ),
                                 selectedOption = state.selectedGender,
-                                onOptionSelected = { onAction(RegisterAction.OnGenderSelect(it)) }
+                                onOptionSelected = {
+                                    onAction(RegisterAction.OnGenderSelect(it))
+                                }
                             )
 
                             Spacer(modifier = Modifier.height(24.dp))
@@ -300,12 +309,15 @@ fun RegisterScreen(
                                     "Everyone"
                                 ),
                                 selectedOption = state.selectedInterest,
-                                onOptionSelected = { onAction(RegisterAction.OnInterestSelect(it)) }
+                                onOptionSelected = {
+                                    onAction(RegisterAction.OnInterestSelect(it))
+                                }
                             )
                         }
+
                         RegisterStep.LookingFor -> {
                             StepTitle(stringResource(Res.string.looking_for))
-                            
+
                             SectionSelection(
                                 title = stringResource(Res.string.looking_for),
                                 options = listOf(
@@ -314,58 +326,54 @@ fun RegisterScreen(
                                     stringResource(Res.string.interest_friends)
                                 ),
                                 selectedOption = state.selectedLookingFor,
-                                onOptionSelected = { onAction(RegisterAction.OnLookingForSelect(it)) }
+                                onOptionSelected = {
+                                    onAction(RegisterAction.OnLookingForSelect(it))
+                                }
                             )
                         }
                     }
-                    
-                    // Error message
-                    if (state.registrationError != null) {
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = state.registrationError.asString(),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.error,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
 
-                    Spacer(modifier = Modifier.height(32.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
+                }
+            }
 
-                    // Navigation Buttons
-                    if (step == RegisterStep.LookingFor) {
-                        ChirpButton(
-                            text = stringResource(Res.string.register),
-                            onClick = { onAction(RegisterAction.OnRegisterClick) },
-                            enabled = state.canRegister, // Final register check
-                            isLoading = state.isRegistering,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    } else {
-                        ChirpButton(
-                            text = stringResource(Res.string.next),
-                            onClick = { onAction(RegisterAction.OnNextClick) },
-                            enabled = state.canProceed, // Granular step check
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
+            // ──────────────── BOTTOM ACTIONS ────────────────
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp, vertical = 48.dp)
+            ) {
+                if (state.currentStep == RegisterStep.LookingFor) {
+                    ChirpButton(
+                        text = stringResource(Res.string.register),
+                        onClick = { onAction(RegisterAction.OnRegisterClick) },
+                        enabled = state.canRegister,
+                        isLoading = state.isRegistering,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                } else {
+                    ChirpButton(
+                        text = stringResource(Res.string.next),
+                        onClick = { onAction(RegisterAction.OnNextClick) },
+                        enabled = state.canProceed,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
 
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    if(step == RegisterStep.Credentials) {
-                        ChirpButton(
-                            text = stringResource(Res.string.login),
-                            onClick = { onAction(RegisterAction.OnLoginClick) },
-                            style = AppButtonStyle.SECONDARY,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                    
-                    Spacer(modifier = Modifier.height(32.dp))
+                if (state.currentStep == RegisterStep.Credentials) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    ChirpButton(
+                        text = stringResource(Res.string.login),
+                        onClick = { onAction(RegisterAction.OnLoginClick) },
+                        style = AppButtonStyle.TEXT,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
             }
         }
+
+        /***/
+
     }
 }
 
@@ -403,7 +411,7 @@ fun SectionSelection(
 fun StepTitle(text: String) {
     Text(
         text = text,
-        style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+        style = MaterialTheme.typography.headlineMedium,
         color = MaterialTheme.colorScheme.onSurface,
         textAlign = TextAlign.Center,
         modifier = Modifier.padding(bottom = 32.dp)

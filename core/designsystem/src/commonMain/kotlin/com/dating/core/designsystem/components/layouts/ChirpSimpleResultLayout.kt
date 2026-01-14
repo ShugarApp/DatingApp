@@ -32,10 +32,10 @@ fun ChirpSimpleResultLayout(
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier
-            .padding(horizontal = 16.dp),
+        modifier = modifier.padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Spacer(modifier = Modifier.height(8.dp))
         icon()
         Column(
             modifier = Modifier
@@ -43,9 +43,10 @@ fun ChirpSimpleResultLayout(
                 .offset(y = -(25).dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            Spacer(modifier = Modifier.height(32.dp))
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.extended.textPrimary,
                 textAlign = TextAlign.Center
             )

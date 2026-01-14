@@ -83,7 +83,7 @@ fun ChirpTextFieldLayout(
                 color = if(isError) {
                     MaterialTheme.colorScheme.error
                 } else {
-                    MaterialTheme.colorScheme.extended.textTertiary
+                    MaterialTheme.colorScheme.extended.textDisabled
                 },
                 style = MaterialTheme.typography.bodySmall
             )

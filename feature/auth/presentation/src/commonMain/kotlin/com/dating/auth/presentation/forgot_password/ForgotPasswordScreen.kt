@@ -36,7 +36,7 @@ import aura.feature.auth.presentation.generated.resources.forgot_password_email_
 import aura.feature.auth.presentation.generated.resources.submit
 import com.dating.core.designsystem.components.brand.AppBrandLogo
 import com.dating.core.designsystem.components.buttons.ChirpButton
-import com.dating.core.designsystem.components.layouts.ChirpSnackbarScaffold
+import com.dating.core.designsystem.components.layouts.AuthSnackbarScaffold
 import com.dating.core.designsystem.components.textfields.ChirpTextField
 import com.dating.core.designsystem.theme.AppTheme
 import com.dating.core.designsystem.theme.extended
@@ -64,7 +64,7 @@ fun ForgotPasswordScreen(
     onAction: (ForgotPasswordAction) -> Unit,
     onBackClick: () -> Unit
 ) {
-    ChirpSnackbarScaffold {
+    AuthSnackbarScaffold {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier

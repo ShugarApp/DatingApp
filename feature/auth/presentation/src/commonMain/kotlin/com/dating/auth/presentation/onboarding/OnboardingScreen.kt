@@ -24,7 +24,7 @@ import aura.feature.auth.presentation.generated.resources.welcome_to_chirp
 import com.dating.core.designsystem.components.brand.AppBrandLogo
 import com.dating.core.designsystem.components.buttons.AppButtonStyle
 import com.dating.core.designsystem.components.buttons.ChirpButton
-import com.dating.core.designsystem.components.layouts.ChirpSnackbarScaffold
+import com.dating.core.designsystem.components.layouts.AuthSnackbarScaffold
 import com.dating.core.designsystem.theme.AppTheme
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -34,7 +34,7 @@ fun OnboardingScreen(
     onLoginClick: () -> Unit,
     onCreateAccountClick: () -> Unit
 ) {
-    ChirpSnackbarScaffold {
+    AuthSnackbarScaffold {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier

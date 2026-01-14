@@ -30,7 +30,7 @@ import aura.feature.auth.presentation.generated.resources.set_new_password
 import aura.feature.auth.presentation.generated.resources.submit
 import com.dating.core.designsystem.components.brand.AppBrandLogo
 import com.dating.core.designsystem.components.buttons.ChirpButton
-import com.dating.core.designsystem.components.layouts.ChirpSnackbarScaffold
+import com.dating.core.designsystem.components.layouts.AuthSnackbarScaffold
 import com.dating.core.designsystem.components.textfields.ChirpPasswordTextField
 import com.dating.core.designsystem.theme.AppTheme
 import com.dating.core.designsystem.theme.extended
@@ -55,7 +55,7 @@ fun ResetPasswordScreen(
     state: ResetPasswordState,
     onAction: (ResetPasswordAction) -> Unit,
 ) {
-    ChirpSnackbarScaffold {
+    AuthSnackbarScaffold {
         Column(
             modifier = Modifier
                 .fillMaxSize()
