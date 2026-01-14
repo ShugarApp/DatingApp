@@ -32,7 +32,10 @@ val ChirpRed500 = Color(0xFFE63964)
 val ChirpRed200 = Color(0xFFFFB3C2)
 
 // Accent Colors (15% alpha)
-val ChirpBlue = Color(0x264F9DFF)
+val ChirpBlue = Color(0xFF1DA1F2)
+val ChirpBlue2 = Color(0xFF7FCBFF)
+val ChirpBlue3 = Color(0xFF7FCBFF)
+
 val ChirpPurple = Color(0x269B5CFF)
 val ChirpViolet = Color(0x26C77DFF)
 val ChirpPink = Color(0x26FF8FB1)
