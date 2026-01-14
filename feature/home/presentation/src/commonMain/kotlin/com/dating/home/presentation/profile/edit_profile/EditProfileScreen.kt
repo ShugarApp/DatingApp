@@ -34,15 +34,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import aura.feature.home.presentation.generated.resources.Res
+import aura.feature.home.presentation.generated.resources.cancel
+import aura.feature.home.presentation.generated.resources.delete
+import aura.feature.home.presentation.generated.resources.delete_profile_picture
+import aura.feature.home.presentation.generated.resources.delete_profile_picture_desc
 import coil3.compose.AsyncImage
+import com.dating.core.designsystem.components.buttons.AppButtonStyle
 import com.dating.core.designsystem.components.buttons.ChirpButton
+import com.dating.core.designsystem.components.chips.ChirpChip
+import com.dating.core.designsystem.components.dialogs.DestructiveConfirmationDialog
 import com.dating.core.designsystem.components.header.AppCenterTopBar
 import com.dating.core.designsystem.components.textfields.ChirpTextField
 import com.dating.core.presentation.util.clearFocusOnTap
 import com.dating.home.presentation.profile.mediapicker.rememberImagePickerLauncher
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -55,10 +63,7 @@ fun EditProfileScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     val launcher = rememberImagePickerLauncher { pickedImageData ->
-        viewModel.onAction(EditProfileAction.OnPictureSelected(
-            pickedImageData.bytes,
-            pickedImageData.mimeType
-        ))
+        viewModel.onAction(EditProfileAction.OnPictureSelected(pickedImageData.bytes, pickedImageData.mimeType))
     }
 
     Scaffold(
@@ -70,15 +75,16 @@ fun EditProfileScreen(
             )
         },
         bottomBar = {
-             Box(
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                 ChirpButton(
+                ChirpButton(
                     text = "Save",
-                    onClick = { onBack() }, // Mock save action
-                    modifier = Modifier.fillMaxWidth()
+                    onClick = { onBack() },
+                    modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
+                    style = AppButtonStyle.PRIMARY_PURPLE
                 )
             }
         }
@@ -99,10 +105,10 @@ fun EditProfileScreen(
             PhotoGrid(
                 photos = state.photos,
                 onAddPhoto = { launcher.launch() },
-                onRemovePhoto = { /* TODO */ }
+                onRemovePhoto = { viewModel.onAction(EditProfileAction.OnDeletePictureClick) }
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // -- About Me Section --
             SectionTitle(title = "About Me")
@@ -110,13 +116,12 @@ fun EditProfileScreen(
             ChirpTextField(
                 state = state.bioTextState,
                 placeholder = "Tell us about yourself...",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp),
-                singleLine = false
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = false,
+                minLines = 5
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // -- Interests Section --
             SectionTitle(title = "Interests")
@@ -127,14 +132,14 @@ fun EditProfileScreen(
             ) {
                 state.availableInterests.forEach { interest ->
                     val isSelected = state.selectedInterests.contains(interest)
-                    InterestChip(
+                    ChirpChip(
                         text = interest,
                         isSelected = isSelected,
                         onClick = { viewModel.onAction(EditProfileAction.OnInterestSelected(interest)) }
                     )
                 }
             }
-            
+
             Spacer(modifier = Modifier.height(32.dp))
 
             // -- Details Section --
@@ -155,7 +160,7 @@ fun EditProfileScreen(
             )
 
             Spacer(modifier = Modifier.height(24.dp))
-            
+
             SectionTitle(title = "Education")
             Spacer(modifier = Modifier.height(12.dp))
             ChirpTextField(
@@ -171,8 +176,26 @@ fun EditProfileScreen(
                 state = state.locationTextState,
                 placeholder = "Add location"
             )
-            
+
             Spacer(modifier = Modifier.height(100.dp)) // Bottom padding for sticky button
+        }
+
+        if (state.showDeleteConfirmationDialog) {
+            DestructiveConfirmationDialog(
+                title = stringResource(Res.string.delete_profile_picture),
+                description = stringResource(Res.string.delete_profile_picture_desc),
+                confirmButtonText = stringResource(Res.string.delete),
+                cancelButtonText = stringResource(Res.string.cancel),
+                onConfirmClick = {
+                    viewModel.onAction(EditProfileAction.OnConfirmDeleteClick)
+                },
+                onCancelClick = {
+                    viewModel.onAction(EditProfileAction.OnDismissDeleteConfirmationDialogClick)
+                },
+                onDismiss = {
+                    viewModel.onAction(EditProfileAction.OnDismissDeleteConfirmationDialogClick)
+                }
+            )
         }
     }
 }
@@ -181,7 +204,7 @@ fun EditProfileScreen(
 fun SectionTitle(title: String) {
     Text(
         text = title,
-        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+        style = MaterialTheme.typography.titleMedium,
         color = MaterialTheme.colorScheme.onSurface
     )
 }
@@ -195,24 +218,25 @@ fun PhotoGrid(
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         // Row 1
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-           PhotoSlot(photos.getOrNull(0), modifier = Modifier.weight(1f), onAdd = onAddPhoto)
-           PhotoSlot(photos.getOrNull(1), modifier = Modifier.weight(1f), onAdd = onAddPhoto)
-           PhotoSlot(photos.getOrNull(2), modifier = Modifier.weight(1f), onAdd = onAddPhoto)
+            PhotoSlot(photos.getOrNull(0), modifier = Modifier.weight(1f), onAdd = onAddPhoto, onRemove = { onRemovePhoto(0) })
+            PhotoSlot(photos.getOrNull(1), modifier = Modifier.weight(1f), onAdd = onAddPhoto, onRemove = { onRemovePhoto(1) })
+            PhotoSlot(photos.getOrNull(2), modifier = Modifier.weight(1f), onAdd = onAddPhoto, onRemove = { onRemovePhoto(2) })
         }
         // Row 2
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-           PhotoSlot(photos.getOrNull(3), modifier = Modifier.weight(1f), onAdd = onAddPhoto)
-           PhotoSlot(photos.getOrNull(4), modifier = Modifier.weight(1f), onAdd = onAddPhoto)
-           PhotoSlot(photos.getOrNull(5), modifier = Modifier.weight(1f), onAdd = onAddPhoto)
+            PhotoSlot(photos.getOrNull(3), modifier = Modifier.weight(1f), onAdd = onAddPhoto, onRemove = { onRemovePhoto(3) })
+            PhotoSlot(photos.getOrNull(4), modifier = Modifier.weight(1f), onAdd = onAddPhoto, onRemove = { onRemovePhoto(4) })
+            PhotoSlot(photos.getOrNull(5), modifier = Modifier.weight(1f), onAdd = onAddPhoto, onRemove = { onRemovePhoto(5) })
         }
     }
 }
 
 @Composable
 fun PhotoSlot(
-    imageUrl: String?, 
+    imageUrl: String?,
     modifier: Modifier = Modifier,
-    onAdd: () -> Unit
+    onAdd: () -> Unit,
+    onRemove: () -> Unit = {}
 ) {
     Box(
         modifier = modifier
@@ -229,7 +253,7 @@ fun PhotoSlot(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
-            
+
             // Remove Button Overlay
             Box(
                 modifier = Modifier
@@ -237,15 +261,15 @@ fun PhotoSlot(
                     .padding(8.dp)
                     .size(24.dp)
                     .background(MaterialTheme.colorScheme.error, CircleShape)
-                    .clickable { /* Remove logic */ },
+                    .clickable { onRemove() },
                 contentAlignment = Alignment.Center
             ) {
-                 Icon(
-                     imageVector = Icons.Default.Close,
-                     contentDescription = "Remove",
-                     tint = Color.White,
-                     modifier = Modifier.size(16.dp)
-                 )
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Remove",
+                    tint = Color.White,
+                    modifier = Modifier.size(16.dp)
+                )
             }
         } else {
             Icon(
@@ -255,29 +279,5 @@ fun PhotoSlot(
                 modifier = Modifier.size(32.dp)
             )
         }
-    }
-}
-
-@Composable
-fun InterestChip(
-    text: String,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(100.dp))
-            .background(
-                if (isSelected) MaterialTheme.colorScheme.primary 
-                else MaterialTheme.colorScheme.surfaceVariant
-            )
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-    ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
-            color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
-        )
     }
 }

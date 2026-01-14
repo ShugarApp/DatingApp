@@ -29,6 +29,8 @@ fun ChirpTextField(
     supportingText: String? = null,
     isError: Boolean = false,
     singleLine: Boolean = false,
+    minLines: Int = 1,
+    maxLines: Int = Int.MAX_VALUE,
     enabled: Boolean = true,
     keyboardType: KeyboardType = KeyboardType.Text,
     onFocusChanged: (Boolean) -> Unit = {},
@@ -46,7 +48,12 @@ fun ChirpTextField(
             enabled = enabled,
             lineLimits = if(singleLine) {
                 TextFieldLineLimits.SingleLine
-            } else TextFieldLineLimits.Default,
+            } else {
+                TextFieldLineLimits.MultiLine(
+                    minHeightInLines = minLines,
+                    maxHeightInLines = maxLines
+                )
+            },
             textStyle = MaterialTheme.typography.bodyMedium.copy(
                 color = if(enabled) {
                     MaterialTheme.colorScheme.onSurface
@@ -64,7 +71,7 @@ fun ChirpTextField(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth(),
-                    contentAlignment = Alignment.CenterStart
+                    contentAlignment = if (singleLine) Alignment.CenterStart else Alignment.TopStart
                 ) {
                     if(state.text.isEmpty() && placeholder != null) {
                         Text(
