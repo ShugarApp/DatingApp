@@ -10,26 +10,29 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.Cake
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.Gavel
+import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Help
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.PrivacyTip
+import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -84,36 +87,110 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Settings List
+            // Discovery Settings
             AccessCardList(
-                title = "Account Settings"
+                title = "Discovery Settings"
+            ) {
+                AccessCardItem(
+                    icon = Icons.Default.LocationOn,
+                    title = "Location",
+                    subtitle = "My Current Location",
+                    onClick = { /* TODO */ }
+                )
+                AccessCardItem(
+                    icon = Icons.Default.Tune,
+                    title = "Maximum Distance",
+                    subtitle = "100 km",
+                    onClick = { /* TODO */ }
+                )
+                AccessCardItem(
+                    icon = Icons.Default.Groups,
+                    title = "Show Me",
+                    subtitle = "Women",
+                    onClick = { /* TODO */ }
+                )
+                AccessCardItem(
+                    icon = Icons.Default.Cake,
+                    title = "Age Range",
+                    subtitle = "18 - 35",
+                    onClick = { /* TODO */ }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Payment Settings
+            AccessCardList(
+                title = "Subscription & Payment"
             ) {
                 AccessCardItem(
                     icon = Icons.Default.Star,
                     title = "Manage Subscription",
                     subtitle = "PRO PLAN ACTIVE",
                     subtitleColor = MaterialTheme.colorScheme.extended.textSecondary,
-                    iconBgColor = MaterialTheme.colorScheme.surfaceVariant
+                    iconBgColor = MaterialTheme.colorScheme.surfaceVariant,
+                    onClick = { /* TODO */ }
+                )
+                AccessCardItem(
+                    icon = Icons.Default.Restore,
+                    title = "Restore Purchases",
+                    onClick = { /* TODO */ }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Notifications
+            AccessCardList(
+                title = "Notifications"
+            ) {
+                AccessCardItem(
+                    icon = Icons.Default.Notifications,
+                    title = "Push Notifications",
+                    onClick = { /* TODO */ }
+                )
+                AccessCardItem(
+                    icon = Icons.Default.Mail,
+                    title = "Email Notifications",
+                    onClick = { /* TODO */ }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Legal & Contact
+            AccessCardList(
+                title = "Legal & Contact"
+            ) {
+                AccessCardItem(
+                    icon = Icons.Default.Help,
+                    title = "Help & Support",
+                    onClick = { /* TODO */ }
                 )
                 AccessCardItem(
                     icon = Icons.Default.Security,
-                    title = "Privacy & Security"
+                    title = "Safety Center",
+                    onClick = { /* TODO */ }
                 )
                 AccessCardItem(
-                    icon = Icons.Default.Notifications,
-                    title = "Notifications",
-                    badgeCount = 3
+                    icon = Icons.Default.PrivacyTip,
+                    title = "Privacy Policy",
+                    onClick = { /* TODO */ }
                 )
                 AccessCardItem(
-                    icon = Icons.Default.Palette,
-                    title = "App Appearance"
+                    icon = Icons.Default.Description,
+                    title = "Terms of Service",
+                    onClick = { /* TODO */ }
                 )
                 AccessCardItem(
-                    icon = Icons.Default.Help,
-                    title = "Help & Support"
+                    icon = Icons.Default.Gavel,
+                    title = "Community Guidelines",
+                    onClick = { /* TODO */ }
                 )
                 AccessCardItem(
                     icon = Icons.Default.Info,
-                    title = "About"
+                    title = "Licenses",
+                    onClick = { /* TODO */ }
                 )
             }
 

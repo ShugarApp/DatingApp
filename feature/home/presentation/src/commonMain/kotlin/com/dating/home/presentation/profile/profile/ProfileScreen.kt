@@ -5,7 +5,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -14,13 +13,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Help
@@ -38,7 +35,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -73,7 +69,7 @@ fun ProfileScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // 1. Header (Avatar + Name)
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(32.dp))
             Box(
                 contentAlignment = Alignment.BottomEnd
             ) {
@@ -103,24 +99,18 @@ fun ProfileScreen(
                 ProfileDashboardCard(
                     icon = Icons.Default.Edit,
                     text = "Edit Profile",
-                    iconColor = MaterialTheme.colorScheme.primary,
-                    iconBgColor = MaterialTheme.colorScheme.primaryContainer,
                     onClick = onEditProfile,
                     modifier = Modifier.weight(1f)
                 )
                 ProfileDashboardCard(
                     icon = Icons.Default.Verified, // Boost/Bolt icon
                     text = "Verify",
-                    iconColor = MaterialTheme.colorScheme.primary,
-                    iconBgColor = MaterialTheme.colorScheme.primaryContainer,
                     onClick = onVerification,
                     modifier = Modifier.weight(1f)
                 )
                 ProfileDashboardCard(
                     icon = Icons.Default.Settings,
                     text = "Settings",
-                    iconColor = MaterialTheme.colorScheme.primary,
-                    iconBgColor = MaterialTheme.colorScheme.primaryContainer,
                     onClick = onSettings,
                     modifier = Modifier.weight(1f)
                 )
@@ -164,8 +154,6 @@ fun ProfileScreen(
 fun ProfileDashboardCard(
     icon: ImageVector,
     text: String,
-    iconColor: Color,
-    iconBgColor: Color,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -183,13 +171,13 @@ fun ProfileDashboardCard(
             modifier = Modifier
                 .size(48.dp)
                 .clip(CircleShape)
-                .background(iconBgColor),
+                .background(MaterialTheme.colorScheme.surfaceVariant),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = text,
-                tint = iconColor,
+                tint = MaterialTheme.colorScheme.extended.textSecondary,
                 modifier = Modifier.size(24.dp)
             )
         }

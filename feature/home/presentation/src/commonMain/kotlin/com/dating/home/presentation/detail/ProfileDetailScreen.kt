@@ -49,7 +49,8 @@ fun ProfileDetailScreen(
     val userBio = "¡Hermoso día para salir a caminar! 🌞\nMe gusta el café, la naturaleza y viajar."
 
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.fillMaxSize(),
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = {},
@@ -57,7 +58,8 @@ fun ProfileDetailScreen(
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = "Back",
+                            tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
                 },
@@ -77,7 +79,7 @@ fun ProfileDetailScreen(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
-                    .background(Color.LightGray)
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
             ) {
                  if (imageUrl != null) {
                     AsyncImage(
@@ -88,7 +90,12 @@ fun ProfileDetailScreen(
                     )
                  } else {
                      Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                         Icon(Icons.Default.Info, null, Modifier.size(64.dp), Color.Gray)
+                         Icon(
+                             imageVector = Icons.Default.Info, 
+                             contentDescription = null, 
+                             modifier = Modifier.size(64.dp), 
+                             tint = MaterialTheme.colorScheme.onSurfaceVariant
+                         )
                      }
                  }
             }
@@ -101,17 +108,20 @@ fun ProfileDetailScreen(
                 Text(
                     text = "$userName, $userAge",
                     style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = "Bio",
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onBackground
                 )
                 Text(
                     text = userBio,
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onBackground
                 )
             }
             
@@ -133,12 +143,12 @@ fun ProfileDetailScreen(
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = "Pass",
-                        tint = Color.Red,
+                        tint = MaterialTheme.colorScheme.error,
                         modifier = Modifier.size(32.dp)
                     )
                 }
                 
-                IconButton(
+                IconButton( // Like Button
                     onClick = { onBack() },
                     modifier = Modifier
                         .size(64.dp)

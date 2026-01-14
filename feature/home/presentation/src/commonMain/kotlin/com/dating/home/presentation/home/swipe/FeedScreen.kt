@@ -46,7 +46,7 @@ fun FeedScreen(
     Scaffold(
         modifier = modifier,
         topBar = {
-            MainTopAppBar(title = "Descubre")
+            MainTopAppBar(title = "Aura")
         }
     ) { paddingValues ->
         Box(

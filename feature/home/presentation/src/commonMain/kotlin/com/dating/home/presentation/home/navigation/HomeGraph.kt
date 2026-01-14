@@ -11,6 +11,7 @@ import com.dating.home.presentation.profile.edit_profile.EditProfileScreen
 import com.dating.home.presentation.profile.settings.SettingsScreen
 import com.dating.home.presentation.detail.ProfileDetailScreen
 import com.dating.home.presentation.chat.chat_detail.ChatDetailRoot
+import com.dating.home.presentation.profile.verification.VerificationScreen
 
 fun NavGraphBuilder.homeGraph(
     navController: NavController,
@@ -82,7 +83,9 @@ fun NavGraphBuilder.homeGraph(
         }
 
         composable<HomeGraphRoutes.VerificationRoute> {
-            // Placeholder
+            VerificationScreen(
+                onBack = { navController.popBackStack() }
+            )
         }
 
         composable<HomeGraphRoutes.SubscriptionRoute> {
