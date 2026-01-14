@@ -70,7 +70,6 @@ fun SettingsScreen(
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             AppCenterTopBar(
                 title = "Settings",
@@ -127,7 +126,6 @@ fun SettingsScreen(
                     icon = Icons.Default.Star,
                     title = "Manage Subscription",
                     subtitle = "PRO PLAN ACTIVE",
-                    subtitleColor = MaterialTheme.colorScheme.extended.textSecondary,
                     iconBgColor = MaterialTheme.colorScheme.surfaceVariant,
                     onClick = { /* TODO */ }
                 )

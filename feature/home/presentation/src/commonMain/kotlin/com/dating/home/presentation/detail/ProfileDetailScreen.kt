@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Info
@@ -23,8 +22,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,6 +30,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.dating.core.designsystem.components.header.AppCenterTopBar
+import com.dating.core.designsystem.theme.extended
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,22 +49,11 @@ fun ProfileDetailScreen(
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        containerColor = MaterialTheme.colorScheme.background,
+        containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
-            TopAppBar(
-                title = {},
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = MaterialTheme.colorScheme.onBackground
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent
-                )
+            AppCenterTopBar(
+                title = "",
+                onBack = onBack,
             )
         }
     ) { paddingValues ->
@@ -81,23 +69,23 @@ fun ProfileDetailScreen(
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.surfaceVariant)
             ) {
-                 if (imageUrl != null) {
+                if (imageUrl != null) {
                     AsyncImage(
                         model = imageUrl,
                         contentDescription = null,
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
                     )
-                 } else {
-                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                         Icon(
-                             imageVector = Icons.Default.Info, 
-                             contentDescription = null, 
-                             modifier = Modifier.size(64.dp), 
-                             tint = MaterialTheme.colorScheme.onSurfaceVariant
-                         )
-                     }
-                 }
+                } else {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = null,
+                            modifier = Modifier.size(64.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
             }
 
             // Info
@@ -109,24 +97,24 @@ fun ProfileDetailScreen(
                     text = "$userName, $userAge",
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground
+                    color = MaterialTheme.colorScheme.extended.textPrimary
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = "Bio",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onBackground
+                    color = MaterialTheme.colorScheme.extended.textPrimary
                 )
                 Text(
                     text = userBio,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onBackground
+                    color = MaterialTheme.colorScheme.extended.textPrimary
                 )
             }
-            
+
             // Actions
-             Row(
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(32.dp),
@@ -137,8 +125,7 @@ fun ProfileDetailScreen(
                     onClick = { onBack() },
                     modifier = Modifier
                         .size(64.dp)
-                        .background(MaterialTheme.colorScheme.surface, CircleShape)
-                        .padding(4.dp)
+                        .background(MaterialTheme.colorScheme.background, CircleShape)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
@@ -147,13 +134,12 @@ fun ProfileDetailScreen(
                         modifier = Modifier.size(32.dp)
                     )
                 }
-                
-                IconButton( // Like Button
+
+                IconButton(
                     onClick = { onBack() },
                     modifier = Modifier
                         .size(64.dp)
-                        .background(MaterialTheme.colorScheme.surface, CircleShape)
-                        .padding(4.dp)
+                        .background(MaterialTheme.colorScheme.background, CircleShape)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Favorite,

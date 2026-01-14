@@ -32,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.dating.core.designsystem.components.buttons.AppButtonStyle
 import com.dating.core.designsystem.components.buttons.ChirpButton
 import com.dating.core.designsystem.components.header.AppCenterTopBar
 import com.dating.core.designsystem.theme.extended
@@ -43,7 +44,6 @@ fun VerificationScreen(
 ) {
     Scaffold(
         modifier = modifier,
-        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             AppCenterTopBar(
                 title = "SECURITY PROTOCOL",
@@ -85,7 +85,7 @@ fun VerificationScreen(
                     fontWeight = FontWeight.Bold,
                     fontSize = 24.sp
                 ),
-                color = MaterialTheme.colorScheme.onBackground
+                color = MaterialTheme.colorScheme.extended.textPrimary
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -128,7 +128,8 @@ fun VerificationScreen(
             ChirpButton(
                 text = "Begin Verification",
                 onClick = { /* TODO: Start verification flow */ },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                style = AppButtonStyle.PRIMARY_PURPLE
             )
 
             Spacer(modifier = Modifier.height(24.dp))

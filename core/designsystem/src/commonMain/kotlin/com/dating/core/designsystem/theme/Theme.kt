@@ -79,7 +79,7 @@ val LightExtendedColors = ExtendedColors(
     secondaryFill = ChirpBase100,
 
     textPrimary = ChirpBase1000,
-    textTertiary = ChirpBase800,
+    textTertiary = ChirpBase0,
     textSecondary = ChirpBase900,
     textPlaceholder = ChirpBase700,
     textDisabled = ChirpBase400,
@@ -124,7 +124,7 @@ val DarkExtendedColors = ExtendedColors(
     secondaryFill = ChirpBase900,
 
     textPrimary = ChirpBase0,
-    textTertiary = ChirpBase200,
+    textTertiary = ChirpBase0,
     textSecondary = ChirpBase150,
     textPlaceholder = ChirpBase400,
     textDisabled = ChirpBase500,
@@ -178,11 +178,11 @@ val LightColorScheme = lightColorScheme(
     errorContainer = ChirpRed200,
     onErrorContainer = ChirpRed600,
 
-    background = ChirpBrand1000,
+    background = ChirpBase0,
     onBackground = ChirpBase0,
-    surface = ChirpBase0,
+    surface = ChirpBase100,
     onSurface = ChirpBase1000,
-    surfaceVariant = ChirpBase100,
+    surfaceVariant = ChirpBrand1000,
     onSurfaceVariant = ChirpBase900,
 
     outline = ChirpBase1000Alpha8,

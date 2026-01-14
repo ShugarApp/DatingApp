@@ -59,8 +59,7 @@ fun ProfileScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     Scaffold(
-        modifier = modifier.fillMaxSize().padding(top = 32.dp),
-        containerColor = MaterialTheme.colorScheme.background,
+        modifier = modifier.fillMaxSize().padding(top = 32.dp)
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -177,7 +176,7 @@ fun ProfileDashboardCard(
             Icon(
                 imageVector = icon,
                 contentDescription = text,
-                tint = MaterialTheme.colorScheme.extended.textSecondary,
+                tint = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.size(24.dp)
             )
         }

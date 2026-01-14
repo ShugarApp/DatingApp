@@ -34,7 +34,6 @@ fun AccessCardItem(
     title: String,
     modifier: Modifier = Modifier,
     subtitle: String? = null,
-    subtitleColor: Color = Color.Unspecified,
     iconBgColor: Color = MaterialTheme.colorScheme.surfaceVariant,
     badgeCount: Int? = null,
     onClick: () -> Unit = {}
@@ -60,7 +59,7 @@ fun AccessCardItem(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.extended.textSecondary,
+                tint = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.size(18.dp)
             )
         }
@@ -80,7 +79,7 @@ fun AccessCardItem(
                     text = subtitle,
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
-                    color = subtitleColor
+                    color = MaterialTheme.colorScheme.extended.textDisabled
                 )
             }
         }

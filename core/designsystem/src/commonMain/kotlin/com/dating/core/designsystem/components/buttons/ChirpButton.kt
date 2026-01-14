@@ -24,6 +24,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 enum class AppButtonStyle {
     PRIMARY,
+    PRIMARY_PURPLE,
     DESTRUCTIVE_PRIMARY,
     SECONDARY,
     DESTRUCTIVE_SECONDARY,
@@ -43,7 +44,13 @@ fun ChirpButton(
     val colors = when(style) {
         AppButtonStyle.PRIMARY -> ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary,
+            contentColor = MaterialTheme.colorScheme.extended.textPrimary,
+            disabledContainerColor = MaterialTheme.colorScheme.extended.disabledFill,
+            disabledContentColor = MaterialTheme.colorScheme.extended.textDisabled
+        )
+        AppButtonStyle.PRIMARY_PURPLE -> ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.extended.textTertiary,
             disabledContainerColor = MaterialTheme.colorScheme.extended.disabledFill,
             disabledContentColor = MaterialTheme.colorScheme.extended.textDisabled
         )

@@ -31,15 +31,14 @@ import aura.feature.home.presentation.generated.resources.Res
 import aura.feature.home.presentation.generated.resources.create_chat
 import aura.feature.home.presentation.generated.resources.no_chats
 import aura.feature.home.presentation.generated.resources.no_chats_subtitle
-import com.dating.core.designsystem.components.header.MainTopAppBar
-import com.dating.home.presentation.chat.chat_list.components.ChatListItemUi
-import com.dating.home.presentation.chat.components.EmptySection
 import com.dating.core.designsystem.components.brand.ChirpHorizontalDivider
 import com.dating.core.designsystem.components.buttons.ChirpFloatingActionButton
+import com.dating.core.designsystem.components.header.MainTopAppBar
 import com.dating.core.designsystem.theme.AppTheme
-import com.dating.core.designsystem.theme.extended
 import com.dating.core.presentation.permissions.Permission
 import com.dating.core.presentation.permissions.rememberPermissionController
+import com.dating.home.presentation.chat.chat_list.components.ChatListItemUi
+import com.dating.home.presentation.chat.components.EmptySection
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
@@ -87,7 +86,6 @@ fun ChatListScreen(
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        containerColor = MaterialTheme.colorScheme.extended.surfaceLower,
         contentWindowInsets = WindowInsets.safeDrawing,
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
@@ -123,9 +121,7 @@ fun ChatListScreen(
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxWidth()
-                            .padding(
-                                horizontal = 8.dp
-                            )
+                            .padding(horizontal = 8.dp)
                     )
                 }
 
