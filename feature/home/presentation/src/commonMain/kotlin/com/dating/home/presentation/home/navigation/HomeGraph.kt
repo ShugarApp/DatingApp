@@ -18,7 +18,6 @@ fun NavGraphBuilder.homeGraph(
 ) {
     navigation<HomeGraphRoutes.Home>(
         startDestination = HomeGraphRoutes.BottomNavContainer(null)
-        //startDestination = HomeGraphRoutes.ChatListDetailRoute(null)
     ) {
         composable<HomeGraphRoutes.ChatDetailRoute>(
             deepLinks = listOf(
@@ -39,8 +38,8 @@ fun NavGraphBuilder.homeGraph(
 
         composable<HomeGraphRoutes.BottomNavContainer> { backStackEntry ->
             BottomNavigationContainer(
-                onNavigateToProfile = { userId ->
-                    navController.navigate(HomeGraphRoutes.ProfileDetailRoute(userId))
+                onNavigateToProfile = { userId, imageUrl ->
+                    navController.navigate(HomeGraphRoutes.ProfileDetailRoute(userId, imageUrl))
                 },
                 onNavigateToChatDetail = { chatId ->
                     navController.navigate(HomeGraphRoutes.ChatDetailRoute(chatId))
@@ -64,6 +63,7 @@ fun NavGraphBuilder.homeGraph(
             val route: HomeGraphRoutes.ProfileDetailRoute = backStackEntry.toRoute()
             ProfileDetailScreen(
                 userId = route.userId,
+                imageUrl = route.encodedImageUrl,
                 onBack = { navController.popBackStack() }
             )
         }

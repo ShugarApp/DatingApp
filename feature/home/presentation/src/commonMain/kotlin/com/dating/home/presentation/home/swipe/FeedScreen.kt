@@ -80,7 +80,7 @@ fun FeedScreen(
                         ) {
                             FeedCardContent(
                                 feedItem = feedItem,
-                                onClick = { onAction(FeedAction.OnUserClick(feedItem.userId)) }
+                                onClick = { onAction(FeedAction.OnUserClick(feedItem.userId, feedItem.imageUrl)) }
                             )
                         }
                     } else {

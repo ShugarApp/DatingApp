@@ -38,6 +38,7 @@ import coil3.compose.AsyncImage
 @Composable
 fun ProfileDetailScreen(
     userId: String,
+    imageUrl: String?,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -46,7 +47,6 @@ fun ProfileDetailScreen(
     val userName = "María García"
     val userAge = 25
     val userBio = "¡Hermoso día para salir a caminar! 🌞\nMe gusta el café, la naturaleza y viajar."
-    val imageUrl: String? = "https://example.com/placeholder.jpg" // Use null or placeholder logic
 
     Scaffold(
         modifier = modifier,

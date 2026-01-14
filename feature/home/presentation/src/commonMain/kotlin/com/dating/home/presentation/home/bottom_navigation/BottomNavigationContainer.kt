@@ -17,7 +17,7 @@ import com.dating.home.presentation.profile.profile.ProfileScreen
 
 @Composable
 fun BottomNavigationContainer(
-    onNavigateToProfile: (String) -> Unit,
+    onNavigateToProfile: (String, String?) -> Unit,
     onNavigateToChatDetail: (String) -> Unit,
     onEditProfile: () -> Unit,
     onSettings: () -> Unit,

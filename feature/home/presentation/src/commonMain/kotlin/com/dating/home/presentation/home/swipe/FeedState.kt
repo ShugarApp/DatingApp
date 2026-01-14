@@ -24,10 +24,10 @@ sealed interface FeedAction {
     data object OnRefresh : FeedAction
     data class OnLikePost(val postId: String) : FeedAction
     data class OnPass(val postId: String) : FeedAction
-    data class OnUserClick(val userId: String) : FeedAction
+    data class OnUserClick(val userId: String, val imageUrl: String?) : FeedAction
 }
 
 sealed interface FeedEvent {
     data class Error(val error: UiText) : FeedEvent
-    data class NavigateToProfile(val userId: String) : FeedEvent
+    data class NavigateToProfile(val userId: String, val imageUrl: String?) : FeedEvent
 }

@@ -9,7 +9,7 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun FeedRoot(
-    onNavigateToProfile: (String) -> Unit,
+    onNavigateToProfile: (String, String?) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: FeedViewModel = koinViewModel()
 ) {
@@ -22,7 +22,7 @@ fun FeedRoot(
             }
 
             is FeedEvent.NavigateToProfile -> {
-                onNavigateToProfile(event.userId)
+                onNavigateToProfile(event.userId, event.imageUrl)
             }
         }
     }

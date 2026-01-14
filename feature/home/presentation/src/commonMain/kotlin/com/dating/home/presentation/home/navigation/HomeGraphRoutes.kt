@@ -10,7 +10,7 @@ sealed interface HomeGraphRoutes {
     data class BottomNavContainer(val chatId: String? = null) : HomeGraphRoutes
 
     @Serializable
-    data class ProfileDetailRoute(val userId: String) : HomeGraphRoutes
+    data class ProfileDetailRoute(val userId: String, val encodedImageUrl: String? = null) : HomeGraphRoutes
 
     @Serializable
     data class ChatDetailRoute(val chatId: String? = null) : HomeGraphRoutes

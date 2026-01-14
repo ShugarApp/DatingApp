@@ -14,10 +14,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import aura.feature.home.presentation.generated.resources.Res
 import aura.feature.home.presentation.generated.resources.empty_chat
+import com.dating.core.designsystem.theme.AppTheme
 import com.dating.core.designsystem.theme.extended
 import com.dating.core.presentation.util.DeviceConfiguration
 import com.dating.core.presentation.util.currentDeviceConfiguration
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun EmptySection(
@@ -35,7 +37,7 @@ fun EmptySection(
             painter = painterResource(Res.drawable.empty_chat),
             contentDescription = title,
             modifier = Modifier.size(
-                if(configuration == DeviceConfiguration.MOBILE_LANDSCAPE) {
+                if (configuration == DeviceConfiguration.MOBILE_LANDSCAPE) {
                     125.dp
                 } else {
                     200.dp
@@ -52,6 +54,17 @@ fun EmptySection(
             text = description,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.extended.textSecondary
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun Preview() {
+    AppTheme {
+        EmptySection(
+            title = "No Chats",
+            description = "Create new chats to start a conversation",
         )
     }
 }

@@ -28,7 +28,7 @@ class FeedViewModel : ViewModel() {
             is FeedAction.OnPass -> removeItem(action.postId) // Treat pass as removing card
             is FeedAction.OnUserClick -> {
                 viewModelScope.launch {
-                    _events.send(FeedEvent.NavigateToProfile(action.userId))
+                    _events.send(FeedEvent.NavigateToProfile(action.userId, action.imageUrl))
                 }
             }
         }
