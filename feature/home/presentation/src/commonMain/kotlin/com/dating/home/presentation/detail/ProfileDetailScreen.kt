@@ -24,6 +24,8 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.outlined.School
+import androidx.compose.material.icons.outlined.Work
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -187,6 +189,20 @@ fun ProfileDetailScreen(
 
                     Spacer(modifier = Modifier.height(32.dp))
 
+                    // -- Basic Info --
+                    Text(
+                        text = "Basic info",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.extended.textPrimary
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        ChirpChip(text = "${user.height}")
+                        ChirpChip(text = user.zodiac)
+                        ChirpChip(text = "Non-smoker")
+                    }
+                    Spacer(modifier = Modifier.height(32.dp))
+
                     // -- Interests --
                     Text(
                         text = "Interests",
@@ -206,17 +222,25 @@ fun ProfileDetailScreen(
 
                     Spacer(modifier = Modifier.height(32.dp))
 
-                    // -- Basic Info --
+                    // -- Work & Education --
                     Text(
-                        text = "Basic info",
+                        text = "Work & Education",
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.extended.textPrimary
                     )
                     Spacer(modifier = Modifier.height(16.dp))
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        ChirpChip(text = "${user.height}")
-                        ChirpChip(text = user.zodiac)
-                        ChirpChip(text = "Non-smoker")
+
+                    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                        ProfileDetailItem(
+                            icon = Icons.Outlined.Work,
+                            text = user.job,
+                            subtext = user.company
+                        )
+                        ProfileDetailItem(
+                            icon = Icons.Outlined.School,
+                            text = "University",
+                            subtext = "Master's"
+                        )
                     }
                 }
             }
