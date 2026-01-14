@@ -78,7 +78,10 @@ fun NavGraphBuilder.homeGraph(
         composable<HomeGraphRoutes.SettingsRoute> {
             SettingsScreen(
                 onBack = { navController.popBackStack() },
-                onLogout = onLogout
+                onLogout = onLogout,
+                onChangePassword = {
+                    navController.navigate(HomeGraphRoutes.ChangePasswordRoute)
+                }
             )
         }
 
@@ -90,6 +93,12 @@ fun NavGraphBuilder.homeGraph(
 
         composable<HomeGraphRoutes.SubscriptionRoute> {
             // Placeholder
+        }
+
+        composable<HomeGraphRoutes.ChangePasswordRoute> {
+            com.dating.home.presentation.profile.settings.changepassword.ChangePasswordScreen(
+                onBack = { navController.popBackStack() }
+            )
         }
     }
 }

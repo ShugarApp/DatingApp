@@ -57,6 +57,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun SettingsScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit,
+    onChangePassword: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SettingsViewModel = koinViewModel()
 ) {
@@ -113,6 +114,18 @@ fun SettingsScreen(
                     title = "Age Range",
                     subtitle = "18 - 35",
                     onClick = { /* TODO */ }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+            // Account Settings
+            AccessCardList(
+                title = "Account Settings"
+            ) {
+                 AccessCardItem(
+                    icon = Icons.Default.Security,
+                    title = "Change Password",
+                    onClick = onChangePassword
                 )
             }
 

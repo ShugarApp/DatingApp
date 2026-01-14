@@ -1,238 +1,283 @@
 package com.dating.home.presentation.profile.edit_profile
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import aura.feature.home.presentation.generated.resources.Res
-import aura.feature.home.presentation.generated.resources.cancel
-import aura.feature.home.presentation.generated.resources.contact_chirp_support_change_email
-import aura.feature.home.presentation.generated.resources.current_password
-import aura.feature.home.presentation.generated.resources.delete
-import aura.feature.home.presentation.generated.resources.delete_profile_picture
-import aura.feature.home.presentation.generated.resources.delete_profile_picture_desc
-import aura.feature.home.presentation.generated.resources.email
-import aura.feature.home.presentation.generated.resources.new_password
-import aura.feature.home.presentation.generated.resources.password
-import aura.feature.home.presentation.generated.resources.password_change_successful
-import aura.feature.home.presentation.generated.resources.password_hint
-import aura.feature.home.presentation.generated.resources.profile_image
-import aura.feature.home.presentation.generated.resources.save
-import aura.feature.home.presentation.generated.resources.upload_image
-import com.dating.home.presentation.profile.mediapicker.rememberImagePickerLauncher
-import com.dating.home.presentation.profile.profile.ProfileViewModel
-import com.dating.home.presentation.profile.profile.ProfileAction
-import com.dating.core.designsystem.components.avatar.AvatarSize
-import com.dating.core.designsystem.components.avatar.ChirpAvatarPhoto
-import com.dating.core.designsystem.components.brand.ChirpHorizontalDivider
-import com.dating.core.designsystem.components.buttons.AppButtonStyle
+import coil3.compose.AsyncImage
 import com.dating.core.designsystem.components.buttons.ChirpButton
-import com.dating.core.designsystem.components.dialogs.DestructiveConfirmationDialog
 import com.dating.core.designsystem.components.header.AppCenterTopBar
-import com.dating.core.designsystem.components.textfields.ChirpPasswordTextField
 import com.dating.core.designsystem.components.textfields.ChirpTextField
-import com.dating.core.designsystem.theme.extended
 import com.dating.core.presentation.util.clearFocusOnTap
-import org.jetbrains.compose.resources.stringResource
+import com.dating.home.presentation.profile.mediapicker.rememberImagePickerLauncher
 import org.koin.compose.viewmodel.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun EditProfileScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: ProfileViewModel = koinViewModel()
+    viewModel: EditProfileViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     val launcher = rememberImagePickerLauncher { pickedImageData ->
-        viewModel.onAction(ProfileAction.OnPictureSelected(
+        viewModel.onAction(EditProfileAction.OnPictureSelected(
             pickedImageData.bytes,
             pickedImageData.mimeType
         ))
     }
 
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.fillMaxSize(),
         topBar = {
             AppCenterTopBar(
-                title = "Editar Perfil",
+                title = "Edit Profile",
                 onBack = onBack
             )
+        },
+        bottomBar = {
+             Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                 ChirpButton(
+                    text = "Save",
+                    onClick = { onBack() }, // Mock save action
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .clearFocusOnTap()
                 .fillMaxSize()
-                .padding(top = paddingValues.calculateTopPadding())
-                .background(MaterialTheme.colorScheme.surface)
+                .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp)
         ) {
-            ProfileSectionLayout(
-                headerText = stringResource(Res.string.profile_image)
-            ) {
-                Row {
-                    ChirpAvatarPhoto(
-                        displayText = state.userInitials,
-                        size = AvatarSize.LARGE,
-                        imageUrl = state.profilePictureUrl,
-                        onClick = {
-                            launcher.launch()
-                        }
-                    )
-                    Spacer(modifier = Modifier.width(20.dp))
-                    FlowRow(
-                        modifier = Modifier.weight(1f),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        ChirpButton(
-                            text = stringResource(Res.string.upload_image),
-                            onClick = {
-                                launcher.launch()
-                            },
-                            style = AppButtonStyle.SECONDARY,
-                            enabled = !state.isUploadingImage && !state.isDeletingImage,
-                            isLoading = state.isUploadingImage,
-                            leadingIcon = {
-                                Icon(
-                                    imageVector = Icons.Default.Send,
-                                    contentDescription = stringResource(Res.string.upload_image)
-                                )
-                            }
-                        )
-                        ChirpButton(
-                            text = stringResource(Res.string.delete),
-                            onClick = {
-                                viewModel.onAction(ProfileAction.OnDeletePictureClick)
-                            },
-                            style = AppButtonStyle.DESTRUCTIVE_SECONDARY,
-                            enabled = !state.isUploadingImage
-                                    && !state.isDeletingImage
-                                    && state.profilePictureUrl != null,
-                            isLoading = state.isDeletingImage,
-                            leadingIcon = {
-                                Icon(
-                                    imageVector = Icons.Default.Close,
-                                    contentDescription = stringResource(Res.string.delete)
-                                )
-                            }
-                        )
-                    }
-                }
+            Spacer(modifier = Modifier.height(16.dp))
 
-                if (state.imageError != null) {
-                    Text(
-                        text = state.imageError?.asString() ?: "Error",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-            }
-            ChirpHorizontalDivider()
-            ProfileSectionLayout(
-                headerText = stringResource(Res.string.email)
+            // -- Photos Section --
+            SectionTitle(title = "Photos")
+            Spacer(modifier = Modifier.height(12.dp))
+            PhotoGrid(
+                photos = state.photos,
+                onAddPhoto = { launcher.launch() },
+                onRemovePhoto = { /* TODO */ }
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // -- About Me Section --
+            SectionTitle(title = "About Me")
+            Spacer(modifier = Modifier.height(12.dp))
+            ChirpTextField(
+                state = state.bioTextState,
+                placeholder = "Tell us about yourself...",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(120.dp),
+                singleLine = false
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // -- Interests Section --
+            SectionTitle(title = "Interests")
+            Spacer(modifier = Modifier.height(12.dp))
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                ChirpTextField(
-                    state = state.emailTextState,
-                    enabled = false,
-                    supportingText = stringResource(Res.string.contact_chirp_support_change_email)
-                )
-            }
-            ChirpHorizontalDivider()
-            ProfileSectionLayout(
-                headerText = stringResource(Res.string.password)
-            ) {
-                ChirpPasswordTextField(
-                    state = state.currentPasswordTextState,
-                    isPasswordVisible = state.isCurrentPasswordVisible,
-                    onToggleVisibilityClick = {
-                        viewModel.onAction(ProfileAction.OnToggleCurrentPasswordVisibility)
-                    },
-                    placeholder = stringResource(Res.string.current_password),
-                    isError = state.newPasswordError != null,
-                )
-                ChirpPasswordTextField(
-                    state = state.newPasswordTextState,
-                    isPasswordVisible = state.isNewPasswordVisible,
-                    onToggleVisibilityClick = {
-                        viewModel.onAction(ProfileAction.OnToggleNewPasswordVisibility)
-                    },
-                    placeholder = stringResource(Res.string.new_password),
-                    isError = state.newPasswordError != null,
-                    supportingText = state.newPasswordError?.asString()
-                        ?: stringResource(Res.string.password_hint)
-                )
-                if (state.isPasswordChangeSuccessful) {
-                    Text(
-                        text = stringResource(Res.string.password_change_successful),
-                        color = MaterialTheme.colorScheme.extended.success,
-                        style = MaterialTheme.typography.labelSmall,
-                        textAlign = TextAlign.End,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.End)
-                ) {
-                    ChirpButton(
-                        text = stringResource(Res.string.save),
-                        onClick = {
-                            viewModel.onAction(ProfileAction.OnChangePasswordClick)
-                        },
-                        enabled = state.canChangePassword,
-                        isLoading = state.isChangingPassword
+                state.availableInterests.forEach { interest ->
+                    val isSelected = state.selectedInterests.contains(interest)
+                    InterestChip(
+                        text = interest,
+                        isSelected = isSelected,
+                        onClick = { viewModel.onAction(EditProfileAction.OnInterestSelected(interest)) }
                     )
                 }
             }
+            
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // -- Details Section --
+            SectionTitle(title = "Job Title")
+            Spacer(modifier = Modifier.height(12.dp))
+            ChirpTextField(
+                state = state.jobTitleTextState,
+                placeholder = "Add job title"
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            SectionTitle(title = "Company")
+            Spacer(modifier = Modifier.height(12.dp))
+            ChirpTextField(
+                state = state.companyTextState,
+                placeholder = "Add company"
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+            
+            SectionTitle(title = "Education")
+            Spacer(modifier = Modifier.height(12.dp))
+            ChirpTextField(
+                state = state.educationTextState,
+                placeholder = "Add education"
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            SectionTitle(title = "Location")
+            Spacer(modifier = Modifier.height(12.dp))
+            ChirpTextField(
+                state = state.locationTextState,
+                placeholder = "Add location"
+            )
+            
+            Spacer(modifier = Modifier.height(100.dp)) // Bottom padding for sticky button
         }
+    }
+}
 
-        if (state.showDeleteConfirmationDialog) {
-            DestructiveConfirmationDialog(
-                title = stringResource(Res.string.delete_profile_picture),
-                description = stringResource(Res.string.delete_profile_picture_desc),
-                confirmButtonText = stringResource(Res.string.delete),
-                cancelButtonText = stringResource(Res.string.cancel),
-                onConfirmClick = {
-                    viewModel.onAction(ProfileAction.OnConfirmDeleteClick)
-                },
-                onCancelClick = {
-                    viewModel.onAction(ProfileAction.OnDismissDeleteConfirmationDialogClick)
-                },
-                onDismiss = {
-                    viewModel.onAction(ProfileAction.OnDismissDeleteConfirmationDialogClick)
-                }
+@Composable
+fun SectionTitle(title: String) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+        color = MaterialTheme.colorScheme.onSurface
+    )
+}
+
+@Composable
+fun PhotoGrid(
+    photos: List<String?>,
+    onAddPhoto: () -> Unit,
+    onRemovePhoto: (Int) -> Unit
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        // Row 1
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+           PhotoSlot(photos.getOrNull(0), modifier = Modifier.weight(1f), onAdd = onAddPhoto)
+           PhotoSlot(photos.getOrNull(1), modifier = Modifier.weight(1f), onAdd = onAddPhoto)
+           PhotoSlot(photos.getOrNull(2), modifier = Modifier.weight(1f), onAdd = onAddPhoto)
+        }
+        // Row 2
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+           PhotoSlot(photos.getOrNull(3), modifier = Modifier.weight(1f), onAdd = onAddPhoto)
+           PhotoSlot(photos.getOrNull(4), modifier = Modifier.weight(1f), onAdd = onAddPhoto)
+           PhotoSlot(photos.getOrNull(5), modifier = Modifier.weight(1f), onAdd = onAddPhoto)
+        }
+    }
+}
+
+@Composable
+fun PhotoSlot(
+    imageUrl: String?, 
+    modifier: Modifier = Modifier,
+    onAdd: () -> Unit
+) {
+    Box(
+        modifier = modifier
+            .aspectRatio(0.75f) // Portrait aspect ratio for photos
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .clickable { if (imageUrl == null) onAdd() },
+        contentAlignment = Alignment.Center
+    ) {
+        if (imageUrl != null) {
+            AsyncImage(
+                model = imageUrl,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+            
+            // Remove Button Overlay
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(8.dp)
+                    .size(24.dp)
+                    .background(MaterialTheme.colorScheme.error, CircleShape)
+                    .clickable { /* Remove logic */ },
+                contentAlignment = Alignment.Center
+            ) {
+                 Icon(
+                     imageVector = Icons.Default.Close,
+                     contentDescription = "Remove",
+                     tint = Color.White,
+                     modifier = Modifier.size(16.dp)
+                 )
+            }
+        } else {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = "Add Photo",
+                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                modifier = Modifier.size(32.dp)
             )
         }
+    }
+}
+
+@Composable
+fun InterestChip(
+    text: String,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(100.dp))
+            .background(
+                if (isSelected) MaterialTheme.colorScheme.primary 
+                else MaterialTheme.colorScheme.surfaceVariant
+            )
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
+            color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
