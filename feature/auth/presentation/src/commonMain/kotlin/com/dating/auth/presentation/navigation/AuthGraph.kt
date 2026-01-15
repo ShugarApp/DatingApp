@@ -10,6 +10,7 @@ import com.dating.auth.presentation.forgot_password.ForgotPasswordRoot
 import com.dating.auth.presentation.login.LoginRoot
 import com.dating.auth.presentation.onboarding.OnboardingScreen
 import com.dating.auth.presentation.register.RegisterRoot
+import com.dating.auth.presentation.register.StepsRegisterRoot
 import com.dating.auth.presentation.register_success.RegisterSuccessRoot
 import com.dating.auth.presentation.reset_password.ResetPasswordRoot
 
@@ -46,8 +47,8 @@ fun NavGraphBuilder.authGraph(
         }
         composable<AuthGraphRoutes.Register> {
             RegisterRoot(
-                onRegisterSuccess = {
-                    navController.navigate(AuthGraphRoutes.RegisterSuccess(it))
+                onNextClick = { email, password ->
+                    navController.navigate(AuthGraphRoutes.StepsRegister(email, password))
                 },
                 onLoginClick = {
                     navController.navigate(AuthGraphRoutes.Login) {
@@ -58,6 +59,16 @@ fun NavGraphBuilder.authGraph(
                         launchSingleTop = true
                         restoreState = true
                     }
+                },
+                onBackClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        composable<AuthGraphRoutes.StepsRegister> {
+            StepsRegisterRoot(
+                onRegisterSuccess = { email ->
+                    navController.navigate(AuthGraphRoutes.RegisterSuccess(email))
                 },
                 onBackClick = {
                     navController.popBackStack()

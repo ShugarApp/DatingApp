@@ -66,11 +66,15 @@ class LoginViewModel(
     fun onAction(action: LoginAction) {
         when (action) {
             LoginAction.OnLoginClick -> login()
+            LoginAction.OnBackClick -> {}
             LoginAction.OnTogglePasswordVisibility -> {
-                _state.update { it.copy(
-                    isPasswordVisible = !it.isPasswordVisible
-                ) }
+                _state.update {
+                    it.copy(
+                        isPasswordVisible = !it.isPasswordVisible
+                    )
+                }
             }
+
             else -> Unit
         }
     }
@@ -81,21 +85,25 @@ class LoginViewModel(
             isPasswordNotBlankFlow,
             isRegisteringFlow
         ) { isEmailValid, isPasswordNotBlank, isRegistering ->
-            _state.update { it.copy(
-                canLogin = !isRegistering && isEmailValid && isPasswordNotBlank
-            ) }
+            _state.update {
+                it.copy(
+                    canLogin = !isRegistering && isEmailValid && isPasswordNotBlank
+                )
+            }
         }.launchIn(viewModelScope)
     }
 
     private fun login() {
-        if(!state.value.canLogin) {
+        if (!state.value.canLogin) {
             return
         }
 
         viewModelScope.launch {
-            _state.update { it.copy(
-                isLoggingIn = true
-            ) }
+            _state.update {
+                it.copy(
+                    isLoggingIn = true
+                )
+            }
 
             val email = state.value.emailTextFieldState.text.toString()
             val password = state.value.passwordTextFieldState.text.toString()
@@ -108,22 +116,26 @@ class LoginViewModel(
                 .onSuccess { authInfo ->
                     sessionStorage.set(authInfo)
 
-                    _state.update { it.copy(
-                        isLoggingIn = false
-                    ) }
+                    _state.update {
+                        it.copy(
+                            isLoggingIn = false
+                        )
+                    }
                     eventChannel.send(LoginEvent.Success)
                 }
                 .onFailure { error ->
-                    val errorMessage = when(error) {
+                    val errorMessage = when (error) {
                         DataError.Remote.UNAUTHORIZED -> UiText.Resource(Res.string.error_invalid_credentials)
                         DataError.Remote.FORBIDDEN -> UiText.Resource(Res.string.error_email_not_verified)
                         else -> error.toUiText()
                     }
 
-                    _state.update { it.copy(
-                        error = errorMessage,
-                        isLoggingIn = false
-                    ) }
+                    _state.update {
+                        it.copy(
+                            error = errorMessage,
+                            isLoggingIn = false
+                        )
+                    }
                 }
         }
     }
