@@ -42,6 +42,9 @@ fun NavGraphBuilder.authGraph(
                         restoreState = true
                         launchSingleTop = true
                     }
+                },
+                onBackClick = {
+                    navController.popBackStack()
                 }
             )
         }

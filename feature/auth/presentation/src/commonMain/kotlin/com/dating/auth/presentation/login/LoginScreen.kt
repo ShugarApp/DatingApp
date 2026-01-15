@@ -50,13 +50,15 @@ fun LoginRoot(
     viewModel: LoginViewModel = koinViewModel(),
     onLoginSuccess: () -> Unit,
     onForgotPasswordClick: () -> Unit,
-    onCreateAccountClick: () -> Unit
+    onCreateAccountClick: () -> Unit,
+    onBackClick: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
             LoginEvent.Success -> onLoginSuccess()
+            LoginEvent.OnBack -> onBackClick()
         }
     }
 
@@ -66,9 +68,9 @@ fun LoginRoot(
             when (action) {
                 LoginAction.OnForgotPasswordClick -> onForgotPasswordClick()
                 LoginAction.OnSignUpClick -> onCreateAccountClick()
-                else -> Unit
+                LoginAction.OnBackClick -> viewModel.onAction(action)
+                else -> viewModel.onAction(action)
             }
-            viewModel.onAction(action)
         }
     )
 }
@@ -86,7 +88,7 @@ fun LoginScreen(
                 AppCenterTopBar(
                     title = "",
                     containerColor = MaterialTheme.colorScheme.background,
-                    onBack = { }
+                    onBack = { onAction(LoginAction.OnBackClick) }
                 )
             }
         }

@@ -66,7 +66,9 @@ class LoginViewModel(
     fun onAction(action: LoginAction) {
         when (action) {
             LoginAction.OnLoginClick -> login()
-            LoginAction.OnBackClick -> {}
+            LoginAction.OnBackClick -> {
+                viewModelScope.launch { eventChannel.send(LoginEvent.OnBack) }
+            }
             LoginAction.OnTogglePasswordVisibility -> {
                 _state.update {
                     it.copy(
