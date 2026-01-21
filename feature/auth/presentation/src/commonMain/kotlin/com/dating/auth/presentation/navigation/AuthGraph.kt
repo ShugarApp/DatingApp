@@ -135,7 +135,11 @@ fun NavGraphBuilder.authGraph(
                 },
             )
         ) {
-            ResetPasswordRoot()
+            ResetPasswordRoot(
+                onBackClick = {
+                    navController.popBackStack()
+                }
+            )
         }
     }
 }

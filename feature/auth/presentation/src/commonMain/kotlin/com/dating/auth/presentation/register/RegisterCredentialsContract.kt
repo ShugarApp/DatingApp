@@ -15,15 +15,15 @@ data class RegisterCredentialsState(
 )
 
 sealed interface RegisterCredentialsAction {
-    data object OnLoginClick: RegisterCredentialsAction
-    data object OnInputTextFocusGain: RegisterCredentialsAction
-    data object OnTogglePasswordVisibilityClick: RegisterCredentialsAction
-    data object OnNextClick: RegisterCredentialsAction
-    data object OnBackClick: RegisterCredentialsAction
+    data object OnLoginClick : RegisterCredentialsAction
+    data object OnInputTextFocusGain : RegisterCredentialsAction
+    data object OnTogglePasswordVisibilityClick : RegisterCredentialsAction
+    data object OnNextClick : RegisterCredentialsAction
+    data object OnBackClick : RegisterCredentialsAction
 }
 
 sealed interface RegisterCredentialsEvent {
-    data class OnNext(val email: String, val password: String): RegisterCredentialsEvent
-    data object OnBack: RegisterCredentialsEvent
-    data object OnLogin: RegisterCredentialsEvent
+    data class OnNext(val email: String, val password: String) : RegisterCredentialsEvent
+    data object OnBack : RegisterCredentialsEvent
+    data object OnLogin : RegisterCredentialsEvent
 }

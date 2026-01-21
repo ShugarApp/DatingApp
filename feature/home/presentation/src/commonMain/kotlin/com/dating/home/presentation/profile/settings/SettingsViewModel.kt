@@ -27,17 +27,12 @@ class SettingsViewModel(
         _state,
         sessionStorage.observeAuthInfo()
     ) { currentState, authInfo ->
-        if (authInfo != null) {
-            currentState.copy(
-                username = authInfo.user.username
-            )
-        } else currentState
-    }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000L),
-            initialValue = SettingsState()
-        )
+        if (authInfo != null) currentState.copy(username = authInfo.user.username) else currentState
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000L),
+        initialValue = SettingsState()
+    )
 
     fun onAction(action: SettingsAction) {
         when (action) {

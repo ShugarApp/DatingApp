@@ -8,7 +8,7 @@ import java.io.File
 fun createDataStore(): DataStore<Preferences> = createDataStore {
     val directory = appDataDirectory
 
-    if(!directory.exists()) {
+    if (!directory.exists()) {
         directory.mkdirs()
     }
 

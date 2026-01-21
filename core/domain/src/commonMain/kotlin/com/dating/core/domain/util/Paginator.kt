@@ -1,7 +1,7 @@
 package com.dating.core.domain.util
 
-import kotlinx.coroutines.ensureActive
 import kotlin.coroutines.coroutineContext
+import kotlinx.coroutines.ensureActive
 
 class Paginator<Key, Item>(
     private val initialKey: Key,
@@ -16,11 +16,11 @@ class Paginator<Key, Item>(
     private var lastRequestKey: Key? = null
 
     suspend fun loadNextItems() {
-        if(isMakingRequest) {
+        if (isMakingRequest) {
             return
         }
 
-        if(currentKey != null && currentKey == lastRequestKey) {
+        if (currentKey != null && currentKey == lastRequestKey) {
             return
         }
 
@@ -39,7 +39,7 @@ class Paginator<Key, Item>(
                 .onFailure { error ->
                     onError(DataErrorException(error))
                 }
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             coroutineContext.ensureActive()
 
             onError(e)

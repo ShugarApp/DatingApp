@@ -13,9 +13,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
 
-class DataStoreSessionStorage(
-    private val dataStore: DataStore<Preferences>
-): SessionStorage {
+class DataStoreSessionStorage(private val dataStore: DataStore<Preferences>) : SessionStorage {
 
     private val authInfoKey = stringPreferencesKey("KEY_AUTH_INFO")
 
@@ -33,7 +31,7 @@ class DataStoreSessionStorage(
     }
 
     override suspend fun set(info: AuthInfo?) {
-        if(info == null) {
+        if (info == null) {
             dataStore.edit {
                 it.remove(authInfoKey)
             }

@@ -52,30 +52,35 @@ class RegisterSuccessViewModel(
     }
 
     private fun resendVerification() {
-        if(state.value.isResendingVerificationEmail) {
+        if (state.value.isResendingVerificationEmail) {
             return
         }
 
         viewModelScope.launch {
-            _state.update { it.copy(
-                isResendingVerificationEmail = true
-            ) }
+            _state.update {
+                it.copy(
+                    isResendingVerificationEmail = true
+                )
+            }
 
             authService
                 .resendVerificationEmail(email)
                 .onSuccess {
-                    _state.update { it.copy(
-                        isResendingVerificationEmail = false
-                    ) }
+                    _state.update {
+                        it.copy(
+                            isResendingVerificationEmail = false
+                        )
+                    }
                     eventChannel.send(RegisterSuccessEvent.ResendVerificationEmailSuccess)
                 }
                 .onFailure { error ->
-                    _state.update { it.copy(
-                        isResendingVerificationEmail = false,
-                        resendVerificationError = error.toUiText()
-                    ) }
+                    _state.update {
+                        it.copy(
+                            isResendingVerificationEmail = false,
+                            resendVerificationError = error.toUiText()
+                        )
+                    }
                 }
         }
     }
-
 }

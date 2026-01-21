@@ -69,6 +69,7 @@ class LoginViewModel(
             LoginAction.OnBackClick -> {
                 viewModelScope.launch { eventChannel.send(LoginEvent.OnBack) }
             }
+
             LoginAction.OnTogglePasswordVisibility -> {
                 _state.update {
                     it.copy(
@@ -141,5 +142,4 @@ class LoginViewModel(
                 }
         }
     }
-
 }

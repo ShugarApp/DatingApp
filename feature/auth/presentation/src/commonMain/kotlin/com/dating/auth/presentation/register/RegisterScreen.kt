@@ -1,6 +1,7 @@
 package com.dating.auth.presentation.register
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Spacer
@@ -10,8 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -59,9 +58,11 @@ fun RegisterRoot(
             is RegisterCredentialsEvent.OnNext -> {
                 onNextClick(event.email, event.password)
             }
+
             RegisterCredentialsEvent.OnBack -> {
                 onBackClick()
             }
+
             RegisterCredentialsEvent.OnLogin -> {
                 onLoginClick()
             }
@@ -99,86 +100,77 @@ fun RegisterScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .imePadding()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(horizontal = 24.dp)
+                .imePadding(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // ──────────────── CONTENT ────────────────
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
 
-                Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
-                AppBrandLogo(modifier = Modifier.size(80.dp))
-                Spacer(modifier = Modifier.height(32.dp))
+            AppBrandLogo(modifier = Modifier.size(80.dp))
 
-                Text(
-                    text = stringResource(Res.string.create_account),
-                    color = MaterialTheme.colorScheme.onSurface,
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
+            Spacer(modifier = Modifier.height(32.dp))
 
-                Spacer(modifier = Modifier.height(32.dp))
+            Text(
+                text = stringResource(Res.string.create_account),
+                color = MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.headlineMedium,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
 
-                ChirpTextField(
-                    state = state.emailTextState,
-                    placeholder = stringResource(Res.string.email_placeholder),
-                    title = stringResource(Res.string.email),
-                    supportingText = state.emailError?.asString(),
-                    isError = state.emailError != null,
-                    onFocusChanged = {
-                        onAction(RegisterCredentialsAction.OnInputTextFocusGain)
-                    },
-                    keyboardType = KeyboardType.Email,
-                    modifier = Modifier.fillMaxWidth()
-                )
+            Spacer(modifier = Modifier.height(32.dp))
 
-                Spacer(modifier = Modifier.height(16.dp))
+            ChirpTextField(
+                state = state.emailTextState,
+                placeholder = stringResource(Res.string.email_placeholder),
+                title = stringResource(Res.string.email),
+                supportingText = state.emailError?.asString(),
+                isError = state.emailError != null,
+                onFocusChanged = {
+                    onAction(RegisterCredentialsAction.OnInputTextFocusGain)
+                },
+                keyboardType = KeyboardType.Email,
+                modifier = Modifier.fillMaxWidth()
+            )
 
-                ChirpPasswordTextField(
-                    state = state.passwordTextState,
-                    placeholder = stringResource(Res.string.password),
-                    title = stringResource(Res.string.password),
-                    supportingText = state.passwordError?.asString() ?: stringResource(Res.string.password_hint),
-                    isError = state.passwordError != null,
-                    onFocusChanged = {
-                        onAction(RegisterCredentialsAction.OnInputTextFocusGain)
-                    },
-                    onToggleVisibilityClick = {
-                        onAction(RegisterCredentialsAction.OnTogglePasswordVisibilityClick)
-                    },
-                    isPasswordVisible = state.isPasswordVisible,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // ──────────────── BOTTOM ACTIONS ────────────────
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp, vertical = 48.dp)
-            ) {
-                ChirpButton(
-                    text = stringResource(Res.string.next),
-                    onClick = { onAction(RegisterCredentialsAction.OnNextClick) },
-                    enabled = state.canProceed,
-                    modifier = Modifier.fillMaxWidth()
-                )
+            ChirpPasswordTextField(
+                state = state.passwordTextState,
+                placeholder = stringResource(Res.string.password),
+                title = stringResource(Res.string.password),
+                supportingText = state.passwordError?.asString() ?: stringResource(Res.string.password_hint),
+                isError = state.passwordError != null,
+                onFocusChanged = {
+                    onAction(RegisterCredentialsAction.OnInputTextFocusGain)
+                },
+                onToggleVisibilityClick = {
+                    onAction(RegisterCredentialsAction.OnTogglePasswordVisibilityClick)
+                },
+                isPasswordVisible = state.isPasswordVisible,
+                modifier = Modifier.fillMaxWidth()
+            )
 
-                Spacer(modifier = Modifier.height(16.dp))
-                
-                ChirpButton(
-                    text = stringResource(Res.string.login),
-                    onClick = { onAction(RegisterCredentialsAction.OnLoginClick) },
-                    style = AppButtonStyle.SECONDARY,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
+            Spacer(modifier = Modifier.weight(1f))
+
+            ChirpButton(
+                text = stringResource(Res.string.next),
+                onClick = { onAction(RegisterCredentialsAction.OnNextClick) },
+                enabled = state.canProceed,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            ChirpButton(
+                text = stringResource(Res.string.login),
+                onClick = { onAction(RegisterCredentialsAction.OnLoginClick) },
+                style = AppButtonStyle.TEXT,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(64.dp))
         }
     }
 }

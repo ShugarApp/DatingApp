@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.map
 
 class DataStoreThemePreferences(
     private val dataStore: DataStore<Preferences>
-): ThemePreferences {
+) : ThemePreferences {
 
     private val themePreferenceKey = stringPreferencesKey("theme_preference")
 
@@ -22,7 +22,7 @@ class DataStoreThemePreferences(
                 val currentPreference = preferences[themePreferenceKey] ?: ThemePreference.SYSTEM.name
                 try {
                     ThemePreference.valueOf(currentPreference)
-                } catch(_: Exception) {
+                } catch (_: Exception) {
                     ThemePreference.SYSTEM
                 }
             }

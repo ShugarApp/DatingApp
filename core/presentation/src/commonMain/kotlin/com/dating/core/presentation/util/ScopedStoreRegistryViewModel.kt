@@ -3,7 +3,7 @@ package com.dating.core.presentation.util
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelStore
 
-class ScopedStoreRegistryViewModel: ViewModel() {
+class ScopedStoreRegistryViewModel : ViewModel() {
 
     private val stores = mutableMapOf<String, ViewModelStore>()
 

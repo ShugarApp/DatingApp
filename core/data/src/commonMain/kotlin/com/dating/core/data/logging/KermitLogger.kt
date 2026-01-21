@@ -3,7 +3,7 @@ package com.dating.core.data.logging
 import co.touchlab.kermit.Logger
 import com.dating.core.domain.logging.AppLogger
 
-object KermitLogger: AppLogger {
+object KermitLogger : AppLogger {
 
     override fun debug(message: String) {
         Logger.d(message)

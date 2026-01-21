@@ -21,9 +21,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.plugins.auth.authProvider
 import io.ktor.client.plugins.auth.providers.BearerAuthProvider
 
-class KtorAuthService(
-    private val httpClient: HttpClient
-): AuthService {
+class KtorAuthService(private val httpClient: HttpClient) : AuthService {
 
     override suspend fun login(
         email: String,

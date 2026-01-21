@@ -12,12 +12,8 @@
     <string name="verifying_account">Verifying account...</string>
     <string name="email_verified_successfully">Email verified successfully!</string>
     <string name="email_verified_failed">Failed to verify your email</string>
-    <string name="email_verified_successfully_desc">
-        Your email has been verified. You can now log in with your credentials.
-    </string>
-    <string name="email_verified_failed_desc">
-        Unable to verify your email. Maybe the link is invalid or has expired.
-    </string>
+    <string name="email_verified_successfully_desc">Your email has been verified. You can now log in with your credentials.</string>
+    <string name="email_verified_failed_desc">Unable to verify your email. Maybe the link is invalid or has expired.</string>
     <string name="close">Close</string>
     <string name="submit">Submit</string>
     <string name="username">Username</string>
@@ -37,15 +33,10 @@
     <string name="error_invalid_credentials">The email or password is incorrect</string>
     <string name="error_email_not_verified">Unable to login because your email isn't verified</string>
     <string name="error_same_password">The new password can't be equal to the old one</string>
-    <string name="error_reset_password_token_invalid">
-        It seems like the reset password link is not valid or has expired. Please request a new email.
-    </string>
-    <string name="forgot_password_email_sent_successfully">
-        We've successfully sent you an email with a link to reset your password
-    </string>
-    <string name="reset_password_successfully">
-        Your password has successfully been changed. You can now log in with your new password.
-    </string>
+    <string name="error_reset_password_token_invalid">It seems like the reset password link is not valid or has expired. Please request a new email.</string>
+    <string name="forgot_password_email_sent_successfully">We've successfully sent you an email with a link to reset your password</string>
+    <string name="reset_password_successfully">Your password has successfully been changed. You can now log in with your new password.</string>
+
     <!-- Registration - Step 2 -->
     <string name="name">Name</string>
     <string name="name_placeholder">Your Name</string>
@@ -58,7 +49,7 @@
     <string name="about_you">About You</string>
     <string name="next">Next</string>
     <string name="back">Back</string>
-    
+
     <!-- Options -->
     <string name="gender_male">Male</string>
     <string name="gender_female">Female</string>

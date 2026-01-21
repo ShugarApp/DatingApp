@@ -1,9 +1,9 @@
 package com.dating.auth.presentation.register
 
+import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.compose.runtime.snapshotFlow
 import aura.feature.auth.presentation.generated.resources.Res
 import aura.feature.auth.presentation.generated.resources.error_account_exists
 import aura.feature.auth.presentation.generated.resources.error_invalid_username
@@ -79,19 +79,22 @@ class StepsRegisterViewModel(
             val interest = values[5] as String?
             val lookingFor = values[6] as String?
 
-            _state.update { 
-                when(currentStep) {
+            _state.update {
+                when (currentStep) {
                     RegisterStep.BasicInfo -> {
                         it.copy(canProceed = isUsernameValid)
                     }
+
                     RegisterStep.BirthDate -> {
                         it.copy(canProceed = birthDate.length == 10)
                     }
+
                     RegisterStep.GenderInterest -> {
                         it.copy(canProceed = gender != null && interest != null)
                     }
+
                     RegisterStep.LookingFor -> {
-                         it.copy(canRegister = !isRegistering && lookingFor != null)
+                        it.copy(canRegister = !isRegistering && lookingFor != null)
                     }
                 }
             }
@@ -107,14 +110,17 @@ class StepsRegisterViewModel(
                 _state.update { it.copy(selectedGender = action.gender) }
                 validateStep(RegisterStep.GenderInterest)
             }
+
             is StepsRegisterAction.OnInterestSelect -> {
                 _state.update { it.copy(selectedInterest = action.interest) }
                 validateStep(RegisterStep.GenderInterest)
             }
+
             is StepsRegisterAction.OnLookingForSelect -> {
                 _state.update { it.copy(selectedLookingFor = action.lookingFor) }
                 validateStep(RegisterStep.LookingFor)
             }
+
             StepsRegisterAction.OnInputTextFocusGain -> {
                 _state.update { it.copy(registrationError = null, usernameError = null) }
             }
@@ -124,7 +130,7 @@ class StepsRegisterViewModel(
     private fun onNextClick() {
         val currentStep = state.value.currentStep
         if (validateStep(currentStep)) {
-            val nextStep = when(currentStep) {
+            val nextStep = when (currentStep) {
                 RegisterStep.BasicInfo -> RegisterStep.BirthDate
                 RegisterStep.BirthDate -> RegisterStep.GenderInterest
                 RegisterStep.GenderInterest -> RegisterStep.LookingFor
@@ -142,7 +148,7 @@ class StepsRegisterViewModel(
                 eventChannel.send(StepsRegisterEvent.OnBack)
             }
         } else {
-             val previousStep = when(currentStep) {
+            val previousStep = when (currentStep) {
                 RegisterStep.BirthDate -> RegisterStep.BasicInfo
                 RegisterStep.GenderInterest -> RegisterStep.BirthDate
                 RegisterStep.LookingFor -> RegisterStep.GenderInterest
@@ -153,7 +159,7 @@ class StepsRegisterViewModel(
     }
 
     private fun register() {
-         if (!validateStep(RegisterStep.LookingFor)) {
+        if (!validateStep(RegisterStep.LookingFor)) {
             return
         }
 
@@ -173,22 +179,24 @@ class StepsRegisterViewModel(
                     eventChannel.send(StepsRegisterEvent.Success(email))
                 }
                 .onFailure { error ->
-                    val registrationError = when(error) {
+                    val registrationError = when (error) {
                         DataError.Remote.CONFLICT -> UiText.Resource(Res.string.error_account_exists)
                         else -> error.toUiText()
                     }
-                    _state.update { it.copy(
-                        isRegistering = false,
-                        registrationError = registrationError,
-                    ) }
+                    _state.update {
+                        it.copy(
+                            isRegistering = false,
+                            registrationError = registrationError,
+                        )
+                    }
                 }
         }
     }
 
     private fun validateStep(step: RegisterStep): Boolean {
         val currentState = state.value
-        
-        return when(step) {
+
+        return when (step) {
             RegisterStep.BasicInfo -> {
                 val username = currentState.usernameTextState.text.toString()
                 val isUsernameValid = username.length in 3..20
@@ -196,12 +204,14 @@ class StepsRegisterViewModel(
                 _state.update { it.copy(usernameError = usernameError, canProceed = isUsernameValid) }
                 isUsernameValid
             }
+
             RegisterStep.BirthDate -> {
                 val birthDate = currentState.birthDateTextState.text.toString()
                 val isValid = birthDate.length == 10
                 _state.update { it.copy(canProceed = isValid) }
                 isValid
             }
+
             RegisterStep.GenderInterest -> {
                 val hasGender = currentState.selectedGender != null
                 val hasInterest = currentState.selectedInterest != null
@@ -209,11 +219,12 @@ class StepsRegisterViewModel(
                 _state.update { it.copy(canProceed = isValid) }
                 isValid
             }
+
             RegisterStep.LookingFor -> {
-                 val hasLookingFor = currentState.selectedLookingFor != null
-                 val isValid = hasLookingFor
-                 _state.update { it.copy(canRegister = isValid) }
-                 isValid
+                val hasLookingFor = currentState.selectedLookingFor != null
+                val isValid = hasLookingFor
+                _state.update { it.copy(canRegister = isValid) }
+                isValid
             }
         }
     }

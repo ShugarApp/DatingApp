@@ -15,16 +15,16 @@ actual class PermissionController(
             PermissionState.GRANTED
         } catch (_: DeniedAlwaysException) {
             PermissionState.PERMANENTLY_DENIED
-        } catch(_: DeniedException) {
+        } catch (_: DeniedException) {
             PermissionState.DENIED
-        } catch(_: RequestCanceledException) {
+        } catch (_: RequestCanceledException) {
             PermissionState.DENIED
         }
     }
 }
 
 fun Permission.toMokoPermission(): dev.icerock.moko.permissions.Permission {
-    return when(this) {
+    return when (this) {
         Permission.NOTIFICATIONS -> dev.icerock.moko.permissions.Permission.REMOTE_NOTIFICATION
     }
 }

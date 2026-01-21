@@ -55,9 +55,11 @@ class ResetPasswordViewModel(
 
     private fun observeValidationState() {
         isPasswordValidFlow.onEach { isPasswordValid ->
-            _state.update { it.copy(
-                canSubmit = isPasswordValid
-            ) }
+            _state.update {
+                it.copy(
+                    canSubmit = isPasswordValid
+                )
+            }
         }.launchIn(viewModelScope)
     }
 
@@ -65,23 +67,27 @@ class ResetPasswordViewModel(
         when (action) {
             ResetPasswordAction.OnSubmitClick -> resetPassword()
             ResetPasswordAction.OnTogglePasswordVisibilityClick -> {
-                _state.update { it.copy(
-                    isPasswordVisible = !it.isPasswordVisible
-                ) }
+                _state.update {
+                    it.copy(
+                        isPasswordVisible = !it.isPasswordVisible
+                    )
+                }
             }
         }
     }
 
     private fun resetPassword() {
-        if(state.value.isLoading || !state.value.canSubmit) {
+        if (state.value.isLoading || !state.value.canSubmit) {
             return
         }
 
         viewModelScope.launch {
-            _state.update { it.copy(
-                isLoading = true,
-                isResetSuccessful = false
-            ) }
+            _state.update {
+                it.copy(
+                    isLoading = true,
+                    isResetSuccessful = false
+                )
+            }
 
             val newPassword = state.value.passwordTextState.text.toString()
             authService
@@ -90,24 +96,27 @@ class ResetPasswordViewModel(
                     token = token
                 )
                 .onSuccess {
-                    _state.update { it.copy(
-                        isLoading = false,
-                        isResetSuccessful = true,
-                        errorText = null
-                    ) }
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            isResetSuccessful = true,
+                            errorText = null
+                        )
+                    }
                 }
                 .onFailure { error ->
-                    val errorText = when(error) {
+                    val errorText = when (error) {
                         DataError.Remote.UNAUTHORIZED -> UiText.Resource(Res.string.error_reset_password_token_invalid)
                         DataError.Remote.CONFLICT -> UiText.Resource(Res.string.error_same_password)
                         else -> error.toUiText()
                     }
-                    _state.update { it.copy(
-                        errorText = errorText,
-                        isLoading = false,
-                    ) }
+                    _state.update {
+                        it.copy(
+                            errorText = errorText,
+                            isLoading = false,
+                        )
+                    }
                 }
         }
     }
-
 }

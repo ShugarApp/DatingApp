@@ -27,11 +27,10 @@ import aura.feature.auth.presentation.generated.resources.login
 import aura.feature.auth.presentation.generated.resources.verifying_account
 import com.dating.core.designsystem.components.brand.ChirpFailureIcon
 import com.dating.core.designsystem.components.brand.ChirpSuccessIcon
-import com.dating.core.designsystem.components.buttons.ChirpButton
 import com.dating.core.designsystem.components.buttons.AppButtonStyle
-import com.dating.core.designsystem.components.layouts.ChirpAdaptiveResultLayout
-import com.dating.core.designsystem.components.layouts.ChirpSimpleResultLayout
+import com.dating.core.designsystem.components.buttons.ChirpButton
 import com.dating.core.designsystem.components.layouts.AuthSnackbarScaffold
+import com.dating.core.designsystem.components.layouts.ChirpSimpleResultLayout
 import com.dating.core.designsystem.theme.AppTheme
 import com.dating.core.designsystem.theme.extended
 import org.jetbrains.compose.resources.stringResource
@@ -49,7 +48,7 @@ fun EmailVerificationRoot(
     EmailVerificationScreen(
         state = state,
         onAction = { action ->
-            when(action) {
+            when (action) {
                 EmailVerificationAction.OnCloseClick -> onCloseClick()
                 EmailVerificationAction.OnLoginClick -> onLoginClick()
             }
@@ -64,56 +63,52 @@ fun EmailVerificationScreen(
     onAction: (EmailVerificationAction) -> Unit,
 ) {
     AuthSnackbarScaffold {
-        ChirpAdaptiveResultLayout {
-            when {
-                state.isVerifying -> {
-                    VerifyingContent(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    )
-                }
-                state.isVerified -> {
-                    ChirpSimpleResultLayout(
-                        title = stringResource(Res.string.email_verified_successfully),
-                        description = stringResource(Res.string.email_verified_successfully_desc),
-                        icon = {
-                            ChirpSuccessIcon()
-                        },
-                        primaryButton = {
-                            ChirpButton(
-                                text = stringResource(Res.string.login),
-                                onClick = {
-                                    onAction(EmailVerificationAction.OnLoginClick)
-                                },
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-                    )
-                }
-                else -> {
-                    ChirpSimpleResultLayout(
-                        title = stringResource(Res.string.email_verified_failed),
-                        description = stringResource(Res.string.email_verified_failed_desc),
-                        icon = {
-                            Spacer(modifier = Modifier.height(32.dp))
-                            ChirpFailureIcon(
-                                modifier = Modifier
-                                    .size(80.dp)
-                            )
-                            Spacer(modifier = Modifier.height(32.dp))
-                        },
-                        primaryButton = {
-                            ChirpButton(
-                                text = stringResource(Res.string.close),
-                                onClick = {
-                                    onAction(EmailVerificationAction.OnCloseClick)
-                                },
-                                modifier = Modifier.fillMaxWidth(),
-                                style = AppButtonStyle.SECONDARY
-                            )
-                        }
-                    )
-                }
+        when {
+            state.isVerifying -> {
+                VerifyingContent(modifier = Modifier.fillMaxWidth())
+            }
+
+            state.isVerified -> {
+                ChirpSimpleResultLayout(
+                    title = stringResource(Res.string.email_verified_successfully),
+                    description = stringResource(Res.string.email_verified_successfully_desc),
+                    icon = {
+                        ChirpSuccessIcon()
+                    },
+                    primaryButton = {
+                        ChirpButton(
+                            text = stringResource(Res.string.login),
+                            onClick = {
+                                onAction(EmailVerificationAction.OnLoginClick)
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                )
+            }
+
+            else -> {
+                ChirpSimpleResultLayout(
+                    title = stringResource(Res.string.email_verified_failed),
+                    description = stringResource(Res.string.email_verified_failed_desc),
+                    icon = {
+                        Spacer(modifier = Modifier.height(32.dp))
+                        ChirpFailureIcon(
+                            modifier = Modifier
+                                .size(80.dp)
+                        )
+                        Spacer(modifier = Modifier.height(32.dp))
+                    },
+                    primaryButton = {
+                        ChirpButton(
+                            text = stringResource(Res.string.close),
+                            onClick = {
+                                onAction(EmailVerificationAction.OnCloseClick)
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                )
             }
         }
     }
@@ -132,8 +127,7 @@ private fun VerifyingContent(modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         CircularProgressIndicator(
-            modifier = Modifier
-                .size(64.dp),
+            modifier = Modifier.size(64.dp),
             color = MaterialTheme.colorScheme.primary
         )
         Text(
@@ -160,9 +154,7 @@ private fun EmailVerificationErrorPreview() {
 private fun EmailVerificationVerifyingPreview() {
     AppTheme {
         EmailVerificationScreen(
-            state = EmailVerificationState(
-                isVerifying = true
-            ),
+            state = EmailVerificationState(isVerifying = true),
             onAction = {}
         )
     }
@@ -173,9 +165,7 @@ private fun EmailVerificationVerifyingPreview() {
 private fun EmailVerificationSuccessPreview() {
     AppTheme {
         EmailVerificationScreen(
-            state = EmailVerificationState(
-                isVerified = true
-            ),
+            state = EmailVerificationState(isVerified = true),
             onAction = {}
         )
     }

@@ -13,10 +13,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class EmailVerificationViewModel(
-    private val authService: AuthService,
-    savedStateHandle: SavedStateHandle
-) : ViewModel() {
+class EmailVerificationViewModel(private val authService: AuthService,
+                                 savedStateHandle: SavedStateHandle) : ViewModel() {
 
     private var hasLoadedInitialData = false
 
@@ -41,23 +39,27 @@ class EmailVerificationViewModel(
 
     private fun verifyEmail() {
         viewModelScope.launch {
-            _state.update { it.copy(
-                isVerifying = true
-            ) }
+            _state.update {
+                it.copy(isVerifying = true)
+            }
 
             authService
                 .verifyEmail(token ?: "Invalid token")
                 .onSuccess {
-                    _state.update { it.copy(
-                        isVerifying = false,
-                        isVerified = true
-                    ) }
+                    _state.update {
+                        it.copy(
+                            isVerifying = false,
+                            isVerified = true
+                        )
+                    }
                 }
                 .onFailure { _ ->
-                    _state.update { it.copy(
-                        isVerifying = false,
-                        isVerified = false
-                    ) }
+                    _state.update {
+                        it.copy(
+                            isVerifying = false,
+                            isVerified = false
+                        )
+                    }
                 }
         }
     }

@@ -6,6 +6,7 @@ import io.ktor.client.engine.darwin.DarwinHttpRequestException
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.statement.HttpResponse
 import io.ktor.util.network.UnresolvedAddressException
+import kotlin.coroutines.coroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.serialization.SerializationException
 import platform.Foundation.NSURLErrorCallIsActive
@@ -18,7 +19,6 @@ import platform.Foundation.NSURLErrorNetworkConnectionLost
 import platform.Foundation.NSURLErrorNotConnectedToInternet
 import platform.Foundation.NSURLErrorResourceUnavailable
 import platform.Foundation.NSURLErrorTimedOut
-import kotlin.coroutines.coroutineContext
 
 actual suspend fun <T> platformSafeCall(
     execute: suspend () -> HttpResponse,
@@ -27,13 +27,13 @@ actual suspend fun <T> platformSafeCall(
     return try {
         val response = execute()
         handleResponse(response)
-    } catch(e: DarwinHttpRequestException) {
+    } catch (e: DarwinHttpRequestException) {
         handleDarwinException(e)
-    } catch(e: UnresolvedAddressException) {
+    } catch (e: UnresolvedAddressException) {
         Result.Failure(DataError.Remote.NO_INTERNET)
-    } catch(e: HttpRequestTimeoutException) {
+    } catch (e: HttpRequestTimeoutException) {
         Result.Failure(DataError.Remote.REQUEST_TIMEOUT)
-    } catch(e: SerializationException) {
+    } catch (e: SerializationException) {
         Result.Failure(DataError.Remote.SERIALIZATION)
     } catch (e: Exception) {
         coroutineContext.ensureActive()
@@ -44,8 +44,8 @@ actual suspend fun <T> platformSafeCall(
 private fun handleDarwinException(e: DarwinHttpRequestException): Result<Nothing, DataError.Remote> {
     val nsError = e.origin
 
-    return if(nsError.domain == NSURLErrorDomain) {
-        when(nsError.code) {
+    return if (nsError.domain == NSURLErrorDomain) {
+        when (nsError.code) {
             NSURLErrorNotConnectedToInternet,
             NSURLErrorNetworkConnectionLost,
             NSURLErrorCannotFindHost,

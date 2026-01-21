@@ -2,7 +2,6 @@ package com.dating.auth.presentation.login
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,15 +10,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -97,32 +93,25 @@ fun LoginScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
-                .verticalScroll(rememberScrollState()) // Enable scrolling
                 .padding(horizontal = 24.dp)
-                .imePadding(), // Padding for keyboard
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .imePadding(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Logo
-            AppBrandLogo(
-                modifier = Modifier.size(80.dp)
-            )
+            Spacer(modifier = Modifier.height(32.dp))
+
+            AppBrandLogo(modifier = Modifier.size(80.dp))
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Welcome Text
             Text(
                 text = stringResource(Res.string.welcome_back),
-                style = MaterialTheme.typography.headlineMedium.copy(
-                    fontWeight = FontWeight.Bold
-                ),
+                style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
 
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
-            // Inputs
             ChirpTextField(
                 state = state.emailTextFieldState,
                 placeholder = stringResource(Res.string.email_placeholder),
@@ -158,9 +147,8 @@ fun LoginScreen(
                     }
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.weight(1f))
 
-            // Buttons
             ChirpButton(
                 text = stringResource(Res.string.login),
                 onClick = {
@@ -171,16 +159,18 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             ChirpButton(
                 text = stringResource(Res.string.create_account),
                 onClick = {
                     onAction(LoginAction.OnSignUpClick)
                 },
-                style = AppButtonStyle.SECONDARY,
+                style = AppButtonStyle.TEXT,
                 modifier = Modifier.fillMaxWidth()
             )
+
+            Spacer(modifier = Modifier.height(64.dp))
         }
     }
 }

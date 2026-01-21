@@ -13,9 +13,9 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
-import org.koin.compose.viewmodel.koinViewModel
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun DialogSheetScopedViewModel(
@@ -23,8 +23,7 @@ fun DialogSheetScopedViewModel(
     scopeId: String = rememberSaveable { Uuid.random().toString() },
     content: @Composable () -> Unit
 ) {
-    val parentOwner = LocalViewModelStoreOwner.current
-        ?: throw IllegalStateException("No parent owner found")
+    val parentOwner = LocalViewModelStoreOwner.current ?: throw IllegalStateException("No parent owner found")
 
     val registry = koinViewModel<ScopedStoreRegistryViewModel>(
         viewModelStoreOwner = parentOwner
@@ -33,12 +32,12 @@ fun DialogSheetScopedViewModel(
     var owner by remember { mutableStateOf<ViewModelStoreOwner?>(null) }
 
     LaunchedEffect(visible, scopeId) {
-        if(visible && owner == null) {
+        if (visible && owner == null) {
             owner = object : ViewModelStoreOwner {
                 override val viewModelStore: ViewModelStore
                     get() = registry.getOrCreate(scopeId)
             }
-        } else if(!visible && owner != null) {
+        } else if (!visible && owner != null) {
             registry.clear(scopeId)
             owner = null
         }

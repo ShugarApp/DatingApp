@@ -45,12 +45,10 @@ fun OnboardingScreen(
             ) {
                 Spacer(modifier = Modifier.weight(1f))
 
-                // Logo
                 AppBrandLogo(modifier = Modifier.size(80.dp))
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                // Welcome Text
                 Text(
                     text = stringResource(Res.string.welcome_to_chirp),
                     style = MaterialTheme.typography.titleMedium,
@@ -69,25 +67,23 @@ fun OnboardingScreen(
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                // Buttons
                 ChirpButton(
                     text = stringResource(Res.string.login),
                     onClick = onLoginClick,
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                 ChirpButton(
                     text = stringResource(Res.string.create_account),
                     onClick = onCreateAccountClick,
-                    style = AppButtonStyle.SECONDARY,
+                    style = AppButtonStyle.TEXT,
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Terms
                 Text(
                     text = "By continuing, you agree to our Terms of Service and Privacy Policy.",
                     style = MaterialTheme.typography.labelSmall,

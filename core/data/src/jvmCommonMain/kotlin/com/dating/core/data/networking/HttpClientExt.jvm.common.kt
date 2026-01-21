@@ -5,12 +5,12 @@ import com.dating.core.domain.util.Result
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.statement.HttpResponse
 import io.ktor.util.network.UnresolvedAddressException
-import kotlinx.coroutines.ensureActive
-import kotlinx.serialization.SerializationException
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import kotlin.coroutines.coroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.serialization.SerializationException
 
 actual suspend fun <T> platformSafeCall(
     execute: suspend () -> HttpResponse,
@@ -19,17 +19,17 @@ actual suspend fun <T> platformSafeCall(
     return try {
         val response = execute()
         handleResponse(response)
-    } catch(e: UnknownHostException) {
+    } catch (e: UnknownHostException) {
         Result.Failure(DataError.Remote.NO_INTERNET)
-    } catch(e: UnresolvedAddressException) {
+    } catch (e: UnresolvedAddressException) {
         Result.Failure(DataError.Remote.NO_INTERNET)
-    } catch(e: ConnectException) {
+    } catch (e: ConnectException) {
         Result.Failure(DataError.Remote.NO_INTERNET)
-    } catch(e: SocketTimeoutException) {
+    } catch (e: SocketTimeoutException) {
         Result.Failure(DataError.Remote.REQUEST_TIMEOUT)
-    } catch(e: HttpRequestTimeoutException) {
+    } catch (e: HttpRequestTimeoutException) {
         Result.Failure(DataError.Remote.REQUEST_TIMEOUT)
-    } catch(e: SerializationException) {
+    } catch (e: SerializationException) {
         Result.Failure(DataError.Remote.SERIALIZATION)
     } catch (e: Exception) {
         coroutineContext.ensureActive()

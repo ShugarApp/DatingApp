@@ -1,6 +1,6 @@
 package com.dating.auth.presentation.login
 
 sealed interface LoginEvent {
-    data object Success: LoginEvent
-    data object OnBack: LoginEvent
+    data object Success : LoginEvent
+    data object OnBack : LoginEvent
 }

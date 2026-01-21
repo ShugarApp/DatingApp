@@ -71,13 +71,16 @@ class RegisterCredentialsViewModel : ViewModel() {
             RegisterCredentialsAction.OnLoginClick -> {
                 viewModelScope.launch { eventChannel.send(RegisterCredentialsEvent.OnLogin) }
             }
+
             RegisterCredentialsAction.OnNextClick -> onNextClick()
             RegisterCredentialsAction.OnBackClick -> {
-                 viewModelScope.launch { eventChannel.send(RegisterCredentialsEvent.OnBack) }
+                viewModelScope.launch { eventChannel.send(RegisterCredentialsEvent.OnBack) }
             }
+
             RegisterCredentialsAction.OnTogglePasswordVisibilityClick -> {
                 _state.update { it.copy(isPasswordVisible = !it.isPasswordVisible) }
             }
+
             RegisterCredentialsAction.OnInputTextFocusGain -> {
                 clearErrors()
             }
@@ -99,7 +102,7 @@ class RegisterCredentialsViewModel : ViewModel() {
         } else {
             val emailError = if (!isEmailValid) UiText.Resource(Res.string.error_invalid_email) else null
             val passwordError = if (!passwordValidation.isValidPassword) UiText.Resource(Res.string.error_invalid_password) else null
-            
+
             _state.update {
                 it.copy(
                     emailError = emailError,

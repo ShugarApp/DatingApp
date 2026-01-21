@@ -19,9 +19,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class ForgotPasswordViewModel(
-    private val authService: AuthService
-) : ViewModel() {
+class ForgotPasswordViewModel(private val authService: AuthService) : ViewModel() {
 
     private var hasLoadedInitialData = false
 
@@ -51,40 +49,47 @@ class ForgotPasswordViewModel(
 
     private fun observeValidationState() {
         isEmailValidFlow.onEach { isEmailValid ->
-            _state.update { it.copy(
-                canSubmit = isEmailValid
-            ) }
+            _state.update {
+                it.copy(
+                    canSubmit = isEmailValid
+                )
+            }
         }.launchIn(viewModelScope)
     }
 
     private fun submitForgotPasswordRequest() {
-        if(state.value.isLoading || !state.value.canSubmit) {
+        if (state.value.isLoading || !state.value.canSubmit) {
             return
         }
 
         viewModelScope.launch {
-            _state.update { it.copy(
-                isLoading = true,
-                isEmailSentSuccessfully = false,
-                errorText = null
-            ) }
+            _state.update {
+                it.copy(
+                    isLoading = true,
+                    isEmailSentSuccessfully = false,
+                    errorText = null
+                )
+            }
 
             val email = state.value.emailTextFieldState.text.toString()
             authService
                 .forgotPassword(email)
                 .onSuccess {
-                    _state.update { it.copy(
-                        isEmailSentSuccessfully = true,
-                        isLoading = false
-                    ) }
+                    _state.update {
+                        it.copy(
+                            isEmailSentSuccessfully = true,
+                            isLoading = false
+                        )
+                    }
                 }
                 .onFailure { error ->
-                    _state.update { it.copy(
-                        errorText = error.toUiText(),
-                        isLoading = false
-                    ) }
+                    _state.update {
+                        it.copy(
+                            errorText = error.toUiText(),
+                            isLoading = false
+                        )
+                    }
                 }
         }
     }
-
 }

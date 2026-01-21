@@ -76,12 +76,12 @@ class HttpClientFactory(
                             }
                     }
                     refreshTokens {
-                        if(response.request.url.encodedPath.contains("auth/")) {
+                        if (response.request.url.encodedPath.contains("auth/")) {
                             return@refreshTokens null
                         }
 
                         val authInfo = sessionStorage.observeAuthInfo().firstOrNull()
-                        if(authInfo?.refreshToken.isNullOrBlank()) {
+                        if (authInfo?.refreshToken.isNullOrBlank()) {
                             sessionStorage.set(null)
                             return@refreshTokens null
                         }

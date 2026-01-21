@@ -33,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import aura.feature.auth.presentation.generated.resources.Res
 import aura.feature.auth.presentation.generated.resources.about_you
-import aura.feature.auth.presentation.generated.resources.basic_info
 import aura.feature.auth.presentation.generated.resources.birth_date
 import aura.feature.auth.presentation.generated.resources.birth_date_placeholder
 import aura.feature.auth.presentation.generated.resources.gender
@@ -217,7 +216,6 @@ fun StepsRegisterScreen(
 
                         RegisterStep.LookingFor -> {
                             StepTitle(stringResource(Res.string.looking_for))
-
                             SectionSelection(
                                 title = stringResource(Res.string.looking_for),
                                 options = listOf(
