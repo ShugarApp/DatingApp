@@ -17,7 +17,7 @@ actual class AppLifecycleObserver {
         send(isAtLeastStarted)
 
         val observer = LifecycleEventObserver { _, event ->
-            when(event) {
+            when (event) {
                 Lifecycle.Event.ON_START -> trySend(true)
                 Lifecycle.Event.ON_STOP -> trySend(false)
                 else -> Unit

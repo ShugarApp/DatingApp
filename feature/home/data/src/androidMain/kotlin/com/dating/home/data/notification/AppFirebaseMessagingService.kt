@@ -1,14 +1,14 @@
 package com.dating.home.data.notification
 
-import com.google.firebase.messaging.FirebaseMessagingService
-import com.dating.home.domain.notification.DeviceTokenService
 import com.dating.core.domain.auth.SessionStorage
+import com.dating.home.domain.notification.DeviceTokenService
+import com.google.firebase.messaging.FirebaseMessagingService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
-class AppFirebaseMessagingService: FirebaseMessagingService() {
+class AppFirebaseMessagingService : FirebaseMessagingService() {
 
     private val deviceTokenService by inject<DeviceTokenService>()
     private val sessionStorage by inject<SessionStorage>()
@@ -18,7 +18,7 @@ class AppFirebaseMessagingService: FirebaseMessagingService() {
         super.onNewToken(token)
         applicationScope.launch {
             val authInfo = sessionStorage.observeAuthInfo().first()
-            if(authInfo != null) {
+            if (authInfo != null) {
                 deviceTokenService.registerToken(
                     token = token,
                     platform = "ANDROID"

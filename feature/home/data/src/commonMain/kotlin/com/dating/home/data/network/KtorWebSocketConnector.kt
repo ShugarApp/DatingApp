@@ -2,9 +2,6 @@
 
 package com.dating.home.data.network
 
-import com.dating.home.data.dto.websocket.WebSocketMessageDto
-import com.dating.home.data.lifecycle.AppLifecycleObserver
-import com.dating.home.domain.models.ConnectionState
 import com.dating.core.data.networking.UrlConstants
 import com.dating.core.domain.auth.SessionStorage
 import com.dating.core.domain.logging.AppLogger
@@ -12,6 +9,9 @@ import com.dating.core.domain.util.DataError
 import com.dating.core.domain.util.EmptyResult
 import com.dating.core.domain.util.Result
 import com.dating.feature.home.data.BuildKonfig
+import com.dating.home.data.dto.websocket.WebSocketMessageDto
+import com.dating.home.data.lifecycle.AppLifecycleObserver
+import com.dating.home.domain.models.ConnectionState
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.webSocketSession
 import io.ktor.client.request.header
@@ -20,6 +20,8 @@ import io.ktor.websocket.WebSocketSession
 import io.ktor.websocket.close
 import io.ktor.websocket.readText
 import io.ktor.websocket.send
+import kotlin.coroutines.coroutineContext
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -42,8 +44,6 @@ import kotlinx.coroutines.flow.retryWhen
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
-import kotlin.coroutines.coroutineContext
-import kotlin.time.Duration.Companion.seconds
 
 class KtorWebSocketConnector(
     private val httpClient: HttpClient,
@@ -129,7 +129,7 @@ class KtorWebSocketConnector(
             }
         }
     }.flatMapLatest { authInfo ->
-        if(authInfo == null) {
+        if (authInfo == null) {
             emptyFlow()
         } else {
             createWebSocketFlow(authInfo.accessToken)
@@ -148,7 +148,7 @@ class KtorWebSocketConnector(
 
                     val shouldRetry = connectionRetryHandler.shouldRetry(t, attempt)
 
-                    if(shouldRetry) {
+                    if (shouldRetry) {
                         _connectionState.value = ConnectionState.CONNECTING
                         connectionRetryHandler.applyRetryDelay(attempt)
                     }
@@ -216,14 +216,14 @@ class KtorWebSocketConnector(
     suspend fun sendMessage(message: String): EmptyResult<DataError.Connection> {
         val connectionState = connectionState.value
 
-        if(currentSession == null || connectionState != ConnectionState.CONNECTED) {
+        if (currentSession == null || connectionState != ConnectionState.CONNECTED) {
             return Result.Failure(DataError.Connection.NOT_CONNECTED)
         }
 
         return try {
             currentSession?.send(message)
             Result.Success(Unit)
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             coroutineContext.ensureActive()
             logger.error("Unable to send WebSocket message", e)
             Result.Failure(DataError.Connection.MESSAGE_SEND_FAILED)

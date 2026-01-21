@@ -38,7 +38,7 @@ interface ChatParticipantsCrossRefDao {
         chatId: String,
         participants: List<ChatParticipantEntity>
     ) {
-        if(participants.isEmpty()) {
+        if (participants.isEmpty()) {
             return
         }
 

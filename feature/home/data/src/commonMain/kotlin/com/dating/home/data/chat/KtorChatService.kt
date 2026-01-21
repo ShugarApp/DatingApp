@@ -1,11 +1,5 @@
 package com.dating.home.data.chat
 
-import com.dating.home.data.dto.ChatDto
-import com.dating.home.data.dto.request.CreateChatRequest
-import com.dating.home.data.dto.request.ParticipantsRequest
-import com.dating.home.data.mappers.toDomain
-import com.dating.home.domain.chat.ChatService
-import com.dating.home.domain.models.Chat
 import com.dating.core.data.networking.delete
 import com.dating.core.data.networking.get
 import com.dating.core.data.networking.post
@@ -14,11 +8,15 @@ import com.dating.core.domain.util.EmptyResult
 import com.dating.core.domain.util.Result
 import com.dating.core.domain.util.asEmptyResult
 import com.dating.core.domain.util.map
+import com.dating.home.data.dto.ChatDto
+import com.dating.home.data.dto.request.CreateChatRequest
+import com.dating.home.data.dto.request.ParticipantsRequest
+import com.dating.home.data.mappers.toDomain
+import com.dating.home.domain.chat.ChatService
+import com.dating.home.domain.models.Chat
 import io.ktor.client.HttpClient
 
-class KtorChatService(
-    private val httpClient: HttpClient
-): ChatService {
+class KtorChatService(private val httpClient: HttpClient) : ChatService {
 
     override suspend fun createChat(otherUserIds: List<String>): Result<Chat, DataError.Remote> {
         return httpClient.post<CreateChatRequest, ChatDto>(

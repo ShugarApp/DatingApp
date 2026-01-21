@@ -16,5 +16,5 @@ sealed class OutgoingWebSocketDto(
         val chatId: String,
         val messageId: String,
         val content: String
-    ): OutgoingWebSocketDto(OutgoingWebSocketType.NEW_MESSAGE)
+    ) : OutgoingWebSocketDto(OutgoingWebSocketType.NEW_MESSAGE)
 }

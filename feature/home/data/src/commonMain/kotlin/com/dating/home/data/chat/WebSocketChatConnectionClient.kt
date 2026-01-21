@@ -1,5 +1,6 @@
 package com.dating.home.data.chat
 
+import com.dating.core.domain.auth.SessionStorage
 import com.dating.home.data.dto.websocket.IncomingWebSocketDto
 import com.dating.home.data.dto.websocket.IncomingWebSocketType
 import com.dating.home.data.dto.websocket.WebSocketMessageDto
@@ -9,7 +10,6 @@ import com.dating.home.data.network.KtorWebSocketConnector
 import com.dating.home.database.AppChatDatabase
 import com.dating.home.domain.chat.ChatConnectionClient
 import com.dating.home.domain.chat.ChatRepository
-import com.dating.core.domain.auth.SessionStorage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.filterIsInstance
@@ -26,7 +26,7 @@ class WebSocketChatConnectionClient(
     private val sessionStorage: SessionStorage,
     private val json: Json,
     private val applicationScope: CoroutineScope
-): ChatConnectionClient {
+) : ChatConnectionClient {
 
     override val chatMessages = webSocketConnector
         .messages
@@ -44,25 +44,29 @@ class WebSocketChatConnectionClient(
     override val connectionState = webSocketConnector.connectionState
 
     private fun parseIncomingMessage(message: WebSocketMessageDto): IncomingWebSocketDto? {
-        return when(message.type) {
+        return when (message.type) {
             IncomingWebSocketType.NEW_MESSAGE.name -> {
                 json.decodeFromString<IncomingWebSocketDto.NewMessageDto>(message.payload)
             }
+
             IncomingWebSocketType.MESSAGE_DELETED.name -> {
                 json.decodeFromString<IncomingWebSocketDto.MessageDeletedDto>(message.payload)
             }
+
             IncomingWebSocketType.PROFILE_PICTURE_UPDATED.name -> {
                 json.decodeFromString<IncomingWebSocketDto.ProfilePictureUpdated>(message.payload)
             }
+
             IncomingWebSocketType.CHAT_PARTICIPANTS_CHANGED.name -> {
                 json.decodeFromString<IncomingWebSocketDto.ChatParticipantsChangedDto>(message.payload)
             }
+
             else -> null
         }
     }
 
     private suspend fun handleIncomingMessage(message: IncomingWebSocketDto) {
-        when(message) {
+        when (message) {
             is IncomingWebSocketDto.ChatParticipantsChangedDto -> refreshChat(message)
             is IncomingWebSocketDto.MessageDeletedDto -> deleteMessage(message)
             is IncomingWebSocketDto.NewMessageDto -> handleNewMessage(message)
@@ -80,7 +84,7 @@ class WebSocketChatConnectionClient(
 
     private suspend fun handleNewMessage(message: IncomingWebSocketDto.NewMessageDto) {
         val chatExists = database.chatDao.getChatById(message.chatId) != null
-        if(!chatExists) {
+        if (!chatExists) {
             chatRepository.fetchChatById(message.chatId)
         }
 
@@ -95,7 +99,7 @@ class WebSocketChatConnectionClient(
         )
 
         val authInfo = sessionStorage.observeAuthInfo().firstOrNull()
-        if(authInfo != null && authInfo.user.id == message.userId) {
+        if (authInfo != null && authInfo.user.id == message.userId) {
             sessionStorage.set(
                 info = authInfo.copy(
                     user = authInfo.user.copy(

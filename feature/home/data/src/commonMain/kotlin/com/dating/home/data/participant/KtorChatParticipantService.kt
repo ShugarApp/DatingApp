@@ -1,34 +1,29 @@
 package com.dating.home.data.participant
 
-import com.dating.home.data.dto.ChatParticipantDto
-import com.dating.home.data.dto.request.ConfirmProfilePictureRequest
-import com.dating.home.data.dto.response.ProfilePictureUploadUrlsResponse
-import com.dating.home.data.mappers.toDomain
-import com.dating.home.domain.participant.ChatParticipantService
-import com.dating.home.domain.models.ChatParticipant
-import com.dating.home.domain.models.ProfilePictureUploadUrls
-import com.dating.core.data.networking.constructRoute
 import com.dating.core.data.networking.delete
 import com.dating.core.data.networking.get
 import com.dating.core.data.networking.post
-import com.dating.core.data.networking.put
 import com.dating.core.data.networking.safeCall
 import com.dating.core.domain.util.DataError
 import com.dating.core.domain.util.EmptyResult
 import com.dating.core.domain.util.Result
 import com.dating.core.domain.util.map
+import com.dating.home.data.dto.ChatParticipantDto
+import com.dating.home.data.dto.request.ConfirmProfilePictureRequest
+import com.dating.home.data.dto.response.ProfilePictureUploadUrlsResponse
+import com.dating.home.data.mappers.toDomain
+import com.dating.home.domain.models.ChatParticipant
+import com.dating.home.domain.models.ProfilePictureUploadUrls
+import com.dating.home.domain.participant.ChatParticipantService
 import io.ktor.client.HttpClient
 import io.ktor.client.request.header
-import io.ktor.client.request.parameter
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.client.request.url
-import kotlin.collections.component1
-import kotlin.collections.component2
 
 class KtorChatParticipantService(
     private val httpClient: HttpClient
-): ChatParticipantService {
+) : ChatParticipantService {
 
     override suspend fun searchParticipant(query: String): Result<ChatParticipant, DataError.Remote> {
         return httpClient.get<ChatParticipantDto>(

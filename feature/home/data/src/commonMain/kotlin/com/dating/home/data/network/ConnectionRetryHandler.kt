@@ -1,7 +1,7 @@
 package com.dating.home.data.network
 
-import kotlinx.coroutines.delay
 import kotlin.math.pow
+import kotlinx.coroutines.delay
 
 class ConnectionRetryHandler(
     private val connectionErrorHandler: ConnectionErrorHandler
@@ -13,7 +13,7 @@ class ConnectionRetryHandler(
     }
 
     suspend fun applyRetryDelay(attempt: Long) {
-        if(!shouldSkipBackoff) {
+        if (!shouldSkipBackoff) {
             val delay = createBackoffDelay(attempt)
             delay(delay)
         } else {

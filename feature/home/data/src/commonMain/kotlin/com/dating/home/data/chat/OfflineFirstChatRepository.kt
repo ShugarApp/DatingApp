@@ -1,5 +1,10 @@
 package com.dating.home.data.chat
 
+import com.dating.core.domain.util.DataError
+import com.dating.core.domain.util.EmptyResult
+import com.dating.core.domain.util.Result
+import com.dating.core.domain.util.asEmptyResult
+import com.dating.core.domain.util.onSuccess
 import com.dating.home.data.mappers.toDomain
 import com.dating.home.data.mappers.toEntity
 import com.dating.home.data.mappers.toLastMessageView
@@ -12,11 +17,6 @@ import com.dating.home.domain.chat.ChatService
 import com.dating.home.domain.models.Chat
 import com.dating.home.domain.models.ChatInfo
 import com.dating.home.domain.models.ChatParticipant
-import com.dating.core.domain.util.DataError
-import com.dating.core.domain.util.EmptyResult
-import com.dating.core.domain.util.Result
-import com.dating.core.domain.util.asEmptyResult
-import com.dating.core.domain.util.onSuccess
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.Flow
@@ -25,10 +25,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.supervisorScope
 
-class OfflineFirstChatRepository(
-    private val chatService: ChatService,
-    private val db: AppChatDatabase,
-): ChatRepository {
+class OfflineFirstChatRepository(private val chatService: ChatService,
+                                 private val db: AppChatDatabase) : ChatRepository {
 
     override fun getChats(): Flow<List<Chat>> {
         return db.chatDao.getChatsWithParticipants()

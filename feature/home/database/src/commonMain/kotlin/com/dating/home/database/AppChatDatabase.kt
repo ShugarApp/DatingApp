@@ -26,7 +26,7 @@ import com.dating.home.database.view.LastMessageView
     version = 1,
 )
 @ConstructedBy(ChirpChatDatabaseConstructor::class)
-abstract class AppChatDatabase: RoomDatabase() {
+abstract class AppChatDatabase : RoomDatabase() {
     abstract val chatDao: ChatDao
     abstract val chatParticipantDao: ChatParticipantDao
     abstract val chatMessageDao: ChatMessageDao
