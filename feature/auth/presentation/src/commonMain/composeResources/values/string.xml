@@ -57,4 +57,14 @@
     <string name="interest_relationship">Relationship</string>
     <string name="interest_casual">Casual</string>
     <string name="interest_friends">Friends</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_body">Find your perfect match today.</string>
+    <string name="onboarding_terms">By continuing, you agree to our Terms of Service and Privacy Policy.</string>
+
+    <!-- Registration - Step 1 (Username) -->
+    <string name="what_is_your_name">¿Cómo te llamas?</string>
+    <string name="enter_your_name">Introduce tu nombre</string>
+    <string name="name_appearance_disclaimer">Este nombre aparecerá en tu perfil</string>
+    <string name="everyone">Everyone</string>
 </resources>

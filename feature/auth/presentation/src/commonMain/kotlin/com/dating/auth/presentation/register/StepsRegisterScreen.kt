@@ -46,6 +46,10 @@ import aura.feature.auth.presentation.generated.resources.interested_in
 import aura.feature.auth.presentation.generated.resources.looking_for
 import aura.feature.auth.presentation.generated.resources.next
 import aura.feature.auth.presentation.generated.resources.register
+import aura.feature.auth.presentation.generated.resources.what_is_your_name
+import aura.feature.auth.presentation.generated.resources.enter_your_name
+import aura.feature.auth.presentation.generated.resources.name_appearance_disclaimer
+import aura.feature.auth.presentation.generated.resources.everyone
 import com.dating.core.designsystem.components.buttons.ChirpButton
 import com.dating.core.designsystem.components.chips.ChirpChip
 import com.dating.core.designsystem.components.header.RegisterTopBar
@@ -155,12 +159,12 @@ fun StepsRegisterScreen(
 
                     when (step) {
                         RegisterStep.BasicInfo -> {
-                            StepTitle("¿Cómo te llamas?")
+                            StepTitle(stringResource(Res.string.what_is_your_name))
                             ChirpTextField(
                                 state = state.usernameTextState,
-                                placeholder = "Introduce tu nombre",
+                                placeholder = stringResource(Res.string.enter_your_name),
                                 supportingText = state.usernameError?.asString()
-                                    ?: "Este nombre aparecerá en tu perfil",
+                                    ?: stringResource(Res.string.name_appearance_disclaimer),
                                 isError = state.usernameError != null,
                                 onFocusChanged = {
                                     onAction(StepsRegisterAction.OnInputTextFocusGain)
@@ -205,7 +209,7 @@ fun StepsRegisterScreen(
                                 options = listOf(
                                     stringResource(Res.string.gender_male),
                                     stringResource(Res.string.gender_female),
-                                    "Everyone"
+                                    stringResource(Res.string.everyone)
                                 ),
                                 selectedOption = state.selectedInterest,
                                 onOptionSelected = {

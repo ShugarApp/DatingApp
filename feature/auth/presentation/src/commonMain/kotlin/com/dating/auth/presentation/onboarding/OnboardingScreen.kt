@@ -21,6 +21,8 @@ import aura.feature.auth.presentation.generated.resources.Res
 import aura.feature.auth.presentation.generated.resources.create_account
 import aura.feature.auth.presentation.generated.resources.login
 import aura.feature.auth.presentation.generated.resources.welcome_to_chirp
+import aura.feature.auth.presentation.generated.resources.onboarding_body
+import aura.feature.auth.presentation.generated.resources.onboarding_terms
 import com.dating.core.designsystem.components.brand.AppBrandLogo
 import com.dating.core.designsystem.components.buttons.AppButtonStyle
 import com.dating.core.designsystem.components.buttons.ChirpButton
@@ -59,7 +61,7 @@ fun OnboardingScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Find your perfect match today.",
+                    text = stringResource(Res.string.onboarding_body),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                     textAlign = TextAlign.Center
@@ -85,7 +87,7 @@ fun OnboardingScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "By continuing, you agree to our Terms of Service and Privacy Policy.",
+                    text = stringResource(Res.string.onboarding_terms),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                     textAlign = TextAlign.Center,
