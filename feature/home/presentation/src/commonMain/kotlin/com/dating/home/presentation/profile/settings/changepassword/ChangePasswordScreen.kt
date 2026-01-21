@@ -22,6 +22,7 @@ import aura.feature.home.presentation.generated.resources.new_password
 import aura.feature.home.presentation.generated.resources.password_change_successful
 import aura.feature.home.presentation.generated.resources.password_hint
 import aura.feature.home.presentation.generated.resources.save
+import aura.feature.home.presentation.generated.resources.settings_change_password
 import com.dating.core.designsystem.components.buttons.ChirpButton
 import com.dating.core.designsystem.components.header.AppCenterTopBar
 import com.dating.core.designsystem.components.textfields.ChirpPasswordTextField
@@ -43,7 +44,7 @@ fun ChangePasswordScreen(
         modifier = modifier.fillMaxSize(),
         topBar = {
             AppCenterTopBar(
-                title = "Change Password",
+                title = stringResource(Res.string.settings_change_password),
                 onBack = onBack
             )
         }

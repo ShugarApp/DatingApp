@@ -41,8 +41,26 @@ import aura.feature.home.presentation.generated.resources.cancel
 import aura.feature.home.presentation.generated.resources.delete
 import aura.feature.home.presentation.generated.resources.delete_profile_picture
 import aura.feature.home.presentation.generated.resources.delete_profile_picture_desc
+import aura.feature.home.presentation.generated.resources.edit_profile_title
+import aura.feature.home.presentation.generated.resources.save
+import aura.feature.home.presentation.generated.resources.edit_profile_photos
+import aura.feature.home.presentation.generated.resources.edit_profile_about_me
+import aura.feature.home.presentation.generated.resources.edit_profile_about_me_placeholder
+import aura.feature.home.presentation.generated.resources.edit_profile_interests
+import aura.feature.home.presentation.generated.resources.edit_profile_job
+import aura.feature.home.presentation.generated.resources.edit_profile_job_placeholder
+import aura.feature.home.presentation.generated.resources.edit_profile_company
+import aura.feature.home.presentation.generated.resources.edit_profile_company_placeholder
+import aura.feature.home.presentation.generated.resources.edit_profile_education
+import aura.feature.home.presentation.generated.resources.edit_profile_education_placeholder
+import aura.feature.home.presentation.generated.resources.edit_profile_personal_info
+import aura.feature.home.presentation.generated.resources.edit_profile_height
+import aura.feature.home.presentation.generated.resources.edit_profile_zodiac
+import aura.feature.home.presentation.generated.resources.edit_profile_smoking
+import aura.feature.home.presentation.generated.resources.edit_profile_drinking
+import aura.feature.home.presentation.generated.resources.remove
+import aura.feature.home.presentation.generated.resources.add_photo
 import coil3.compose.AsyncImage
-import com.dating.core.designsystem.components.buttons.AppButtonStyle
 import com.dating.core.designsystem.components.buttons.ChirpButton
 import com.dating.core.designsystem.components.chips.ChirpChip
 import com.dating.core.designsystem.components.dialogs.DestructiveConfirmationDialog
@@ -70,7 +88,7 @@ fun EditProfileScreen(
         modifier = modifier.fillMaxSize(),
         topBar = {
             AppCenterTopBar(
-                title = "Edit Profile",
+                title = stringResource(Res.string.edit_profile_title),
                 onBack = onBack
             )
         },
@@ -81,7 +99,7 @@ fun EditProfileScreen(
                     .padding(16.dp)
             ) {
                 ChirpButton(
-                    text = "Save",
+                    text = stringResource(Res.string.save),
                     onClick = { onBack() },
                     modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth()
                 )
@@ -99,7 +117,7 @@ fun EditProfileScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             // -- Photos Section --
-            SectionTitle(title = "Photos")
+            SectionTitle(title = stringResource(Res.string.edit_profile_photos))
             Spacer(modifier = Modifier.height(12.dp))
             PhotoGrid(
                 photos = state.photos,
@@ -110,11 +128,11 @@ fun EditProfileScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             // -- About Me Section --
-            SectionTitle(title = "About Me")
+            SectionTitle(title = stringResource(Res.string.edit_profile_about_me))
             Spacer(modifier = Modifier.height(12.dp))
             ChirpTextField(
                 state = state.bioTextState,
-                placeholder = "Tell us about yourself...",
+                placeholder = stringResource(Res.string.edit_profile_about_me_placeholder),
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = false,
                 minLines = 5
@@ -123,7 +141,7 @@ fun EditProfileScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             // -- Interests Section --
-            SectionTitle(title = "Interests")
+            SectionTitle(title = stringResource(Res.string.edit_profile_interests))
             Spacer(modifier = Modifier.height(12.dp))
             FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -132,7 +150,7 @@ fun EditProfileScreen(
                 state.availableInterests.forEach { interest ->
                     val isSelected = state.selectedInterests.contains(interest)
                     ChirpChip(
-                        text = interest,
+                        text = stringResource(interest),
                         isSelected = isSelected,
                         onClick = { viewModel.onAction(EditProfileAction.OnInterestSelected(interest)) }
                     )
@@ -142,45 +160,45 @@ fun EditProfileScreen(
             Spacer(modifier = Modifier.height(32.dp))
 
             // -- Details Section --
-            SectionTitle(title = "Job Title")
+            SectionTitle(title = stringResource(Res.string.edit_profile_job))
             Spacer(modifier = Modifier.height(12.dp))
             ChirpTextField(
                 state = state.jobTitleTextState,
-                placeholder = "Add job title"
+                placeholder = stringResource(Res.string.edit_profile_job_placeholder)
             )
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            SectionTitle(title = "Company")
+            SectionTitle(title = stringResource(Res.string.edit_profile_company))
             Spacer(modifier = Modifier.height(12.dp))
             ChirpTextField(
                 state = state.companyTextState,
-                placeholder = "Add company"
+                placeholder = stringResource(Res.string.edit_profile_company_placeholder)
             )
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            SectionTitle(title = "Education")
+            SectionTitle(title = stringResource(Res.string.edit_profile_education))
             Spacer(modifier = Modifier.height(12.dp))
             ChirpTextField(
                 state = state.educationTextState,
-                placeholder = "Add education"
+                placeholder = stringResource(Res.string.edit_profile_education_placeholder)
             )
 
             Spacer(modifier = Modifier.height(24.dp))
             
-            SectionTitle(title = "Personal Information")
+            SectionTitle(title = stringResource(Res.string.edit_profile_personal_info))
             Spacer(modifier = Modifier.height(12.dp))
             
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 ChirpTextField(
                     state = state.heightTextState,
-                    placeholder = "Height",
+                    placeholder = stringResource(Res.string.edit_profile_height),
                     modifier = Modifier.weight(1f)
                 )
                 ChirpTextField(
                     state = state.zodiacTextState,
-                    placeholder = "Zodiac",
+                    placeholder = stringResource(Res.string.edit_profile_zodiac),
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -188,12 +206,12 @@ fun EditProfileScreen(
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 ChirpTextField(
                     state = state.smokingTextState,
-                    placeholder = "Smoking",
+                    placeholder = stringResource(Res.string.edit_profile_smoking),
                     modifier = Modifier.weight(1f)
                 )
                 ChirpTextField(
                     state = state.drinkingTextState,
-                    placeholder = "Drinking",
+                    placeholder = stringResource(Res.string.edit_profile_drinking),
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -287,7 +305,7 @@ fun PhotoSlot(
             ) {
                 Icon(
                     imageVector = Icons.Default.Close,
-                    contentDescription = "Remove",
+                    contentDescription = stringResource(Res.string.remove),
                     tint = Color.White,
                     modifier = Modifier.size(16.dp)
                 )
@@ -295,7 +313,7 @@ fun PhotoSlot(
         } else {
             Icon(
                 imageVector = Icons.Default.Add,
-                contentDescription = "Add Photo",
+                contentDescription = stringResource(Res.string.add_photo),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                 modifier = Modifier.size(32.dp)
             )

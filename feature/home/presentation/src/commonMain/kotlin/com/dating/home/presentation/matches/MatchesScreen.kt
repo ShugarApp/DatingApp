@@ -37,7 +37,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import aura.feature.home.presentation.generated.resources.Res
+import aura.feature.home.presentation.generated.resources.matches_chat
+import aura.feature.home.presentation.generated.resources.matches_empty_desc
+import aura.feature.home.presentation.generated.resources.matches_empty_title
+import aura.feature.home.presentation.generated.resources.matches_title
 import com.dating.core.designsystem.components.header.MainTopAppBar
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,7 +55,7 @@ fun MatchesScreen(
     Scaffold(
         modifier = modifier,
         topBar = {
-            MainTopAppBar("Matches")
+            MainTopAppBar(stringResource(Res.string.matches_title))
         }
     ) { paddingValues ->
         PullToRefreshBox(
@@ -183,7 +189,7 @@ private fun MatchCard(
                     modifier = Modifier.size(16.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
-                Text("Chat")
+                Text(stringResource(Res.string.matches_chat))
             }
         }
     }
@@ -202,13 +208,13 @@ private fun EmptyMatchesState(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "No tienes matches aún",
+                text = stringResource(Res.string.matches_empty_title),
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "¡Sigue explorando para encontrar a alguien especial!",
+                text = stringResource(Res.string.matches_empty_desc),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

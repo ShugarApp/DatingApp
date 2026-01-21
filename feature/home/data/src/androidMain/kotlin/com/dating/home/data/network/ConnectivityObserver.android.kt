@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.callbackFlow
 actual class ConnectivityObserver(
     private val context: Context
 ) {
-    private val connectivityManager = context.getSystemService<ConnectivityManager>()!!
+    private val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
     actual val isConnected: Flow<Boolean> = callbackFlow {
         val initiallyConnected = connectivityManager.activeNetwork?.let { network ->

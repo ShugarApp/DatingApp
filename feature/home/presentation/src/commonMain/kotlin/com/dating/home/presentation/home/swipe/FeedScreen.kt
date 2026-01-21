@@ -35,6 +35,11 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.dating.core.designsystem.components.header.MainTopAppBar
 import com.dating.home.presentation.home.swipe.components.SwipeableCard
+import aura.feature.home.presentation.generated.resources.Res
+import aura.feature.home.presentation.generated.resources.app_name_feed
+import aura.feature.home.presentation.generated.resources.feed_empty_state_title
+import aura.feature.home.presentation.generated.resources.feed_empty_state_button
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,7 +51,7 @@ fun FeedScreen(
     Scaffold(
         modifier = modifier,
         topBar = {
-            MainTopAppBar(title = "Aura")
+            MainTopAppBar(title = stringResource(Res.string.app_name_feed))
         }
     ) { paddingValues ->
         Box(
@@ -176,12 +181,12 @@ private fun EmptyFeedState(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "No hay más perfiles",
+            text = stringResource(Res.string.feed_empty_state_title),
             style = MaterialTheme.typography.titleLarge
         )
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = onRefresh) {
-            Text("Volver a cargar")
+            Text(stringResource(Res.string.feed_empty_state_button))
         }
     }
 }

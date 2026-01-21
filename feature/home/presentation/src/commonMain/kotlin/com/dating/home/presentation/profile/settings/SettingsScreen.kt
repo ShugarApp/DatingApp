@@ -41,6 +41,33 @@ import aura.feature.home.presentation.generated.resources.cancel
 import aura.feature.home.presentation.generated.resources.do_you_want_to_logout
 import aura.feature.home.presentation.generated.resources.do_you_want_to_logout_desc
 import aura.feature.home.presentation.generated.resources.logout
+import aura.feature.home.presentation.generated.resources.settings_100_km
+import aura.feature.home.presentation.generated.resources.settings_18_35
+import aura.feature.home.presentation.generated.resources.settings_account
+import aura.feature.home.presentation.generated.resources.settings_age_range
+import aura.feature.home.presentation.generated.resources.settings_change_password
+import aura.feature.home.presentation.generated.resources.settings_current_location
+import aura.feature.home.presentation.generated.resources.settings_discovery
+import aura.feature.home.presentation.generated.resources.settings_email_notifications
+import aura.feature.home.presentation.generated.resources.settings_guidelines
+import aura.feature.home.presentation.generated.resources.settings_help
+import aura.feature.home.presentation.generated.resources.settings_legal
+import aura.feature.home.presentation.generated.resources.settings_licenses
+import aura.feature.home.presentation.generated.resources.settings_location
+import aura.feature.home.presentation.generated.resources.settings_manage_subscription
+import aura.feature.home.presentation.generated.resources.settings_max_distance
+import aura.feature.home.presentation.generated.resources.settings_notifications
+import aura.feature.home.presentation.generated.resources.settings_privacy
+import aura.feature.home.presentation.generated.resources.settings_pro_plan_active
+import aura.feature.home.presentation.generated.resources.settings_push_notifications
+import aura.feature.home.presentation.generated.resources.settings_restore_purchases
+import aura.feature.home.presentation.generated.resources.settings_safety
+import aura.feature.home.presentation.generated.resources.settings_show_me
+import aura.feature.home.presentation.generated.resources.settings_subscription
+import aura.feature.home.presentation.generated.resources.settings_terms
+import aura.feature.home.presentation.generated.resources.settings_title
+import aura.feature.home.presentation.generated.resources.settings_version
+import aura.feature.home.presentation.generated.resources.settings_women
 import com.dating.core.designsystem.components.buttons.AppButtonStyle
 import com.dating.core.designsystem.components.buttons.ChirpButton
 import com.dating.core.designsystem.components.cards.AccessCardItem
@@ -64,7 +91,7 @@ fun SettingsScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     ObserveAsEvents(viewModel.events) { event ->
-        when(event) {
+        when (event) {
             SettingsEvent.OnLogoutSuccess -> onLogout()
         }
     }
@@ -73,7 +100,7 @@ fun SettingsScreen(
         modifier = modifier.fillMaxSize(),
         topBar = {
             AppCenterTopBar(
-                title = "Settings",
+                title = stringResource(Res.string.settings_title),
                 onBack = onBack,
             )
         }
@@ -89,30 +116,30 @@ fun SettingsScreen(
             // Settings List
             // Discovery Settings
             AccessCardList(
-                title = "Discovery Settings"
+                title = stringResource(Res.string.settings_discovery)
             ) {
                 AccessCardItem(
                     icon = Icons.Default.LocationOn,
-                    title = "Location",
-                    subtitle = "My Current Location",
+                    title = stringResource(Res.string.settings_location),
+                    subtitle = stringResource(Res.string.settings_current_location),
                     onClick = { /* TODO */ }
                 )
                 AccessCardItem(
                     icon = Icons.Default.Tune,
-                    title = "Maximum Distance",
-                    subtitle = "100 km",
+                    title = stringResource(Res.string.settings_max_distance),
+                    subtitle = stringResource(Res.string.settings_100_km),
                     onClick = { /* TODO */ }
                 )
                 AccessCardItem(
                     icon = Icons.Default.Groups,
-                    title = "Show Me",
-                    subtitle = "Women",
+                    title = stringResource(Res.string.settings_show_me),
+                    subtitle = stringResource(Res.string.settings_women),
                     onClick = { /* TODO */ }
                 )
                 AccessCardItem(
                     icon = Icons.Default.Cake,
-                    title = "Age Range",
-                    subtitle = "18 - 35",
+                    title = stringResource(Res.string.settings_age_range),
+                    subtitle = stringResource(Res.string.settings_18_35),
                     onClick = { /* TODO */ }
                 )
             }
@@ -120,11 +147,11 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(16.dp))
             // Account Settings
             AccessCardList(
-                title = "Account Settings"
+                title = stringResource(Res.string.settings_account)
             ) {
-                 AccessCardItem(
+                AccessCardItem(
                     icon = Icons.Default.Security,
-                    title = "Change Password",
+                    title = stringResource(Res.string.settings_change_password),
                     onClick = onChangePassword
                 )
             }
@@ -133,18 +160,18 @@ fun SettingsScreen(
 
             // Payment Settings
             AccessCardList(
-                title = "Subscription & Payment"
+                title = stringResource(Res.string.settings_subscription)
             ) {
                 AccessCardItem(
                     icon = Icons.Default.Star,
-                    title = "Manage Subscription",
-                    subtitle = "PRO PLAN ACTIVE",
+                    title = stringResource(Res.string.settings_manage_subscription),
+                    subtitle = stringResource(Res.string.settings_pro_plan_active),
                     iconBgColor = MaterialTheme.colorScheme.surfaceVariant,
                     onClick = { /* TODO */ }
                 )
                 AccessCardItem(
                     icon = Icons.Default.Restore,
-                    title = "Restore Purchases",
+                    title = stringResource(Res.string.settings_restore_purchases),
                     onClick = { /* TODO */ }
                 )
             }
@@ -153,16 +180,16 @@ fun SettingsScreen(
 
             // Notifications
             AccessCardList(
-                title = "Notifications"
+                title = stringResource(Res.string.settings_notifications)
             ) {
                 AccessCardItem(
                     icon = Icons.Default.Notifications,
-                    title = "Push Notifications",
+                    title = stringResource(Res.string.settings_push_notifications),
                     onClick = { /* TODO */ }
                 )
                 AccessCardItem(
                     icon = Icons.Default.Mail,
-                    title = "Email Notifications",
+                    title = stringResource(Res.string.settings_email_notifications),
                     onClick = { /* TODO */ }
                 )
             }
@@ -171,36 +198,36 @@ fun SettingsScreen(
 
             // Legal & Contact
             AccessCardList(
-                title = "Legal & Contact"
+                title = stringResource(Res.string.settings_legal)
             ) {
                 AccessCardItem(
                     icon = Icons.Default.Help,
-                    title = "Help & Support",
+                    title = stringResource(Res.string.settings_help),
                     onClick = { /* TODO */ }
                 )
                 AccessCardItem(
                     icon = Icons.Default.Security,
-                    title = "Safety Center",
+                    title = stringResource(Res.string.settings_safety),
                     onClick = { /* TODO */ }
                 )
                 AccessCardItem(
                     icon = Icons.Default.PrivacyTip,
-                    title = "Privacy Policy",
+                    title = stringResource(Res.string.settings_privacy),
                     onClick = { /* TODO */ }
                 )
                 AccessCardItem(
                     icon = Icons.Default.Description,
-                    title = "Terms of Service",
+                    title = stringResource(Res.string.settings_terms),
                     onClick = { /* TODO */ }
                 )
                 AccessCardItem(
                     icon = Icons.Default.Gavel,
-                    title = "Community Guidelines",
+                    title = stringResource(Res.string.settings_guidelines),
                     onClick = { /* TODO */ }
                 )
                 AccessCardItem(
                     icon = Icons.Default.Info,
-                    title = "Licenses",
+                    title = stringResource(Res.string.settings_licenses),
                     onClick = { /* TODO */ }
                 )
             }
@@ -213,7 +240,7 @@ fun SettingsScreen(
                 onClick = { viewModel.onAction(SettingsAction.OnLogoutClick) },
                 style = AppButtonStyle.DESTRUCTIVE_SECONDARY,
                 leadingIcon = {
-                     Icon(
+                    Icon(
                         imageVector = Icons.AutoMirrored.Filled.Logout,
                         contentDescription = null,
                         modifier = Modifier.size(18.dp)
@@ -221,21 +248,21 @@ fun SettingsScreen(
                 },
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
             )
-            
+
             Spacer(modifier = Modifier.height(16.dp))
-            
+
             Text(
-                text = "Version 1.0 (Beta)",
+                text = stringResource(Res.string.settings_version),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.extended.textDisabled,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center
             )
-            
+
             Spacer(modifier = Modifier.height(16.dp))
         }
-        
-        if(state.showLogoutConfirmationDialog) {
+
+        if (state.showLogoutConfirmationDialog) {
             DestructiveConfirmationDialog(
                 title = stringResource(Res.string.do_you_want_to_logout),
                 description = stringResource(Res.string.do_you_want_to_logout_desc),

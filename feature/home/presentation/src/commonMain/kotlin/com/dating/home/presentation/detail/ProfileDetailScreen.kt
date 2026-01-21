@@ -41,9 +41,19 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import aura.feature.home.presentation.generated.resources.Res
+import aura.feature.home.presentation.generated.resources.go_back
+import aura.feature.home.presentation.generated.resources.profile_about_me
+import aura.feature.home.presentation.generated.resources.profile_basic_info
+import aura.feature.home.presentation.generated.resources.profile_interests
+import aura.feature.home.presentation.generated.resources.profile_like
+import aura.feature.home.presentation.generated.resources.profile_pass
+import aura.feature.home.presentation.generated.resources.profile_super_like
+import aura.feature.home.presentation.generated.resources.profile_work_education
 import coil3.compose.AsyncImage
 import com.dating.core.designsystem.components.chips.ChirpChip
 import com.dating.core.designsystem.theme.extended
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -162,7 +172,7 @@ fun ProfileDetailScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Back",
+                                contentDescription = stringResource(Res.string.go_back),
                                 tint = Color.White
                             )
                         }
@@ -176,7 +186,7 @@ fun ProfileDetailScreen(
 
                     // -- Bio --
                     Text(
-                        text = "About me",
+                        text = stringResource(Res.string.profile_about_me),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.extended.textPrimary
                     )
@@ -191,7 +201,7 @@ fun ProfileDetailScreen(
 
                     // -- Basic Info --
                     Text(
-                        text = "Basic info",
+                        text = stringResource(Res.string.profile_basic_info),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.extended.textPrimary
                     )
@@ -205,7 +215,7 @@ fun ProfileDetailScreen(
 
                     // -- Interests --
                     Text(
-                        text = "Interests",
+                        text = stringResource(Res.string.profile_interests),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.extended.textPrimary
                     )
@@ -224,7 +234,7 @@ fun ProfileDetailScreen(
 
                     // -- Work & Education --
                     Text(
-                        text = "Work & Education",
+                        text = stringResource(Res.string.profile_work_education),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.extended.textPrimary
                     )
@@ -275,7 +285,7 @@ fun ProfileDetailScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Close,
-                            contentDescription = "Pass",
+                            contentDescription = stringResource(Res.string.profile_pass),
                             tint = MaterialTheme.colorScheme.error,
                             modifier = Modifier.size(32.dp)
                         )
@@ -290,7 +300,7 @@ fun ProfileDetailScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Star,
-                            contentDescription = "Super Like",
+                            contentDescription = stringResource(Res.string.profile_super_like),
                             tint = MaterialTheme.colorScheme.extended.accentBlue,
                             modifier = Modifier.size(24.dp)
                         )
@@ -305,7 +315,7 @@ fun ProfileDetailScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Favorite,
-                            contentDescription = "Like",
+                            contentDescription = stringResource(Res.string.profile_like),
                             tint = MaterialTheme.colorScheme.extended.success,
                             modifier = Modifier.size(32.dp)
                         )

@@ -1,7 +1,24 @@
 package com.dating.home.presentation.profile.edit_profile
 
 import androidx.compose.foundation.text.input.TextFieldState
+import aura.feature.home.presentation.generated.resources.Res
+import aura.feature.home.presentation.generated.resources.interest_art
+import aura.feature.home.presentation.generated.resources.interest_cooking
+import aura.feature.home.presentation.generated.resources.interest_design
+import aura.feature.home.presentation.generated.resources.interest_fashion
+import aura.feature.home.presentation.generated.resources.interest_gaming
+import aura.feature.home.presentation.generated.resources.interest_hiking
+import aura.feature.home.presentation.generated.resources.interest_movies
+import aura.feature.home.presentation.generated.resources.interest_music
+import aura.feature.home.presentation.generated.resources.interest_photography
+import aura.feature.home.presentation.generated.resources.interest_reading
+import aura.feature.home.presentation.generated.resources.interest_running
+import aura.feature.home.presentation.generated.resources.interest_sushi
+import aura.feature.home.presentation.generated.resources.interest_tech
+import aura.feature.home.presentation.generated.resources.interest_travel
+import aura.feature.home.presentation.generated.resources.interest_yoga
 import com.dating.core.presentation.util.UiText
+import org.jetbrains.compose.resources.StringResource
 
 data class EditProfileState(
     val profilePictureUrl: String? = null,
@@ -9,25 +26,25 @@ data class EditProfileState(
     val isDeletingImage: Boolean = false,
     val showDeleteConfirmationDialog: Boolean = false,
     val imageError: UiText? = null,
-    
+
     // Profile Fields
     val bioTextState: TextFieldState = TextFieldState(),
     val jobTitleTextState: TextFieldState = TextFieldState(),
     val companyTextState: TextFieldState = TextFieldState(),
     val educationTextState: TextFieldState = TextFieldState(),
     val locationTextState: TextFieldState = TextFieldState(),
-    
+
     // Personal Info
     val heightTextState: TextFieldState = TextFieldState(),
     val zodiacTextState: TextFieldState = TextFieldState(),
     val smokingTextState: TextFieldState = TextFieldState(),
     val drinkingTextState: TextFieldState = TextFieldState(),
-    
-    val selectedInterests: List<String> = emptyList(),
-    val availableInterests: List<String> = listOf(
-        "Photography", "Hiking", "Art", "Sushi", "Travel", 
-        "Running", "Design", "Music", "Cooking", "Reading",
-        "Yoga", "Gaming", "Movies", "Tech", "Fashion"
+
+    val selectedInterests: List<StringResource> = emptyList(),
+    val availableInterests: List<StringResource> = listOf(
+        Res.string.interest_photography, Res.string.interest_hiking, Res.string.interest_art, Res.string.interest_sushi, Res.string.interest_travel,
+        Res.string.interest_running, Res.string.interest_design, Res.string.interest_music, Res.string.interest_cooking, Res.string.interest_reading,
+        Res.string.interest_yoga, Res.string.interest_gaming, Res.string.interest_movies, Res.string.interest_tech, Res.string.interest_fashion
     ),
     val photos: List<String?> = listOf(null, null, null, null, null, null) // Mock photo slots
 )

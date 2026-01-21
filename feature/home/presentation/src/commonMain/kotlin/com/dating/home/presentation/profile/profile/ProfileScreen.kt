@@ -39,11 +39,23 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import aura.feature.home.presentation.generated.resources.Res
+import aura.feature.home.presentation.generated.resources.profile_community_guidelines
+import aura.feature.home.presentation.generated.resources.profile_edit
+import aura.feature.home.presentation.generated.resources.profile_header_info_format
+import aura.feature.home.presentation.generated.resources.profile_help_support
+import aura.feature.home.presentation.generated.resources.profile_privacy_policy
+import aura.feature.home.presentation.generated.resources.profile_safety_center
+import aura.feature.home.presentation.generated.resources.profile_safety_legal
+import aura.feature.home.presentation.generated.resources.profile_settings_dashboard
+import aura.feature.home.presentation.generated.resources.profile_support
+import aura.feature.home.presentation.generated.resources.profile_verify
 import com.dating.core.designsystem.components.avatar.AvatarSize
 import com.dating.core.designsystem.components.avatar.ChirpAvatarPhoto
 import com.dating.core.designsystem.components.cards.AccessCardItem
 import com.dating.core.designsystem.components.cards.AccessCardList
 import com.dating.core.designsystem.theme.extended
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -84,7 +96,7 @@ fun ProfileScreen(
 
             // 2. Name & Age
             Text(
-                text = "${state.username}, 26",
+                text = stringResource(Res.string.profile_header_info_format, state.username, 26),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.extended.textPrimary
             )
@@ -97,19 +109,19 @@ fun ProfileScreen(
             ) {
                 ProfileDashboardCard(
                     icon = Icons.Default.Edit,
-                    text = "Edit Profile",
+                    text = stringResource(Res.string.profile_edit),
                     onClick = onEditProfile,
                     modifier = Modifier.weight(1f)
                 )
                 ProfileDashboardCard(
                     icon = Icons.Default.Verified, // Boost/Bolt icon
-                    text = "Verify",
+                    text = stringResource(Res.string.profile_verify),
                     onClick = onVerification,
                     modifier = Modifier.weight(1f)
                 )
                 ProfileDashboardCard(
                     icon = Icons.Default.Settings,
-                    text = "Settings",
+                    text = stringResource(Res.string.profile_settings_dashboard),
                     onClick = onSettings,
                     modifier = Modifier.weight(1f)
                 )
@@ -117,30 +129,30 @@ fun ProfileScreen(
             Spacer(modifier = Modifier.height(32.dp))
 
             // 4. SAFETY & LEGAL
-            AccessCardList(title = "SAFETY & LEGAL") {
+            AccessCardList(title = stringResource(Res.string.profile_safety_legal)) {
                 AccessCardItem(
                     icon = Icons.Default.Security,
-                    title = "Safety Center",
+                    title = stringResource(Res.string.profile_safety_center),
                     onClick = { /* Todo */ }
                 )
                 AccessCardItem(
                     icon = Icons.Default.Lock, // Or Gavel/Policy
-                    title = "Privacy Policy",
+                    title = stringResource(Res.string.profile_privacy_policy),
                     onClick = { /* Todo */ }
                 )
             }
             Spacer(modifier = Modifier.height(24.dp))
 
             // 4. SUPPORT
-            AccessCardList(title = "SUPPORT") {
+            AccessCardList(title = stringResource(Res.string.profile_support)) {
                 AccessCardItem(
                     icon = Icons.Default.Help,
-                    title = "Help & Support",
+                    title = stringResource(Res.string.profile_help_support),
                     onClick = { /* Todo */ }
                 )
                 AccessCardItem(
                     icon = Icons.Default.Favorite, // Heart/Hand
-                    title = "Community Guidelines",
+                    title = stringResource(Res.string.profile_community_guidelines),
                     onClick = { /* Todo */ }
                 )
             }

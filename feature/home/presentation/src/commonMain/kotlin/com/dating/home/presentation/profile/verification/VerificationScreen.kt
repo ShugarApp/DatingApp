@@ -32,10 +32,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.dating.core.designsystem.components.buttons.AppButtonStyle
+import aura.feature.home.presentation.generated.resources.Res
+import aura.feature.home.presentation.generated.resources.verification_button
+import aura.feature.home.presentation.generated.resources.verification_desc
+import aura.feature.home.presentation.generated.resources.verification_feature_1_desc
+import aura.feature.home.presentation.generated.resources.verification_feature_1_title
+import aura.feature.home.presentation.generated.resources.verification_feature_2_desc
+import aura.feature.home.presentation.generated.resources.verification_feature_2_title
+import aura.feature.home.presentation.generated.resources.verification_feature_3_desc
+import aura.feature.home.presentation.generated.resources.verification_feature_3_title
+import aura.feature.home.presentation.generated.resources.verification_footer
+import aura.feature.home.presentation.generated.resources.verification_subtitle
+import aura.feature.home.presentation.generated.resources.verification_title
 import com.dating.core.designsystem.components.buttons.ChirpButton
 import com.dating.core.designsystem.components.header.AppCenterTopBar
 import com.dating.core.designsystem.theme.extended
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun VerificationScreen(
@@ -46,7 +58,7 @@ fun VerificationScreen(
         modifier = modifier,
         topBar = {
             AppCenterTopBar(
-                title = "SECURITY PROTOCOL",
+                title = stringResource(Res.string.verification_title),
                 onBack = onBack
             )
         }
@@ -80,7 +92,7 @@ fun VerificationScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "Account Authenticity",
+                text = stringResource(Res.string.verification_subtitle),
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.Bold,
                     fontSize = 24.sp
@@ -91,7 +103,7 @@ fun VerificationScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                text = "Verify your profile to maintain the integrity of our community and secure your data.",
+                text = stringResource(Res.string.verification_desc),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.extended.textSecondary,
                 textAlign = TextAlign.Center,
@@ -103,30 +115,30 @@ fun VerificationScreen(
             // Feature List
             SecurityFeatureItem(
                 icon = Icons.Default.Lock,
-                title = "Advanced Protection",
-                description = "End-to-end encryption for all identity verification assets."
+                title = stringResource(Res.string.verification_feature_1_title),
+                description = stringResource(Res.string.verification_feature_1_desc)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             SecurityFeatureItem(
                 icon = Icons.Default.VerifiedUser,
-                title = "Trustworthy Network",
-                description = "Mandatory vetting ensures 100% human-verified interactions."
+                title = stringResource(Res.string.verification_feature_2_title),
+                description = stringResource(Res.string.verification_feature_2_desc)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             SecurityFeatureItem(
                 icon = Icons.Default.Security,
-                title = "Secure Matching",
-                description = "Prioritized visibility within our verified member database."
+                title = stringResource(Res.string.verification_feature_3_title),
+                description = stringResource(Res.string.verification_feature_3_desc)
             )
 
             Spacer(modifier = Modifier.height(32.dp))
 
             ChirpButton(
-                text = "Begin Verification",
+                text = stringResource(Res.string.verification_button),
                 onClick = { /* TODO: Start verification flow */ },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -134,7 +146,7 @@ fun VerificationScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "SECURE PROCESSING BY BITVAULT-ID",
+                text = stringResource(Res.string.verification_footer),
                 style = MaterialTheme.typography.labelSmall.copy(
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 1.sp

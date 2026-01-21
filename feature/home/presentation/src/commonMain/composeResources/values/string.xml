@@ -55,9 +55,9 @@
     <string name="delete_profile_picture">Delete profile image</string>
     <string name="delete_profile_picture_desc">Are you sure you want to delete your profile picture? This action cannot be undone.</string>
     <string name="contact_chirp_support_change_email">Contact the Aura support to change your email.</string>
-    <string name="password_change_successful">You've successfully changed your password!</string>
+    <string name="password_change_successful">You\'ve successfully changed your password!</string>
     <string name="error_current_password_incorrect">Your current password is not correct</string>
-    <string name="error_current_password_equal_to_new_one">Your new password can't be equal to the old one.</string>
+    <string name="error_current_password_equal_to_new_one">Your new password can\'t be equal to the old one.</string>
     <string name="error_invalid_file_type">This file type is not supported.</string>
 
     <!-- Bottom Navigation -->
@@ -67,4 +67,125 @@
     <string name="bottom_nav_messages">Mensajes</string>
 
 
+    <!-- Settings Screen -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_discovery">Discovery Settings</string>
+    <string name="settings_location">Location</string>
+    <string name="settings_current_location">My Current Location</string>
+    <string name="settings_max_distance">Maximum Distance</string>
+    <string name="settings_100_km">100 km</string>
+    <string name="settings_show_me">Show Me</string>
+    <string name="settings_women">Women</string>
+    <string name="settings_age_range">Age Range</string>
+    <string name="settings_18_35">18 - 35</string>
+    <string name="settings_account">Account Settings</string>
+    <string name="settings_change_password">Change Password</string>
+    <string name="settings_subscription">Subscription &amp; Payment</string>
+    <string name="settings_manage_subscription">Manage Subscription</string>
+    <string name="settings_pro_plan_active">PRO PLAN ACTIVE</string>
+    <string name="settings_restore_purchases">Restore Purchases</string>
+    <string name="settings_notifications">Notifications</string>
+    <string name="settings_push_notifications">Push Notifications</string>
+    <string name="settings_email_notifications">Email Notifications</string>
+    <string name="settings_legal">Legal &amp; Contact</string>
+    <string name="settings_help">Help &amp; Support</string>
+    <string name="settings_safety">Safety Center</string>
+    <string name="settings_privacy">Privacy Policy</string>
+    <string name="settings_terms">Terms of Service</string>
+    <string name="settings_guidelines">Community Guidelines</string>
+    <string name="settings_licenses">Licenses</string>
+    <string name="settings_version">Version 1.0 (Beta)</string>
+
+    <!-- Matches Screen -->
+    <string name="matches_title">Matches</string>
+    <string name="matches_chat">Chat</string>
+    <string name="matches_empty_title">No tienes matches aún</string>
+    <string name="matches_empty_desc">¡Sigue explorando para encontrar a alguien especial!</string>
+
+    <!-- Verification Screen -->
+    <string name="verification_title">SECURITY PROTOCOL</string>
+    <string name="verification_subtitle">Account Authenticity</string>
+    <string name="verification_desc">Verify your profile to maintain the integrity of our community and secure your data.</string>
+    <string name="verification_feature_1_title">Advanced Protection</string>
+    <string name="verification_feature_1_desc">End-to-end encryption for all identity verification assets.</string>
+    <string name="verification_feature_2_title">Trustworthy Network</string>
+    <string name="verification_feature_2_desc">Mandatory vetting ensures 100% human-verified interactions.</string>
+    <string name="verification_feature_3_title">Secure Matching</string>
+    <string name="verification_feature_3_desc">Prioritized visibility within our verified member database.</string>
+    <string name="verification_button">Begin Verification</string>
+    <string name="verification_footer">SECURE PROCESSING BY BITVAULT-ID</string>
+
+    <!-- Profile Detail Screen -->
+    <string name="profile_about_me">About me</string>
+    <string name="profile_basic_info">Basic info</string>
+    <string name="profile_interests">Interests</string>
+    <string name="profile_work_education">Work &amp; Education</string>
+    <string name="profile_pass">Pass</string>
+    <string name="profile_super_like">Super Like</string>
+    <string name="profile_like">Like</string>
+    <!-- Edit Profile Screen -->
+    <string name="edit_profile_title">Edit Profile</string>
+    <string name="edit_profile_photos">Photos</string>
+    <string name="edit_profile_about_me">About Me</string>
+    <string name="edit_profile_about_me_placeholder">Tell us about yourself...</string>
+    <string name="edit_profile_interests">Interests</string>
+    <string name="edit_profile_job">Job Title</string>
+    <string name="edit_profile_job_placeholder">Add job title</string>
+    <string name="edit_profile_company">Company</string>
+    <string name="edit_profile_company_placeholder">Add company</string>
+    <string name="edit_profile_education">Education</string>
+    <string name="edit_profile_education_placeholder">Add education</string>
+    <string name="edit_profile_personal_info">Personal Information</string>
+    <string name="edit_profile_height">Height</string>
+    <string name="edit_profile_zodiac">Zodiac</string>
+    <string name="edit_profile_smoking">Smoking</string>
+    <string name="edit_profile_drinking">Drinking</string>
+    <string name="remove">Remove</string>
+    <string name="add_photo">Add Photo</string>
+
+    <string name="profile_header_info_format">%1$s, %2$d</string>
+
+    <!-- Feed Screen -->
+    <string name="app_name_feed">Aura</string>
+    <string name="feed_empty_state_title">No hay más perfiles</string>
+    <string name="feed_empty_state_button">Volver a cargar</string>
+
+    <!-- Profile Screen -->
+    <string name="profile_edit">Edit Profile</string>
+    <string name="profile_verify">Verify</string>
+    <string name="profile_settings_dashboard">Settings</string>
+    <string name="profile_safety_legal">SAFETY &amp; LEGAL</string>
+    <string name="profile_safety_center">Safety Center</string>
+    <string name="profile_privacy_policy">Privacy Policy</string>
+    <string name="profile_support">SUPPORT</string>
+    <string name="profile_help_support">Help &amp; Support</string>
+    <string name="profile_community_guidelines">Community Guidelines</string>
+
+    <!-- Interests -->
+    <string name="interest_photography">Photography</string>
+    <string name="interest_hiking">Hiking</string>
+    <string name="interest_art">Art</string>
+    <string name="interest_sushi">Sushi</string>
+    <string name="interest_travel">Travel</string>
+    <string name="interest_running">Running</string>
+    <string name="interest_design">Design</string>
+    <string name="interest_music">Music</string>
+    <string name="interest_cooking">Cooking</string>
+    <string name="interest_reading">Reading</string>
+    <string name="interest_yoga">Yoga</string>
+    <string name="interest_gaming">Gaming</string>
+    <string name="interest_movies">Movies</string>
+    <string name="interest_tech">Tech</string>
+    <string name="interest_fashion">Fashion</string>
+    <string name="interest_coffee">Coffee</string>
+
+    <string name="mock_bio">Hello! I\'m a UX Designer who loves hiking and coffee.</string>
+    <string name="mock_job">UX Designer</string>
+    <string name="mock_company">Spotify</string>
+    <string name="mock_university">University of Arts</string>
+    <string name="mock_location">New York, USA</string>
+    <string name="mock_height">175 cm</string>
+    <string name="mock_zodiac">Leo</string>
+    <string name="mock_smoking">Reviewing</string>
+    <string name="mock_drinking">Socially</string>
 </resources>

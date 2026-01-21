@@ -4,13 +4,13 @@ import com.dating.home.presentation.chat.chat_detail.ChatDetailViewModel
 import com.dating.home.presentation.chat.chat_list.ChatListViewModel
 import com.dating.home.presentation.chat.chat_list_detail.ChatListDetailViewModel
 import com.dating.home.presentation.chat.create_chat.CreateChatViewModel
-import com.dating.home.presentation.home.swipe.FeedViewModel
 import com.dating.home.presentation.chat.manage_chat.ManageChatViewModel
+import com.dating.home.presentation.home.swipe.FeedViewModel
 import com.dating.home.presentation.matches.MatchesViewModel
+import com.dating.home.presentation.profile.edit_profile.EditProfileViewModel
 import com.dating.home.presentation.profile.profile.ProfileViewModel
 import com.dating.home.presentation.profile.settings.SettingsViewModel
 import com.dating.home.presentation.profile.settings.changepassword.ChangePasswordViewModel
-import com.dating.home.presentation.profile.edit_profile.EditProfileViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 

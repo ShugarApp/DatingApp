@@ -5,6 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import aura.feature.home.presentation.generated.resources.Res
 import aura.feature.home.presentation.generated.resources.error_invalid_file_type
+import aura.feature.home.presentation.generated.resources.interest_coffee
+import aura.feature.home.presentation.generated.resources.interest_design
+import aura.feature.home.presentation.generated.resources.interest_hiking
+import aura.feature.home.presentation.generated.resources.interest_music
 import com.dating.core.domain.auth.SessionStorage
 import com.dating.core.domain.util.onFailure
 import com.dating.core.domain.util.onSuccess
@@ -18,6 +22,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.StringResource
 
 class EditProfileViewModel(
     private val chatParticipantRepository: ChatParticipantRepository,
@@ -31,22 +36,22 @@ class EditProfileViewModel(
         _state,
         sessionStorage.observeAuthInfo()
     ) { currentState, authInfo ->
-        if(authInfo != null && !hasLoadedInitialData) {
-             currentState.copy(
+        if (authInfo != null && !hasLoadedInitialData) {
+            currentState.copy(
                 profilePictureUrl = authInfo.user.profilePictureUrl,
-                 // Mock Pre-fill for demo purposes
+                // Mock Pre-fill for demo purposes
                 bioTextState = TextFieldState("Hello! I'm a UX Designer who loves hiking and coffee."),
                 jobTitleTextState = TextFieldState("UX Designer"),
                 companyTextState = TextFieldState("Spotify"),
                 educationTextState = TextFieldState("University of Arts"),
                 locationTextState = TextFieldState("New York, USA"),
-                
+
                 heightTextState = TextFieldState("175 cm"),
                 zodiacTextState = TextFieldState("Leo"),
                 smokingTextState = TextFieldState("Reviewing"),
                 drinkingTextState = TextFieldState("Socially"),
-                
-                selectedInterests = listOf("Design", "Music", "Coffee", "Hiking"),
+
+                selectedInterests = listOf(Res.string.interest_design, Res.string.interest_music, Res.string.interest_coffee, Res.string.interest_hiking),
                 photos = listOf(authInfo.user.profilePictureUrl, null, null, null, null, null)
             )
         } else currentState
@@ -73,8 +78,8 @@ class EditProfileViewModel(
         }
     }
 
-    private fun toggleInterest(interest: String) {
-        _state.update { 
+    private fun toggleInterest(interest: StringResource) {
+        _state.update {
             val currentInterests = it.selectedInterests.toMutableList()
             if (currentInterests.contains(interest)) {
                 currentInterests.remove(interest)
@@ -86,61 +91,75 @@ class EditProfileViewModel(
     }
 
     private fun deleteProfilePicture() {
-        if(state.value.isDeletingImage && state.value.profilePictureUrl == null) {
+        if (state.value.isDeletingImage && state.value.profilePictureUrl == null) {
             return
         }
 
-        _state.update { it.copy(
-            isDeletingImage = true,
-            imageError = null,
-            showDeleteConfirmationDialog = false
-        ) }
+        _state.update {
+            it.copy(
+                isDeletingImage = true,
+                imageError = null,
+                showDeleteConfirmationDialog = false
+            )
+        }
 
         viewModelScope.launch {
             chatParticipantRepository
                 .deleteProfilePicture()
                 .onSuccess {
-                    _state.update { it.copy(
-                        isDeletingImage = false
-                    ) }
+                    _state.update {
+                        it.copy(
+                            isDeletingImage = false
+                        )
+                    }
                 }
                 .onFailure { error ->
-                    _state.update { it.copy(
-                        imageError = error.toUiText(),
-                        isDeletingImage = false
-                    ) }
+                    _state.update {
+                        it.copy(
+                            imageError = error.toUiText(),
+                            isDeletingImage = false
+                        )
+                    }
                 }
         }
     }
 
     private fun dismissDeleteConfirmation() {
-        _state.update { it.copy(
-            showDeleteConfirmationDialog = false
-        ) }
+        _state.update {
+            it.copy(
+                showDeleteConfirmationDialog = false
+            )
+        }
     }
 
     private fun showDeleteConfirmation() {
-        _state.update { it.copy(
-            showDeleteConfirmationDialog = true
-        )}
+        _state.update {
+            it.copy(
+                showDeleteConfirmationDialog = true
+            )
+        }
     }
 
     private fun uploadProfilePicture(bytes: ByteArray, mimeType: String?) {
-        if(state.value.isUploadingImage) {
+        if (state.value.isUploadingImage) {
             return
         }
 
-        if(mimeType == null) {
-            _state.update { it.copy(
-                imageError = UiText.Resource(Res.string.error_invalid_file_type)
-            ) }
+        if (mimeType == null) {
+            _state.update {
+                it.copy(
+                    imageError = UiText.Resource(Res.string.error_invalid_file_type)
+                )
+            }
             return
         }
 
-        _state.update { it.copy(
-            isUploadingImage = true,
-            imageError = null
-        ) }
+        _state.update {
+            it.copy(
+                isUploadingImage = true,
+                imageError = null
+            )
+        }
 
         viewModelScope.launch {
             chatParticipantRepository
@@ -149,15 +168,19 @@ class EditProfileViewModel(
                     mimeType = mimeType
                 )
                 .onSuccess {
-                    _state.update { it.copy(
-                        isUploadingImage = false,
-                    ) }
+                    _state.update {
+                        it.copy(
+                            isUploadingImage = false,
+                        )
+                    }
                 }
                 .onFailure { error ->
-                    _state.update { it.copy(
-                        imageError = error.toUiText(),
-                        isUploadingImage = false
-                    ) }
+                    _state.update {
+                        it.copy(
+                            imageError = error.toUiText(),
+                            isUploadingImage = false
+                        )
+                    }
                 }
         }
     }
