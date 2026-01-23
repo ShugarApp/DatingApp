@@ -2,10 +2,10 @@ package com.dating.home.presentation.chat.chat_list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dating.core.domain.auth.SessionStorage
 import com.dating.home.domain.chat.ChatRepository
 import com.dating.home.domain.participant.ChatParticipantRepository
 import com.dating.home.presentation.chat.mappers.toUi
-import com.dating.core.domain.auth.SessionStorage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -28,7 +28,7 @@ class ChatListViewModel(
         repository.getChats(),
         sessionStorage.observeAuthInfo()
     ) { currentState, chats, authInfo ->
-        if(authInfo == null) {
+        if (authInfo == null) {
             return@combine ChatListState()
         }
 
@@ -53,18 +53,20 @@ class ChatListViewModel(
     fun onAction(action: ChatListAction) {
         when (action) {
             is ChatListAction.OnSelectChat -> {
-                _state.update { it.copy(
-                    selectedChatId = action.chatId
-                ) }
+                _state.update {
+                    it.copy(
+                        selectedChatId = action.chatId
+                    )
+                }
             }
+
             else -> Unit
         }
     }
 
     private fun fetchLocalUserProfile() {
         viewModelScope.launch {
-            chatParticipantRepository
-                .fetchLocalParticipant()
+            chatParticipantRepository.fetchLocalParticipant()
         }
     }
 

@@ -171,7 +171,7 @@ class KtorWebSocketConnector(
             urlString = "${UrlConstants.BASE_URL_WS}/chat"
         ) {
             header("Authorization", "Bearer $accessToken")
-            header("X-API-Key", BuildKonfig.API_KEY)
+            //header("X-API-Key", BuildKonfig.API_KEY)
         }
 
         currentSession?.let { session ->

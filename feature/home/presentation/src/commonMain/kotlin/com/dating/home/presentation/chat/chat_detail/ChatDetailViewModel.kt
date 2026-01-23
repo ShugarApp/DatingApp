@@ -8,6 +8,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import aura.feature.home.presentation.generated.resources.Res
 import aura.feature.home.presentation.generated.resources.today
+import com.dating.core.domain.auth.SessionStorage
+import com.dating.core.domain.util.DataErrorException
+import com.dating.core.domain.util.Paginator
+import com.dating.core.domain.util.onFailure
+import com.dating.core.domain.util.onSuccess
+import com.dating.core.presentation.util.UiText
+import com.dating.core.presentation.util.toUiText
 import com.dating.home.domain.chat.ChatConnectionClient
 import com.dating.home.domain.chat.ChatRepository
 import com.dating.home.domain.message.MessageRepository
@@ -17,13 +24,8 @@ import com.dating.home.domain.models.OutgoingNewMessage
 import com.dating.home.presentation.chat.mappers.toUi
 import com.dating.home.presentation.chat.mappers.toUiList
 import com.dating.home.presentation.chat.model.MessageUi
-import com.dating.core.domain.auth.SessionStorage
-import com.dating.core.domain.util.DataErrorException
-import com.dating.core.domain.util.Paginator
-import com.dating.core.domain.util.onFailure
-import com.dating.core.domain.util.onSuccess
-import com.dating.core.presentation.util.UiText
-import com.dating.core.presentation.util.toUiText
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,8 +42,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
 
 class ChatDetailViewModel(
     private val chatRepository: ChatRepository,
@@ -141,9 +141,11 @@ class ChatDetailViewModel(
     }
 
     private fun updateNearBottom(firstVisibleIndex: Int) {
-        _state.update { it.copy(
-            isNearBottom = firstVisibleIndex <= 3
-        ) }
+        _state.update {
+            it.copy(
+                isNearBottom = firstVisibleIndex <= 3
+            )
+        }
     }
 
     private fun updateBanner(topVisibleIndex: Int) {
@@ -152,19 +154,21 @@ class ChatDetailViewModel(
             index = topVisibleIndex
         )
 
-        _state.update { it.copy(
-            bannerState = BannerState(
-                formattedDate = visibleDate,
-                isVisible = visibleDate != null
+        _state.update {
+            it.copy(
+                bannerState = BannerState(
+                    formattedDate = visibleDate,
+                    isVisible = visibleDate != null
+                )
             )
-        ) }
+        }
     }
 
     private fun calculateBannerDateFromIndex(
         messages: List<MessageUi>,
         index: Int
     ): UiText? {
-        if(messages.isEmpty() || index < 0 || index >= messages.size) {
+        if (messages.isEmpty() || index < 0 || index >= messages.size) {
             return null
         }
 
@@ -172,14 +176,15 @@ class ChatDetailViewModel(
             .asSequence()
             .mapNotNull { index ->
                 val item = messages.getOrNull(index)
-                if(item is MessageUi.DateSeparator) item.date else null
+                if (item is MessageUi.DateSeparator) item.date else null
             }
             .firstOrNull()
 
-        return when(nearestDateSeparator) {
+        return when (nearestDateSeparator) {
             is UiText.Resource -> {
-                if(nearestDateSeparator.id == Res.string.today) null else nearestDateSeparator
+                if (nearestDateSeparator.id == Res.string.today) null else nearestDateSeparator
             }
+
             else -> nearestDateSeparator
         }
     }
@@ -268,9 +273,7 @@ class ChatDetailViewModel(
     private fun observeCanSendMessage() {
         canSendMessage.onEach { canSend ->
             _state.update {
-                it.copy(
-                    canSendMessage = canSend
-                )
+                it.copy(canSendMessage = canSend)
             }
         }.launchIn(viewModelScope)
     }
@@ -315,9 +318,7 @@ class ChatDetailViewModel(
                 }
 
                 _state.update {
-                    it.copy(
-                        connectionState = connectionState
-                    )
+                    it.copy(connectionState = connectionState)
                 }
             }
             .launchIn(viewModelScope)
@@ -366,9 +367,7 @@ class ChatDetailViewModel(
         val chatId = _chatId.value ?: return
 
         _state.update {
-            it.copy(
-                isChatOptionsOpen = false
-            )
+            it.copy(isChatOptionsOpen = false)
         }
 
         viewModelScope.launch {
@@ -410,9 +409,7 @@ class ChatDetailViewModel(
 
     private fun onChatOptionsClick() {
         _state.update {
-            it.copy(
-                isChatOptionsOpen = true
-            )
+            it.copy(isChatOptionsOpen = true)
         }
     }
 
@@ -424,5 +421,4 @@ class ChatDetailViewModel(
             }
         }
     }
-
 }
