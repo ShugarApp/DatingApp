@@ -35,11 +35,10 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.dating.core.designsystem.components.header.MainTopAppBar
 import com.dating.home.presentation.home.swipe.components.SwipeableCard
-import shugar.feature.home.presentation.generated.resources.Res
-import shugar.feature.home.presentation.generated.resources.app_name_feed
-import shugar.feature.home.presentation.generated.resources.feed_empty_state_title
-import shugar.feature.home.presentation.generated.resources.feed_empty_state_button
 import org.jetbrains.compose.resources.stringResource
+import shugar.feature.home.presentation.generated.resources.Res
+import shugar.feature.home.presentation.generated.resources.feed_empty_state_button
+import shugar.feature.home.presentation.generated.resources.feed_empty_state_title
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,7 +50,7 @@ fun FeedScreen(
     Scaffold(
         modifier = modifier,
         topBar = {
-            MainTopAppBar(title = stringResource(Res.string.app_name_feed))
+            MainTopAppBar()
         }
     ) { paddingValues ->
         Box(

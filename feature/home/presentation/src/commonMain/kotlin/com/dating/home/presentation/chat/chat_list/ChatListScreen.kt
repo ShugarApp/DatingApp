@@ -106,7 +106,7 @@ fun ChatListScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            MainTopAppBar(title = "Chats")
+            MainTopAppBar()
             when {
                 state.isLoading -> {
                     CircularProgressIndicator(

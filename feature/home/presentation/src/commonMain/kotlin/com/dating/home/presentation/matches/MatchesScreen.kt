@@ -55,7 +55,7 @@ fun MatchesScreen(
     Scaffold(
         modifier = modifier,
         topBar = {
-            MainTopAppBar(stringResource(Res.string.matches_title))
+            MainTopAppBar()
         }
     ) { paddingValues ->
         PullToRefreshBox(
