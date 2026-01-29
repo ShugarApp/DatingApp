@@ -107,7 +107,7 @@ fun ChatListScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            MainTopAppBar(title = "Chats")
+            MainTopAppBar()
             PullToRefreshBox(
                 isRefreshing = state.isLoading,
                 onRefresh = { onAction(ChatListAction.OnRefresh) },
