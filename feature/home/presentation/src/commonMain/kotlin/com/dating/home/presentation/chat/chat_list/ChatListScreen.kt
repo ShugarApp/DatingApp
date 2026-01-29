@@ -27,10 +27,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import aura.feature.home.presentation.generated.resources.Res
-import aura.feature.home.presentation.generated.resources.create_chat
-import aura.feature.home.presentation.generated.resources.no_chats
-import aura.feature.home.presentation.generated.resources.no_chats_subtitle
+import shugar.feature.home.presentation.generated.resources.Res
+import shugar.feature.home.presentation.generated.resources.create_chat
+import shugar.feature.home.presentation.generated.resources.no_chats
+import shugar.feature.home.presentation.generated.resources.no_chats_subtitle
 import com.dating.core.designsystem.components.brand.ChirpHorizontalDivider
 import com.dating.core.designsystem.components.buttons.ChirpFloatingActionButton
 import com.dating.core.designsystem.components.header.MainTopAppBar

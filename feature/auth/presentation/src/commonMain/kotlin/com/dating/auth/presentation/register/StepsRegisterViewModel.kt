@@ -4,9 +4,9 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import aura.feature.auth.presentation.generated.resources.Res
-import aura.feature.auth.presentation.generated.resources.error_account_exists
-import aura.feature.auth.presentation.generated.resources.error_invalid_username
+import shugar.feature.auth.presentation.generated.resources.Res
+import shugar.feature.auth.presentation.generated.resources.error_account_exists
+import shugar.feature.auth.presentation.generated.resources.error_invalid_username
 import com.dating.core.domain.auth.AuthService
 import com.dating.core.domain.util.DataError
 import com.dating.core.domain.util.onFailure

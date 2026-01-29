@@ -9,9 +9,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import aura.feature.home.presentation.generated.resources.Res
-import aura.feature.home.presentation.generated.resources.add
-import aura.feature.home.presentation.generated.resources.email_or_username
+import shugar.feature.home.presentation.generated.resources.Res
+import shugar.feature.home.presentation.generated.resources.add
+import shugar.feature.home.presentation.generated.resources.email_or_username
 import com.dating.core.designsystem.components.buttons.ChirpButton
 import com.dating.core.designsystem.components.buttons.AppButtonStyle
 import com.dating.core.designsystem.components.textfields.ChirpTextField

@@ -8,10 +8,10 @@
 	<array>
 		<dict>
 			<key>CFBundleURLName</key>
-			<string>api.aura-safe-dating.com</string>
+			<string>api.shugar-safe-dating.com</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>aura</string>
+				<string>shugar</string>
 			</array>
 		</dict>
 	</array>

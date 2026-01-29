@@ -1,11 +1,11 @@
 package com.dating.home.presentation.chat.util
 
-import aura.feature.home.presentation.generated.resources.Res
-import aura.feature.home.presentation.generated.resources.network_error
-import aura.feature.home.presentation.generated.resources.offline
-import aura.feature.home.presentation.generated.resources.online
-import aura.feature.home.presentation.generated.resources.reconnecting
-import aura.feature.home.presentation.generated.resources.unknown_error
+import shugar.feature.home.presentation.generated.resources.Res
+import shugar.feature.home.presentation.generated.resources.network_error
+import shugar.feature.home.presentation.generated.resources.offline
+import shugar.feature.home.presentation.generated.resources.online
+import shugar.feature.home.presentation.generated.resources.reconnecting
+import shugar.feature.home.presentation.generated.resources.unknown_error
 import com.dating.home.domain.models.ConnectionState
 import com.dating.core.presentation.util.UiText
 

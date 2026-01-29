@@ -23,11 +23,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import aura.core.designsystem.generated.resources.Res
-import aura.core.designsystem.generated.resources.eye_icon
-import aura.core.designsystem.generated.resources.eye_off_icon
-import aura.core.designsystem.generated.resources.hide_password
-import aura.core.designsystem.generated.resources.show_password
+import shugar.core.designsystem.generated.resources.Res
+import shugar.core.designsystem.generated.resources.eye_icon
+import shugar.core.designsystem.generated.resources.eye_off_icon
+import shugar.core.designsystem.generated.resources.hide_password
+import shugar.core.designsystem.generated.resources.show_password
 import com.dating.core.designsystem.theme.AppTheme
 import com.dating.core.designsystem.theme.extended
 import org.jetbrains.compose.resources.stringResource

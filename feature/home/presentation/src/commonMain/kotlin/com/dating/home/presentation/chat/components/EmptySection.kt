@@ -12,8 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import aura.feature.home.presentation.generated.resources.Res
-import aura.feature.home.presentation.generated.resources.empty_chat
+import shugar.feature.home.presentation.generated.resources.Res
+import shugar.feature.home.presentation.generated.resources.empty_chat
 import com.dating.core.designsystem.theme.AppTheme
 import com.dating.core.designsystem.theme.extended
 import com.dating.core.presentation.util.DeviceConfiguration

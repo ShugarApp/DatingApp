@@ -1,10 +1,10 @@
 package com.dating.home.presentation.chat.util
 
-import aura.feature.home.presentation.generated.resources.Res
-import aura.feature.home.presentation.generated.resources.today
-import aura.feature.home.presentation.generated.resources.today_x
-import aura.feature.home.presentation.generated.resources.yesterday
-import aura.feature.home.presentation.generated.resources.yesterday_x
+import shugar.feature.home.presentation.generated.resources.Res
+import shugar.feature.home.presentation.generated.resources.today
+import shugar.feature.home.presentation.generated.resources.today_x
+import shugar.feature.home.presentation.generated.resources.yesterday
+import shugar.feature.home.presentation.generated.resources.yesterday_x
 import com.dating.core.presentation.util.UiText
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate

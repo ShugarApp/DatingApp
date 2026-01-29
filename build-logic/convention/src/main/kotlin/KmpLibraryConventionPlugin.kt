@@ -1,8 +1,8 @@
 import com.android.build.api.dsl.LibraryExtension
-import com.dating.aura.convention.configureKotlinAndroid
-import com.dating.aura.convention.configureKotlinMultiplatform
-import com.dating.aura.convention.libs
-import com.dating.aura.convention.pathToResourcePrefix
+import app.shugar.shugar.convention.configureKotlinAndroid
+import app.shugar.shugar.convention.configureKotlinMultiplatform
+import app.shugar.shugar.convention.libs
+import app.shugar.shugar.convention.pathToResourcePrefix
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure

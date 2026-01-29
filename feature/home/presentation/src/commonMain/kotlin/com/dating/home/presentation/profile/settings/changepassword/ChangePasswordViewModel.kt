@@ -5,9 +5,9 @@ import androidx.compose.foundation.text.input.clearText
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import aura.feature.home.presentation.generated.resources.Res
-import aura.feature.home.presentation.generated.resources.error_current_password_equal_to_new_one
-import aura.feature.home.presentation.generated.resources.error_current_password_incorrect
+import shugar.feature.home.presentation.generated.resources.Res
+import shugar.feature.home.presentation.generated.resources.error_current_password_equal_to_new_one
+import shugar.feature.home.presentation.generated.resources.error_current_password_incorrect
 import com.dating.core.domain.auth.AuthService
 import com.dating.core.domain.util.DataError
 import com.dating.core.domain.util.onFailure

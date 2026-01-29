@@ -3,9 +3,9 @@ package com.dating.auth.presentation.register
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import aura.feature.auth.presentation.generated.resources.Res
-import aura.feature.auth.presentation.generated.resources.error_invalid_email
-import aura.feature.auth.presentation.generated.resources.error_invalid_password
+import shugar.feature.auth.presentation.generated.resources.Res
+import shugar.feature.auth.presentation.generated.resources.error_invalid_email
+import shugar.feature.auth.presentation.generated.resources.error_invalid_password
 import com.dating.core.domain.validation.PasswordValidator
 import com.dating.core.presentation.util.UiText
 import com.dating.domain.EmailValidator

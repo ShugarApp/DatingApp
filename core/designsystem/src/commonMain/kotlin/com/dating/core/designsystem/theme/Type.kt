@@ -6,12 +6,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import aura.core.designsystem.generated.resources.Res
-import aura.core.designsystem.generated.resources.plusjakartasans_bold
-import aura.core.designsystem.generated.resources.plusjakartasans_light
-import aura.core.designsystem.generated.resources.plusjakartasans_medium
-import aura.core.designsystem.generated.resources.plusjakartasans_regular
-import aura.core.designsystem.generated.resources.plusjakartasans_semibold
+import shugar.core.designsystem.generated.resources.Res
+import shugar.core.designsystem.generated.resources.plusjakartasans_bold
+import shugar.core.designsystem.generated.resources.plusjakartasans_light
+import shugar.core.designsystem.generated.resources.plusjakartasans_medium
+import shugar.core.designsystem.generated.resources.plusjakartasans_regular
+import shugar.core.designsystem.generated.resources.plusjakartasans_semibold
 import org.jetbrains.compose.resources.Font
 
 val PlusJakartaSans @Composable get() = FontFamily(

@@ -1,6 +1,6 @@
-# Aura
+# Shugar
 
-Aura is a multi-platform real-time messaging app for Android, iOS, and Desktop devices built with Kotlin Multiplatform and Compose Multiplatform.
+Shugar is a multi-platform real-time messaging app for Android, iOS, and Desktop devices built with Kotlin Multiplatform and Compose Multiplatform.
 
 ### Mobile View
 <div align="center">

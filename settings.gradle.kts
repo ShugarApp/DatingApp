@@ -1,4 +1,4 @@
-rootProject.name = "Aura"
+rootProject.name = "Shugar"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {

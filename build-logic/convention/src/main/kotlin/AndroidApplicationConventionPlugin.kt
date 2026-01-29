@@ -1,6 +1,6 @@
 import com.android.build.api.dsl.ApplicationExtension
-import com.dating.aura.convention.configureKotlinAndroid
-import com.dating.aura.convention.libs
+import app.shugar.shugar.convention.configureKotlinAndroid
+import app.shugar.shugar.convention.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
@@ -14,7 +14,7 @@ class AndroidApplicationConventionPlugin: Plugin<Project> {
             }
 
             extensions.configure<ApplicationExtension> {
-                namespace = "com.dating.aura"
+                namespace = "app.shugar.shugar"
 
                 defaultConfig {
                     applicationId = libs.findVersion("projectApplicationId").get().toString()

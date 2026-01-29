@@ -35,10 +35,10 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.dating.core.designsystem.components.header.MainTopAppBar
 import com.dating.home.presentation.home.swipe.components.SwipeableCard
-import aura.feature.home.presentation.generated.resources.Res
-import aura.feature.home.presentation.generated.resources.app_name_feed
-import aura.feature.home.presentation.generated.resources.feed_empty_state_title
-import aura.feature.home.presentation.generated.resources.feed_empty_state_button
+import shugar.feature.home.presentation.generated.resources.Res
+import shugar.feature.home.presentation.generated.resources.app_name_feed
+import shugar.feature.home.presentation.generated.resources.feed_empty_state_title
+import shugar.feature.home.presentation.generated.resources.feed_empty_state_button
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
