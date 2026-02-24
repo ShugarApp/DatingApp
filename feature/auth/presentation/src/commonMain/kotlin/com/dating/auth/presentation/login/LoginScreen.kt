@@ -99,12 +99,12 @@ fun LoginScreen(
         ) {
             Spacer(modifier = Modifier.height(32.dp))
 
-            AppBrandLogo(modifier = Modifier.size(80.dp))
+            AppBrandLogo(modifier = Modifier.size(148.dp))
 
             Spacer(modifier = Modifier.height(32.dp))
 
             Text(
-                text = stringResource(Res.string.welcome_back),
+                text = stringResource(Res.string.login),
                 style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
