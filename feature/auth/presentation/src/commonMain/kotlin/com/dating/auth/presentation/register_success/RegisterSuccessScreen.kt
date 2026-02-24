@@ -77,7 +77,7 @@ fun RegisterSuccessScreen(
             title = stringResource(Res.string.account_successfully_created),
             description = stringResource(Res.string.verification_email_sent_to_x, state.registeredEmail),
             icon = {
-                AppBrandLogo(modifier = Modifier.size(80.dp))
+                AppBrandLogo(modifier = Modifier.size(148.dp))
             },
             primaryButton = {
                 ChirpButton(

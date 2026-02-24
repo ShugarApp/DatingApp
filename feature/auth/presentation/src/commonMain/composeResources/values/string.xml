@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
-    <string name="welcome_to_chirp">Welcome to Shugar!</string>
+    <string name="welcome_to_chirp">Welcome!</string>
     <string name="welcome_back">Shugar</string>
     <string name="forgot_password">Forgot password?</string>
     <string name="set_new_password">Set a new password</string>

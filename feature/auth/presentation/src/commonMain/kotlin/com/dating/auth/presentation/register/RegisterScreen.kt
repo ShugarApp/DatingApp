@@ -108,7 +108,7 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            AppBrandLogo(modifier = Modifier.size(80.dp))
+            AppBrandLogo(modifier = Modifier.size(148.dp))
 
             Spacer(modifier = Modifier.height(32.dp))
 
