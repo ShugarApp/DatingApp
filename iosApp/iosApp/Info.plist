@@ -19,5 +19,9 @@
 	<array>
 		<string>remote-notification</string>
 	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Aura usa tu ubicación para mostrarte personas cercanas.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Aura usa tu ubicación para mostrarte personas cercanas.</string>
 </dict>
 </plist>

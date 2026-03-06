@@ -31,6 +31,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 fun MainTopAppBar(
     title: String,
     containerColor: Color = MaterialTheme.colorScheme.surface,
+    actions: @Composable () -> Unit = {}
 ) {
     TopAppBar(
         title = {
@@ -53,6 +54,7 @@ fun MainTopAppBar(
                 Spacer(modifier = Modifier.weight(1f))
             }
         },
+        actions = { actions() },
         modifier = Modifier.fillMaxWidth(),
         colors = TopAppBarDefaults.topAppBarColors(containerColor = containerColor)
     )

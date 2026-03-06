@@ -5,26 +5,27 @@ import com.dating.core.presentation.util.UiText
 data class FeedState(
     val isLoading: Boolean = false,
     val feedItems: List<FeedItem> = emptyList(),
-    val error: UiText? = null
+    val error: UiText? = null,
+    val maxDistance: Double? = null,
+    val showMatchDialog: Boolean = false,
+    val matchedUserName: String? = null
 )
 
 data class FeedItem(
-    val id: String,
     val userId: String,
-    val userName: String,
-    val userImageUrl: String?,
-    val content: String,
-    val imageUrl: String?,
-    val timestamp: Long,
-    val likesCount: Int = 0,
-    val isLiked: Boolean = false
+    val username: String,
+    val profilePictureUrl: String?,
+    val city: String?,
+    val country: String?
 )
 
 sealed interface FeedAction {
     data object OnRefresh : FeedAction
-    data class OnLikePost(val postId: String) : FeedAction
-    data class OnPass(val postId: String) : FeedAction
+    data class OnSwipeRight(val userId: String) : FeedAction
+    data class OnSwipeLeft(val userId: String) : FeedAction
     data class OnUserClick(val userId: String, val imageUrl: String?) : FeedAction
+    data class OnMaxDistanceChanged(val distance: Double?) : FeedAction
+    data object OnDismissMatchDialog : FeedAction
 }
 
 sealed interface FeedEvent {

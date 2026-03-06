@@ -2,6 +2,10 @@ package com.dating.home.presentation.matches
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dating.core.domain.util.onFailure
+import com.dating.core.domain.util.onSuccess
+import com.dating.core.presentation.util.toUiText
+import com.dating.home.domain.matching.MatchingService
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -9,7 +13,9 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class MatchesViewModel : ViewModel() {
+class MatchesViewModel(
+    private val matchingService: MatchingService
+) : ViewModel() {
 
     private val _state = MutableStateFlow(MatchesState())
     val state = _state.asStateFlow()
@@ -25,66 +31,42 @@ class MatchesViewModel : ViewModel() {
         when (action) {
             is MatchesAction.OnRefresh -> loadMatches()
             is MatchesAction.OnMatchClick -> {
-                // TODO: Navigate to match profile
+                viewModelScope.launch {
+                    _events.send(MatchesEvent.NavigateToProfile(action.matchId, action.imageUrl))
+                }
             }
-            is MatchesAction.OnStartChat -> {
-                startChat(action.matchId)
-            }
+            is MatchesAction.OnStartChat -> startChat(action.matchId)
         }
     }
 
     private fun loadMatches() {
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true) }
-            
-            // TODO: Replace with actual API call
-            // Simulating matches data
-            val mockMatches = listOf(
-                Match(
-                    id = "match1",
-                    userId = "user1",
-                    userName = "Ana Martínez",
-                    userAge = 28,
-                    userImageUrl = null,
-                    bio = "Amante del café y los viajes ✈️",
-                    matchedAt = 86400000,
-                    distance = 5
-                ),
-                Match(
-                    id = "match2",
-                    userId = "user2",
-                    userName = "Laura Sánchez",
-                    userAge = 26,
-                    userImageUrl = null,
-                    bio = "Fotógrafa profesional 📸",
-                    matchedAt = 86400000,
-                    distance = 8
-                ),
-                Match(
-                    id = "match3",
-                    userId = "user3",
-                    userName = "Sofia López",
-                    userAge = 30,
-                    userImageUrl = null,
-                    bio = "Yoga y meditación 🧘‍♀️",
-                    matchedAt = 259200000,
-                    distance = 3
-                )
-            )
-            
-            _state.update {
-                it.copy(
-                    isLoading = false,
-                    matches = mockMatches
-                )
-            }
+            _state.update { it.copy(isLoading = true, error = null) }
+            matchingService.getMatches()
+                .onSuccess { users ->
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            matches = users.map { user ->
+                                Match(
+                                    id = user.id,
+                                    username = user.username,
+                                    profilePictureUrl = user.profilePictureUrl,
+                                    city = user.city,
+                                    country = user.country
+                                )
+                            }
+                        )
+                    }
+                }
+                .onFailure { error ->
+                    _state.update { it.copy(isLoading = false, error = error.toUiText()) }
+                }
         }
     }
 
     private fun startChat(matchId: String) {
         viewModelScope.launch {
-            // TODO: Create or get existing chat with this match
-            // For now, just emit an event
             _events.send(MatchesEvent.NavigateToChat(matchId))
         }
     }

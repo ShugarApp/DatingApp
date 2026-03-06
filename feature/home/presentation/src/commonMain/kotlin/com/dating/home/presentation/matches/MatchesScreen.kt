@@ -81,7 +81,7 @@ fun MatchesScreen(
                     ) { match ->
                         MatchCard(
                             match = match,
-                            onClick = { onAction(MatchesAction.OnMatchClick(match.id)) },
+                            onClick = { onAction(MatchesAction.OnMatchClick(match.id, match.profilePictureUrl)) },
                             onStartChat = { onAction(MatchesAction.OnStartChat(match.id)) }
                         )
                     }
@@ -105,9 +105,7 @@ private fun MatchCard(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 2.dp
-        )
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
             modifier = Modifier
@@ -115,7 +113,6 @@ private fun MatchCard(
                 .padding(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // User avatar placeholder
             Box(
                 modifier = Modifier
                     .size(80.dp)
@@ -124,7 +121,7 @@ private fun MatchCard(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = match.userName.first().uppercase(),
+                    text = match.username.first().uppercase(),
                     style = MaterialTheme.typography.headlineMedium,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     fontWeight = FontWeight.Bold
@@ -133,22 +130,18 @@ private fun MatchCard(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // User name and age
             Text(
-                text = "${match.userName}, ${match.userAge}",
+                text = match.username,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
-
-            // Distance
-            match.distance?.let { distance ->
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+            val location = listOfNotNull(match.city, match.country).joinToString(", ")
+            if (location.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = Icons.Default.LocationOn,
                         contentDescription = null,
@@ -157,28 +150,17 @@ private fun MatchCard(
                     )
                     Spacer(modifier = Modifier.width(2.dp))
                     Text(
-                        text = "${distance} km",
+                        text = location,
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Bio
-            Text(
-                text = match.bio,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.fillMaxWidth()
-            )
-
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Chat button
             Button(
                 onClick = onStartChat,
                 modifier = Modifier.fillMaxWidth()

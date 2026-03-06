@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,9 +23,12 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Help
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Verified
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -32,6 +36,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,6 +49,8 @@ import aura.feature.home.presentation.generated.resources.profile_community_guid
 import aura.feature.home.presentation.generated.resources.profile_edit
 import aura.feature.home.presentation.generated.resources.profile_header_info_format
 import aura.feature.home.presentation.generated.resources.profile_help_support
+import aura.feature.home.presentation.generated.resources.profile_location_update
+import aura.feature.home.presentation.generated.resources.profile_location_updating
 import aura.feature.home.presentation.generated.resources.profile_privacy_policy
 import aura.feature.home.presentation.generated.resources.profile_safety_center
 import aura.feature.home.presentation.generated.resources.profile_safety_legal
@@ -55,6 +62,10 @@ import com.dating.core.designsystem.components.avatar.ChirpAvatarPhoto
 import com.dating.core.designsystem.components.cards.AccessCardItem
 import com.dating.core.designsystem.components.cards.AccessCardList
 import com.dating.core.designsystem.theme.extended
+import com.dating.core.presentation.permissions.Permission
+import com.dating.core.presentation.permissions.PermissionState
+import com.dating.core.presentation.permissions.rememberPermissionController
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -69,6 +80,8 @@ fun ProfileScreen(
     viewModel: ProfileViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val permissionController = rememberPermissionController()
+    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         modifier = modifier.fillMaxSize().padding(top = 32.dp)
@@ -94,13 +107,70 @@ fun ProfileScreen(
             }
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 2. Name & Age
+            // 2. Name & Location
             Text(
                 text = stringResource(Res.string.profile_header_info_format, state.username, 26),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.extended.textPrimary
             )
-            Spacer(modifier = Modifier.height(32.dp))
+            val location = listOfNotNull(state.city, state.country).joinToString(", ")
+            if (location.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.LocationOn,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = location,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(
+                onClick = {
+                    coroutineScope.launch {
+                        val permissionState = permissionController.requestPermission(Permission.LOCATION)
+                        if (permissionState == PermissionState.GRANTED) {
+                            viewModel.onAction(ProfileAction.OnUpdateLocation)
+                        }
+                    }
+                },
+                enabled = !state.isUpdatingLocation,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            ) {
+                if (state.isUpdatingLocation) {
+                    CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(stringResource(Res.string.profile_location_updating))
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.LocationOn,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(stringResource(Res.string.profile_location_update))
+                }
+            }
+            val locationError = state.locationError
+            if (locationError != null) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = locationError,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+            Spacer(modifier = Modifier.height(24.dp))
 
             // 3. Action Buttons Row (Dashboard Cards)
             Row(

@@ -1,0 +1,70 @@
+package com.dating.home.presentation.detail
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.dating.core.domain.util.onFailure
+import com.dating.core.domain.util.onSuccess
+import com.dating.core.presentation.util.toUiText
+import com.dating.home.domain.matching.MatchingService
+import com.dating.home.domain.matching.SwipeAction
+import com.dating.home.domain.user.UserService
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+
+class ProfileDetailViewModel(
+    private val userService: UserService,
+    private val matchingService: MatchingService
+) : ViewModel() {
+
+    private val _state = MutableStateFlow(ProfileDetailState())
+    val state = _state.asStateFlow()
+
+    private val _events = Channel<ProfileDetailEvent>()
+    val events = _events.receiveAsFlow()
+
+    fun loadUser(userId: String) {
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true, error = null) }
+            userService.getUserById(userId)
+                .onSuccess { user ->
+                    _state.update { it.copy(isLoading = false, user = user) }
+                }
+                .onFailure { error ->
+                    _state.update { it.copy(isLoading = false, error = error.toUiText()) }
+                }
+        }
+    }
+
+    fun onAction(action: ProfileDetailAction) {
+        when (action) {
+            is ProfileDetailAction.OnBack -> {
+                viewModelScope.launch { _events.send(ProfileDetailEvent.NavigateBack) }
+            }
+            is ProfileDetailAction.OnSwipeRight -> swipe(action.userId, SwipeAction.LIKE)
+            is ProfileDetailAction.OnSwipeLeft -> {
+                viewModelScope.launch { _events.send(ProfileDetailEvent.NavigateBack) }
+            }
+        }
+    }
+
+    private fun swipe(userId: String, action: SwipeAction) {
+        viewModelScope.launch {
+            matchingService.swipe(swipedId = userId, action = action)
+                .onSuccess { result ->
+                    if (result.isMatch) {
+                        val name = _state.value.user?.username ?: ""
+                        _events.send(ProfileDetailEvent.ShowMatch(name))
+                    } else {
+                        _events.send(ProfileDetailEvent.NavigateBack)
+                    }
+                }
+                .onFailure {
+                    _events.send(ProfileDetailEvent.NavigateBack)
+                }
+        }
+    }
+}

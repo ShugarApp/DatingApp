@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,17 +14,31 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,14 +47,21 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import aura.feature.home.presentation.generated.resources.Res
+import aura.feature.home.presentation.generated.resources.app_name_feed
+import aura.feature.home.presentation.generated.resources.feed_empty_state_button
+import aura.feature.home.presentation.generated.resources.feed_empty_state_title
+import aura.feature.home.presentation.generated.resources.feed_filter_apply
+import aura.feature.home.presentation.generated.resources.feed_filter_max_distance
+import aura.feature.home.presentation.generated.resources.feed_filter_no_limit
+import aura.feature.home.presentation.generated.resources.feed_filter_title
+import aura.feature.home.presentation.generated.resources.feed_match_dismiss
+import aura.feature.home.presentation.generated.resources.feed_match_title
 import coil3.compose.AsyncImage
 import com.dating.core.designsystem.components.header.MainTopAppBar
 import com.dating.home.presentation.home.swipe.components.SwipeableCard
-import aura.feature.home.presentation.generated.resources.Res
-import aura.feature.home.presentation.generated.resources.app_name_feed
-import aura.feature.home.presentation.generated.resources.feed_empty_state_title
-import aura.feature.home.presentation.generated.resources.feed_empty_state_button
 import org.jetbrains.compose.resources.stringResource
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,10 +70,23 @@ fun FeedScreen(
     onAction: (FeedAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var showFilterSheet by remember { mutableStateOf(false) }
+    val filterSheetState = rememberModalBottomSheetState()
+
     Scaffold(
         modifier = modifier,
         topBar = {
-            MainTopAppBar(title = stringResource(Res.string.app_name_feed))
+            MainTopAppBar(
+                title = stringResource(Res.string.app_name_feed),
+                actions = {
+                    IconButton(onClick = { showFilterSheet = true }) {
+                        Icon(
+                            imageVector = Icons.Default.Tune,
+                            contentDescription = stringResource(Res.string.feed_filter_title)
+                        )
+                    }
+                }
+            )
         }
     ) { paddingValues ->
         Box(
@@ -65,34 +100,23 @@ fun FeedScreen(
             } else if (state.feedItems.isEmpty()) {
                 EmptyFeedState(onRefresh = { onAction(FeedAction.OnRefresh) })
             } else {
-                // Render top cards (reversed so first in list is on top if we use z-index correctly)
-                // Actually, standard iteration: last drawn is on top.
-                // So we want state.feedItems[0] to be on top? No, usually 0 is current.
-                // In a Box, later children cover earlier ones.
-                // So we should iterate reversed, or just take the first few and draw them in reverse order.
-
                 val visibleItems = state.feedItems.take(3).reversed()
-
                 visibleItems.forEach { feedItem ->
-                    // Only the top card (last in this reversed list, so index 0 of original list) is swipeable
                     val isTopCard = feedItem == state.feedItems.first()
-
                     if (isTopCard) {
                         SwipeableCard(
-                            onSwipeLeft = { onAction(FeedAction.OnPass(feedItem.id)) },
-                            onSwipeRight = { onAction(FeedAction.OnLikePost(feedItem.id)) },
+                            onSwipeLeft = { onAction(FeedAction.OnSwipeLeft(feedItem.userId)) },
+                            onSwipeRight = { onAction(FeedAction.OnSwipeRight(feedItem.userId)) },
                             modifier = Modifier.padding(16.dp)
                         ) {
                             FeedCardContent(
                                 feedItem = feedItem,
-                                onClick = { onAction(FeedAction.OnUserClick(feedItem.userId, feedItem.imageUrl)) }
+                                onClick = { onAction(FeedAction.OnUserClick(feedItem.userId, feedItem.profilePictureUrl)) }
                             )
                         }
                     } else {
-                        // Background cards (not swipeable)
                         Card(
-                            modifier = Modifier
-                                .padding(16.dp),
+                            modifier = Modifier.padding(16.dp),
                             colors = CardDefaults.cardColors(
                                 containerColor = MaterialTheme.colorScheme.surfaceContainer
                             )
@@ -103,6 +127,47 @@ fun FeedScreen(
                 }
             }
         }
+    }
+
+    if (showFilterSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showFilterSheet = false },
+            sheetState = filterSheetState
+        ) {
+            FilterBottomSheet(
+                currentMaxDistance = state.maxDistance,
+                onApply = { distance ->
+                    onAction(FeedAction.OnMaxDistanceChanged(distance))
+                    showFilterSheet = false
+                }
+            )
+        }
+    }
+
+    if (state.showMatchDialog) {
+        AlertDialog(
+            onDismissRequest = { onAction(FeedAction.OnDismissMatchDialog) },
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Favorite,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(48.dp)
+                )
+            },
+            title = {
+                Text(
+                    text = stringResource(Res.string.feed_match_title, state.matchedUserName ?: ""),
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = { onAction(FeedAction.OnDismissMatchDialog) }) {
+                    Text(stringResource(Res.string.feed_match_dismiss))
+                }
+            }
+        )
     }
 }
 
@@ -118,22 +183,20 @@ fun FeedCardContent(
             .background(MaterialTheme.colorScheme.surfaceContainer)
             .clickable(onClick = onClick)
     ) {
-        // Image Area
         Box(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
                 .background(Color.LightGray)
         ) {
-            if (feedItem.imageUrl != null) {
+            if (feedItem.profilePictureUrl != null) {
                 AsyncImage(
-                    model = feedItem.imageUrl,
+                    model = feedItem.profilePictureUrl,
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )
             } else {
-                // Placeholder
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Icon(
                         imageVector = Icons.Default.Info,
@@ -144,7 +207,6 @@ fun FeedCardContent(
                 }
             }
 
-            // Name Overlay
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
@@ -153,20 +215,74 @@ fun FeedCardContent(
                     .padding(16.dp)
             ) {
                 Text(
-                    text = "${feedItem.userName}, 25",
+                    text = feedItem.username,
                     style = MaterialTheme.typography.headlineMedium,
                     color = Color.White,
                     fontWeight = FontWeight.Bold
                 )
-                Text(
-                    text = feedItem.content,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White.copy(alpha = 0.8f),
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
+                val location = listOfNotNull(feedItem.city, feedItem.country).joinToString(", ")
+                if (location.isNotEmpty()) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.LocationOn,
+                            contentDescription = null,
+                            tint = Color.White.copy(alpha = 0.8f),
+                            modifier = Modifier.size(14.dp)
+                        )
+                        Text(
+                            text = location,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color.White.copy(alpha = 0.8f),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
             }
         }
+    }
+}
+
+@Composable
+private fun FilterBottomSheet(
+    currentMaxDistance: Double?,
+    onApply: (Double?) -> Unit
+) {
+    var sliderValue by remember { mutableFloatStateOf(currentMaxDistance?.toFloat() ?: 0f) }
+    val hasDistance = sliderValue > 0f
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp, vertical = 16.dp)
+    ) {
+        Text(
+            text = stringResource(Res.string.feed_filter_title),
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = if (hasDistance)
+                stringResource(Res.string.feed_filter_max_distance, sliderValue.roundToInt())
+            else
+                stringResource(Res.string.feed_filter_no_limit),
+            style = MaterialTheme.typography.bodyMedium
+        )
+        Slider(
+            value = sliderValue,
+            onValueChange = { sliderValue = it },
+            valueRange = 0f..500f,
+            steps = 49
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(
+            onClick = { onApply(if (hasDistance) sliderValue.toDouble() else null) },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(stringResource(Res.string.feed_filter_apply))
+        }
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }
 

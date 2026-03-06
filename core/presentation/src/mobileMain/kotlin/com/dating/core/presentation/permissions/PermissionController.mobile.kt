@@ -26,5 +26,6 @@ actual class PermissionController(
 fun Permission.toMokoPermission(): dev.icerock.moko.permissions.Permission {
     return when (this) {
         Permission.NOTIFICATIONS -> dev.icerock.moko.permissions.Permission.REMOTE_NOTIFICATION
+        Permission.LOCATION -> dev.icerock.moko.permissions.Permission.LOCATION
     }
 }

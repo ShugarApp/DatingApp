@@ -49,7 +49,10 @@ fun BottomNavigationContainer(
                 }
 
                 BottomNavSection.MATCHES -> {
-                    MatchesRoot()
+                    MatchesRoot(
+                        onNavigateToProfile = onNavigateToProfile,
+                        onNavigateToChatDetail = onNavigateToChatDetail
+                    )
                 }
 
                 BottomNavSection.MESSAGES -> {

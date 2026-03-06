@@ -17,10 +17,7 @@ fun FeedRoot(
 
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
-            is FeedEvent.Error -> {
-                // Handle error
-            }
-
+            is FeedEvent.Error -> { /* Handle error */ }
             is FeedEvent.NavigateToProfile -> {
                 onNavigateToProfile(event.userId, event.imageUrl)
             }

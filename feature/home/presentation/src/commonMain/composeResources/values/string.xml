@@ -149,11 +149,19 @@
     <string name="app_name_feed">Aura</string>
     <string name="feed_empty_state_title">No hay más perfiles</string>
     <string name="feed_empty_state_button">Volver a cargar</string>
+    <string name="feed_filter_title">Filtros</string>
+    <string name="feed_filter_max_distance">Distancia máxima: %1$d km</string>
+    <string name="feed_filter_no_limit">Sin límite de distancia</string>
+    <string name="feed_filter_apply">Aplicar</string>
+    <string name="feed_match_title">¡Es un match con %1$s!</string>
+    <string name="feed_match_dismiss">¡Genial!</string>
 
     <!-- Profile Screen -->
     <string name="profile_edit">Edit Profile</string>
     <string name="profile_verify">Verify</string>
     <string name="profile_settings_dashboard">Settings</string>
+    <string name="profile_location_update">Actualizar ubicación</string>
+    <string name="profile_location_updating">Actualizando...</string>
     <string name="profile_safety_legal">SAFETY &amp; LEGAL</string>
     <string name="profile_safety_center">Safety Center</string>
     <string name="profile_privacy_policy">Privacy Policy</string>

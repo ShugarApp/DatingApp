@@ -6,5 +6,9 @@ data class ProfileState(
     val username: String = "",
     val userInitials: String = "--",
     val profilePictureUrl: String? = null,
-    val emailTextState: TextFieldState = TextFieldState()
+    val emailTextState: TextFieldState = TextFieldState(),
+    val city: String? = null,
+    val country: String? = null,
+    val isUpdatingLocation: Boolean = false,
+    val locationError: String? = null
 )
