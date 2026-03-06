@@ -7,6 +7,8 @@ data class FeedState(
     val feedItems: List<FeedItem> = emptyList(),
     val error: UiText? = null,
     val maxDistance: Double? = null,
+    val minAge: Int = 18,
+    val maxAge: Int = 50,
     val showMatchDialog: Boolean = false,
     val matchedUserName: String? = null
 )
@@ -25,6 +27,7 @@ sealed interface FeedAction {
     data class OnSwipeLeft(val userId: String) : FeedAction
     data class OnUserClick(val userId: String, val imageUrl: String?) : FeedAction
     data class OnMaxDistanceChanged(val distance: Double?) : FeedAction
+    data class OnAgeRangeChanged(val minAge: Int, val maxAge: Int) : FeedAction
     data object OnDismissMatchDialog : FeedAction
 }
 

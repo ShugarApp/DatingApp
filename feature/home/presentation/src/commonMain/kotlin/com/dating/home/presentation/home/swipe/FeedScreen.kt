@@ -29,6 +29,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -51,6 +52,7 @@ import aura.feature.home.presentation.generated.resources.Res
 import aura.feature.home.presentation.generated.resources.app_name_feed
 import aura.feature.home.presentation.generated.resources.feed_empty_state_button
 import aura.feature.home.presentation.generated.resources.feed_empty_state_title
+import aura.feature.home.presentation.generated.resources.feed_filter_age_range
 import aura.feature.home.presentation.generated.resources.feed_filter_apply
 import aura.feature.home.presentation.generated.resources.feed_filter_max_distance
 import aura.feature.home.presentation.generated.resources.feed_filter_no_limit
@@ -136,8 +138,11 @@ fun FeedScreen(
         ) {
             FilterBottomSheet(
                 currentMaxDistance = state.maxDistance,
-                onApply = { distance ->
+                currentMinAge = state.minAge,
+                currentMaxAge = state.maxAge,
+                onApply = { distance, minAge, maxAge ->
                     onAction(FeedAction.OnMaxDistanceChanged(distance))
+                    onAction(FeedAction.OnAgeRangeChanged(minAge, maxAge))
                     showFilterSheet = false
                 }
             )
@@ -246,10 +251,13 @@ fun FeedCardContent(
 @Composable
 private fun FilterBottomSheet(
     currentMaxDistance: Double?,
-    onApply: (Double?) -> Unit
+    currentMinAge: Int,
+    currentMaxAge: Int,
+    onApply: (Double?, Int, Int) -> Unit
 ) {
-    var sliderValue by remember { mutableFloatStateOf(currentMaxDistance?.toFloat() ?: 0f) }
-    val hasDistance = sliderValue > 0f
+    var distanceValue by remember { mutableFloatStateOf(currentMaxDistance?.toFloat() ?: 0f) }
+    var ageRange by remember { mutableStateOf(currentMinAge.toFloat()..currentMaxAge.toFloat()) }
+    val hasDistance = distanceValue > 0f
 
     Column(
         modifier = Modifier
@@ -262,22 +270,48 @@ private fun FilterBottomSheet(
             fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.height(16.dp))
+
+        // Distance
         Text(
             text = if (hasDistance)
-                stringResource(Res.string.feed_filter_max_distance, sliderValue.roundToInt())
+                stringResource(Res.string.feed_filter_max_distance, distanceValue.roundToInt())
             else
                 stringResource(Res.string.feed_filter_no_limit),
             style = MaterialTheme.typography.bodyMedium
         )
         Slider(
-            value = sliderValue,
-            onValueChange = { sliderValue = it },
+            value = distanceValue,
+            onValueChange = { distanceValue = it },
             valueRange = 0f..500f,
             steps = 49
         )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Age range
+        Text(
+            text = stringResource(
+                Res.string.feed_filter_age_range,
+                ageRange.start.roundToInt(),
+                ageRange.endInclusive.roundToInt()
+            ),
+            style = MaterialTheme.typography.bodyMedium
+        )
+        RangeSlider(
+            value = ageRange,
+            onValueChange = { ageRange = it },
+            valueRange = 18f..80f,
+            steps = 61
+        )
         Spacer(modifier = Modifier.height(16.dp))
+
         Button(
-            onClick = { onApply(if (hasDistance) sliderValue.toDouble() else null) },
+            onClick = {
+                onApply(
+                    if (hasDistance) distanceValue.toDouble() else null,
+                    ageRange.start.roundToInt(),
+                    ageRange.endInclusive.roundToInt()
+                )
+            },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(stringResource(Res.string.feed_filter_apply))

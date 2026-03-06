@@ -152,6 +152,7 @@
     <string name="feed_filter_title">Filtros</string>
     <string name="feed_filter_max_distance">Distancia máxima: %1$d km</string>
     <string name="feed_filter_no_limit">Sin límite de distancia</string>
+    <string name="feed_filter_age_range">Rango de edad: %1$d – %2$d años</string>
     <string name="feed_filter_apply">Aplicar</string>
     <string name="feed_match_title">¡Es un match con %1$s!</string>
     <string name="feed_match_dismiss">¡Genial!</string>

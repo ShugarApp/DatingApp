@@ -42,6 +42,10 @@ class FeedViewModel(
                 _state.update { it.copy(maxDistance = action.distance) }
                 loadFeed()
             }
+            is FeedAction.OnAgeRangeChanged -> {
+                _state.update { it.copy(minAge = action.minAge, maxAge = action.maxAge) }
+                loadFeed()
+            }
             FeedAction.OnDismissMatchDialog -> {
                 _state.update { it.copy(showMatchDialog = false, matchedUserName = null) }
             }
@@ -51,7 +55,12 @@ class FeedViewModel(
     private fun loadFeed() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, error = null) }
-            matchingService.getFeed(maxDistance = _state.value.maxDistance)
+            val s = _state.value
+            matchingService.getFeed(
+                minAge = s.minAge,
+                maxAge = s.maxAge,
+                maxDistance = s.maxDistance
+            )
                 .onSuccess { users ->
                     _state.update {
                         it.copy(
