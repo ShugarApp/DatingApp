@@ -39,9 +39,9 @@ class EditProfileViewModel(
 
     fun onAction(action: EditProfileAction) {
         when (action) {
-            is EditProfileAction.OnPictureSelected -> uploadProfilePicture(action.bytes, action.mimeType)
-            is EditProfileAction.OnDeletePictureClick -> showDeleteConfirmation()
-            is EditProfileAction.OnConfirmDeleteClick -> deleteProfilePicture()
+            is EditProfileAction.OnPictureSelected -> uploadPhoto(action.bytes, action.mimeType, action.slotIndex)
+            is EditProfileAction.OnDeletePhotoClick -> showDeleteConfirmation(action.slotIndex)
+            is EditProfileAction.OnConfirmDeletePhoto -> deletePhoto()
             is EditProfileAction.OnDismissDeleteConfirmationDialogClick -> dismissDeleteConfirmation()
             is EditProfileAction.OnInterestToggled -> toggleInterest(action.interest)
             is EditProfileAction.OnSaveProfile -> saveProfile()
@@ -51,6 +51,7 @@ class EditProfileViewModel(
             is EditProfileAction.OnZodiacChanged -> _state.update { it.copy(zodiac = action.zodiac) }
             is EditProfileAction.OnSmokingChanged -> _state.update { it.copy(smoking = action.smoking) }
             is EditProfileAction.OnDrinkingChanged -> _state.update { it.copy(drinking = action.drinking) }
+            is EditProfileAction.OnPhotosReordered -> reorderPhotos(action.newPhotos)
             is EditProfileAction.OnDismissSuccessMessage -> _state.update { it.copy(showSuccessMessage = false) }
         }
     }
@@ -61,7 +62,7 @@ class EditProfileViewModel(
                 .onSuccess { user ->
                     _state.update {
                         it.copy(
-                            profilePictureUrl = user.profilePictureUrl,
+                            photos = List(6) { i -> user.photos.getOrNull(i) },
                             bioTextState = TextFieldState(initialText = user.bio ?: ""),
                             gender = user.gender,
                             birthDate = user.birthDate,
@@ -72,8 +73,7 @@ class EditProfileViewModel(
                             zodiac = user.zodiac,
                             smoking = user.smoking,
                             drinking = user.drinking,
-                            selectedInterests = user.interests,
-                            photos = listOf(user.profilePictureUrl, null, null, null, null, null)
+                            selectedInterests = user.interests
                         )
                     }
                 }
@@ -186,54 +186,104 @@ class EditProfileViewModel(
         }
     }
 
-    private fun deleteProfilePicture() {
-        if (_state.value.isDeletingImage) return
-        _state.update { it.copy(isDeletingImage = true, imageError = null, showDeleteConfirmationDialog = false) }
+    private fun showDeleteConfirmation(slotIndex: Int) {
+        _state.update { it.copy(pendingDeleteSlot = slotIndex) }
+    }
+
+    private fun dismissDeleteConfirmation() {
+        _state.update { it.copy(pendingDeleteSlot = null) }
+    }
+
+    private fun deletePhoto() {
+        val slotIndex = _state.value.pendingDeleteSlot ?: return
+        _state.update {
+            it.copy(
+                pendingDeleteSlot = null,
+                deletingSlots = it.deletingSlots + slotIndex,
+                imageError = null
+            )
+        }
         viewModelScope.launch {
-            userService.deleteProfilePicture()
+            userService.deletePhoto(slotIndex)
                 .onSuccess {
-                    _state.update { it.copy(isDeletingImage = false, profilePictureUrl = null) }
-                    updateSessionPicture(null)
+                    // Backend compacts the array — mirror that locally
+                    val compacted = _state.value.photos.filterNotNull().toMutableList()
+                    if (slotIndex < compacted.size) compacted.removeAt(slotIndex)
+                    val updatedPhotos = List(6) { i -> compacted.getOrNull(i) }
+                    _state.update {
+                        it.copy(
+                            deletingSlots = it.deletingSlots - slotIndex,
+                            photos = updatedPhotos
+                        )
+                    }
+                    updateSessionPhotos(compacted)
                 }
                 .onFailure { error ->
-                    _state.update { it.copy(imageError = error.toUiText(), isDeletingImage = false) }
+                    _state.update {
+                        it.copy(
+                            deletingSlots = it.deletingSlots - slotIndex,
+                            imageError = error.toUiText()
+                        )
+                    }
                 }
         }
     }
 
-    private fun dismissDeleteConfirmation() {
-        _state.update { it.copy(showDeleteConfirmationDialog = false) }
-    }
-
-    private fun showDeleteConfirmation() {
-        _state.update { it.copy(showDeleteConfirmationDialog = true) }
-    }
-
-    private fun uploadProfilePicture(bytes: ByteArray, mimeType: String?) {
-        if (_state.value.isUploadingImage) return
+    private fun uploadPhoto(bytes: ByteArray, mimeType: String?, slotIndex: Int) {
+        if (slotIndex in _state.value.uploadingSlots) return
         if (mimeType == null) {
             _state.update { it.copy(imageError = UiText.Resource(Res.string.error_invalid_file_type)) }
             return
         }
-        _state.update { it.copy(isUploadingImage = true, imageError = null) }
+        _state.update {
+            it.copy(
+                uploadingSlots = it.uploadingSlots + slotIndex,
+                imageError = null
+            )
+        }
         viewModelScope.launch {
-            userService.uploadProfilePicture(imageBytes = bytes, mimeType = mimeType)
-                .onSuccess {
-                    userService.getMyProfile().onSuccess { user ->
-                        _state.update { it.copy(isUploadingImage = false, profilePictureUrl = user.profilePictureUrl) }
-                        updateSessionPicture(user.profilePictureUrl)
+            userService.uploadPhoto(imageBytes = bytes, mimeType = mimeType, index = slotIndex)
+                .onSuccess { publicUrl ->
+                    // Place the confirmed URL at the target slot
+                    val updatedPhotos = _state.value.photos.toMutableList()
+                    updatedPhotos[slotIndex] = publicUrl
+                    _state.update {
+                        it.copy(
+                            uploadingSlots = it.uploadingSlots - slotIndex,
+                            photos = updatedPhotos
+                        )
                     }
+                    updateSessionPhotos(updatedPhotos.filterNotNull())
                 }
                 .onFailure { error ->
-                    _state.update { it.copy(imageError = error.toUiText(), isUploadingImage = false) }
+                    _state.update {
+                        it.copy(
+                            uploadingSlots = it.uploadingSlots - slotIndex,
+                            imageError = error.toUiText()
+                        )
+                    }
                 }
         }
     }
 
-    private fun updateSessionPicture(url: String?) {
+    private fun reorderPhotos(newPhotos: List<String?>) {
+        val previousPhotos = _state.value.photos
+        // Optimistic update — apply immediately, revert on failure
+        _state.update { it.copy(photos = newPhotos) }
+        val realPhotos = newPhotos.filterNotNull()
+        viewModelScope.launch {
+            userService.reorderPhotos(realPhotos)
+                .onSuccess { updateSessionPhotos(realPhotos) }
+                .onFailure { error ->
+                    _state.update { it.copy(photos = previousPhotos, imageError = error.toUiText()) }
+                }
+        }
+    }
+
+    private fun updateSessionPhotos(photos: List<String>) {
         viewModelScope.launch {
             sessionStorage.observeAuthInfo().firstOrNull()?.let { info ->
-                sessionStorage.set(info.copy(user = info.user.copy(profilePictureUrl = url)))
+                sessionStorage.set(info.copy(user = info.user.copy(photos = photos)))
             }
         }
     }

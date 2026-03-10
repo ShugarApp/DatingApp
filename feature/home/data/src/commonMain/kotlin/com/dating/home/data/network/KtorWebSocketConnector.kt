@@ -8,7 +8,6 @@ import com.dating.core.domain.logging.AppLogger
 import com.dating.core.domain.util.DataError
 import com.dating.core.domain.util.EmptyResult
 import com.dating.core.domain.util.Result
-import com.dating.feature.home.data.BuildKonfig
 import com.dating.home.data.dto.websocket.WebSocketMessageDto
 import com.dating.home.data.lifecycle.AppLifecycleObserver
 import com.dating.home.domain.models.ConnectionState

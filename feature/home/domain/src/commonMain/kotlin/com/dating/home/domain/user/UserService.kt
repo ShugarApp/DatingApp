@@ -20,8 +20,10 @@ interface UserService {
         drinking: String?,
         interests: List<String>?
     ): Result<User, DataError.Remote>
-    suspend fun uploadProfilePicture(imageBytes: ByteArray, mimeType: String): EmptyResult<DataError.Remote>
-    suspend fun deleteProfilePicture(): EmptyResult<DataError.Remote>
+    // Returns the confirmed publicUrl so the caller can update state locally
+    suspend fun uploadPhoto(imageBytes: ByteArray, mimeType: String, index: Int): Result<String, DataError.Remote>
+    suspend fun deletePhoto(index: Int): EmptyResult<DataError.Remote>
+    suspend fun reorderPhotos(photos: List<String>): EmptyResult<DataError.Remote>
     suspend fun updateLocation(latitude: Double, longitude: Double): Result<User, DataError.Remote>
     suspend fun getUserById(id: String): Result<User, DataError.Remote>
 }

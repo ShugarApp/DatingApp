@@ -25,7 +25,7 @@ class OfflineFirstChatParticipantRepository(
                         user = currentAuthInfo.user.copy(
                             id = participant.userId,
                             username = participant.username,
-                            profilePictureUrl = participant.profilePictureUrl
+                            photos = listOfNotNull(participant.profilePictureUrl) + currentAuthInfo.user.photos.drop(1)
                         )
                     )
                 )
@@ -60,7 +60,7 @@ class OfflineFirstChatParticipantRepository(
                 sessionStorage.set(
                     currentAuthInfo?.copy(
                         user = currentAuthInfo.user.copy(
-                            profilePictureUrl = uploadUrls.publicUrl
+                            photos = listOf(uploadUrls.publicUrl) + currentAuthInfo.user.photos.drop(1)
                         )
                     )
                 )
@@ -75,7 +75,7 @@ class OfflineFirstChatParticipantRepository(
                 sessionStorage.set(
                     authInfo?.copy(
                         user = authInfo.user.copy(
-                            profilePictureUrl = null
+                            photos = authInfo.user.photos.drop(1)
                         )
                     )
                 )

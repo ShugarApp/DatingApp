@@ -116,11 +116,28 @@ fun EditProfileScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val successMessage = stringResource(Res.string.edit_profile_save_success)
 
+    // Track which slot the user intends to fill — set before launching picker
+    var pendingSlotIndex by remember { mutableStateOf<Int?>(null) }
+    var showPhotoOptionsDialog by remember { mutableStateOf(false) }
+
     val launcher = rememberImagePickerLauncher { pickedImageData ->
-        viewModel.onAction(EditProfileAction.OnPictureSelected(pickedImageData.bytes, pickedImageData.mimeType))
+        pendingSlotIndex?.let { index ->
+            viewModel.onAction(
+                EditProfileAction.OnPictureSelected(pickedImageData.bytes, pickedImageData.mimeType, index)
+            )
+        }
+        pendingSlotIndex = null
     }
 
-    // Show success snackbar
+    fun onPhotoSlotClicked(index: Int) {
+        pendingSlotIndex = index
+        if (state.photos.getOrNull(index) != null) {
+            showPhotoOptionsDialog = true
+        } else {
+            launcher.launch()
+        }
+    }
+
     LaunchedEffect(state.showSuccessMessage) {
         if (state.showSuccessMessage) {
             snackbarHostState.showSnackbar(successMessage)
@@ -128,8 +145,6 @@ fun EditProfileScreen(
         }
     }
 
-    // Date picker state — synced with state.birthDate
-    // Max selectable = 18 years ago (user must be at least 18)
     val maxBirthDateMillis = now().toEpochMilliseconds() - 18L * 365L * 24L * 3600L * 1000L
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = state.birthDate?.toDateMillis(),
@@ -141,7 +156,6 @@ fun EditProfileScreen(
         state.birthDate?.toDateMillis()?.let { datePickerState.selectedDateMillis = it }
     }
     var showDatePicker by remember { mutableStateOf(false) }
-    var showPhotoOptionsDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -192,10 +206,9 @@ fun EditProfileScreen(
             Spacer(Modifier.height(12.dp))
             PhotoGrid(
                 photos = state.photos,
-                onAddPhoto = { launcher.launch() },
-                onRemovePhoto = { viewModel.onAction(EditProfileAction.OnDeletePictureClick) },
-                onProfilePhotoClick = { showPhotoOptionsDialog = true },
-                isUploadingProfile = state.isUploadingImage || state.isDeletingImage
+                uploadingSlots = state.uploadingSlots,
+                deletingSlots = state.deletingSlots,
+                onPhotoSlotClicked = { index -> onPhotoSlotClicked(index) }
             )
             val imageError = state.imageError
             if (imageError != null) {
@@ -401,10 +414,13 @@ fun EditProfileScreen(
             Spacer(Modifier.height(100.dp))
         }
 
-        // Photo options dialog
+        // Photo options dialog: change or delete for a filled slot
         if (showPhotoOptionsDialog) {
             AlertDialog(
-                onDismissRequest = { showPhotoOptionsDialog = false },
+                onDismissRequest = {
+                    showPhotoOptionsDialog = false
+                    pendingSlotIndex = null
+                },
                 title = { Text(stringResource(Res.string.profile_image)) },
                 text = {
                     Column {
@@ -420,7 +436,10 @@ fun EditProfileScreen(
                         TextButton(
                             onClick = {
                                 showPhotoOptionsDialog = false
-                                viewModel.onAction(EditProfileAction.OnDeletePictureClick)
+                                pendingSlotIndex?.let { index ->
+                                    viewModel.onAction(EditProfileAction.OnDeletePhotoClick(index))
+                                }
+                                pendingSlotIndex = null
                             },
                             modifier = Modifier.fillMaxWidth()
                         ) {
@@ -434,21 +453,24 @@ fun EditProfileScreen(
                 },
                 confirmButton = {},
                 dismissButton = {
-                    TextButton(onClick = { showPhotoOptionsDialog = false }) {
+                    TextButton(onClick = {
+                        showPhotoOptionsDialog = false
+                        pendingSlotIndex = null
+                    }) {
                         Text(stringResource(Res.string.cancel))
                     }
                 }
             )
         }
 
-        // Delete picture dialog
+        // Delete confirmation dialog
         if (state.showDeleteConfirmationDialog) {
             DestructiveConfirmationDialog(
                 title = stringResource(Res.string.delete_profile_picture),
                 description = stringResource(Res.string.delete_profile_picture_desc),
                 confirmButtonText = stringResource(Res.string.delete),
                 cancelButtonText = stringResource(Res.string.cancel),
-                onConfirmClick = { viewModel.onAction(EditProfileAction.OnConfirmDeleteClick) },
+                onConfirmClick = { viewModel.onAction(EditProfileAction.OnConfirmDeletePhoto) },
                 onCancelClick = { viewModel.onAction(EditProfileAction.OnDismissDeleteConfirmationDialogClick) },
                 onDismiss = { viewModel.onAction(EditProfileAction.OnDismissDeleteConfirmationDialogClick) }
             )
@@ -531,28 +553,30 @@ fun SectionTitle(title: String) {
 @Composable
 fun PhotoGrid(
     photos: List<String?>,
-    onAddPhoto: () -> Unit,
-    onRemovePhoto: (Int) -> Unit,
-    onProfilePhotoClick: () -> Unit = {},
-    isUploadingProfile: Boolean = false
+    uploadingSlots: Set<Int>,
+    deletingSlots: Set<Int>,
+    onPhotoSlotClicked: (Int) -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            // First slot is the profile photo — tap shows options dialog
-            PhotoSlot(
-                imageUrl = photos.getOrNull(0),
-                modifier = Modifier.weight(1f),
-                onAdd = onAddPhoto,
-                onImageClick = onProfilePhotoClick,
-                isLoading = isUploadingProfile
-            )
-            PhotoSlot(photos.getOrNull(1), modifier = Modifier.weight(1f), onAdd = onAddPhoto, onRemove = { onRemovePhoto(1) })
-            PhotoSlot(photos.getOrNull(2), modifier = Modifier.weight(1f), onAdd = onAddPhoto, onRemove = { onRemovePhoto(2) })
+            for (index in 0..2) {
+                PhotoSlot(
+                    imageUrl = photos.getOrNull(index),
+                    isLoading = index in uploadingSlots || index in deletingSlots,
+                    modifier = Modifier.weight(1f),
+                    onSlotClicked = { onPhotoSlotClicked(index) }
+                )
+            }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            PhotoSlot(photos.getOrNull(3), modifier = Modifier.weight(1f), onAdd = onAddPhoto, onRemove = { onRemovePhoto(3) })
-            PhotoSlot(photos.getOrNull(4), modifier = Modifier.weight(1f), onAdd = onAddPhoto, onRemove = { onRemovePhoto(4) })
-            PhotoSlot(photos.getOrNull(5), modifier = Modifier.weight(1f), onAdd = onAddPhoto, onRemove = { onRemovePhoto(5) })
+            for (index in 3..5) {
+                PhotoSlot(
+                    imageUrl = photos.getOrNull(index),
+                    isLoading = index in uploadingSlots || index in deletingSlots,
+                    modifier = Modifier.weight(1f),
+                    onSlotClicked = { onPhotoSlotClicked(index) }
+                )
+            }
         }
     }
 }
@@ -560,47 +584,65 @@ fun PhotoGrid(
 @Composable
 fun PhotoSlot(
     imageUrl: String?,
+    isLoading: Boolean,
     modifier: Modifier = Modifier,
-    onAdd: () -> Unit,
-    onRemove: () -> Unit = {},
-    onImageClick: (() -> Unit)? = null, // if set, tapping existing image calls this; X button hidden
-    isLoading: Boolean = false
+    onSlotClicked: () -> Unit
 ) {
     Box(
         modifier = modifier
             .aspectRatio(0.75f)
             .clip(RoundedCornerShape(16.dp))
             .background(MaterialTheme.colorScheme.surfaceVariant)
-            .clickable(enabled = !isLoading) {
-                when {
-                    imageUrl != null && onImageClick != null -> onImageClick()
-                    imageUrl == null -> onAdd()
-                }
-            },
+            .clickable(enabled = !isLoading, onClick = onSlotClicked),
         contentAlignment = Alignment.Center
     ) {
         if (imageUrl != null) {
-            AsyncImage(model = imageUrl, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
-            if (!isLoading && onImageClick == null) {
-                // X button only for slots without an options dialog
+            AsyncImage(
+                model = imageUrl,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+            // Edit indicator in bottom-right corner (only when not loading)
+            if (!isLoading) {
                 Box(
-                    modifier = Modifier.align(Alignment.BottomEnd).padding(8.dp).size(24.dp)
-                        .background(MaterialTheme.colorScheme.error, CircleShape).clickable { onRemove() },
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(8.dp)
+                        .size(24.dp)
+                        .background(MaterialTheme.colorScheme.primary, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(Icons.Default.Close, contentDescription = stringResource(Res.string.remove), tint = Color.White, modifier = Modifier.size(16.dp))
+                    Icon(
+                        Icons.Default.Add,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(16.dp)
+                    )
                 }
             }
         } else if (!isLoading) {
-            Icon(Icons.Default.Add, contentDescription = stringResource(Res.string.add_photo), tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f), modifier = Modifier.size(32.dp))
+            Icon(
+                Icons.Default.Add,
+                contentDescription = stringResource(Res.string.add_photo),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                modifier = Modifier.size(32.dp)
+            )
         }
+
         // Loading overlay
         if (isLoading) {
             Box(
-                modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.45f)),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.45f)),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(32.dp), strokeWidth = 2.dp)
+                CircularProgressIndicator(
+                    color = Color.White,
+                    modifier = Modifier.size(32.dp),
+                    strokeWidth = 2.dp
+                )
             }
         }
     }

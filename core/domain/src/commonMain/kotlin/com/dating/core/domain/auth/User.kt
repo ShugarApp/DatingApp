@@ -5,7 +5,7 @@ data class User(
     val email: String,
     val username: String,
     val hasVerifiedEmail: Boolean,
-    val profilePictureUrl: String? = null,
+    val photos: List<String> = emptyList(),
     val city: String? = null,
     val country: String? = null,
     val bio: String? = null,
@@ -19,4 +19,6 @@ data class User(
     val smoking: String? = null,
     val drinking: String? = null,
     val interests: List<String> = emptyList()
-)
+) {
+    val profilePictureUrl: String? get() = photos.firstOrNull()
+}

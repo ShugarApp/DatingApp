@@ -103,7 +103,7 @@ class WebSocketChatConnectionClient(
             sessionStorage.set(
                 info = authInfo.copy(
                     user = authInfo.user.copy(
-                        profilePictureUrl = message.newUrl
+                        photos = listOfNotNull(message.newUrl) + authInfo.user.photos.drop(1)
                     )
                 )
             )

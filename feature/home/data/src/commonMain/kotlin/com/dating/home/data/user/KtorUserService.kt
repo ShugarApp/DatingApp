@@ -12,8 +12,9 @@ import com.dating.core.domain.util.DataError
 import com.dating.core.domain.util.EmptyResult
 import com.dating.core.domain.util.Result
 import com.dating.core.domain.util.map
-import com.dating.home.data.dto.request.ConfirmProfilePictureRequest
+import com.dating.home.data.dto.request.ConfirmPhotoRequest
 import com.dating.home.data.dto.request.LocationRequest
+import com.dating.home.data.dto.request.ReorderPhotosRequest
 import com.dating.home.data.dto.request.UpdateProfileRequest
 import com.dating.home.data.dto.response.ProfilePictureUploadUrlsResponse
 import com.dating.home.domain.user.UserService
@@ -61,12 +62,15 @@ class KtorUserService(private val httpClient: HttpClient) : UserService {
         ).map { it.toDomain() }
     }
 
-    override suspend fun uploadProfilePicture(
+    // Step 1: get signed upload URL. Step 2: upload bytes. Step 3: confirm (204).
+    // Returns the confirmed publicUrl so the ViewModel can update state locally.
+    override suspend fun uploadPhoto(
         imageBytes: ByteArray,
-        mimeType: String
-    ): EmptyResult<DataError.Remote> {
+        mimeType: String,
+        index: Int
+    ): Result<String, DataError.Remote> {
         val urlResult = httpClient.post<Unit, ProfilePictureUploadUrlsResponse>(
-            route = "/users/profile/picture-upload",
+            route = "/users/profile/photos/upload-url",
             queryParams = mapOf("mimeType" to mimeType),
             body = Unit
         )
@@ -76,21 +80,30 @@ class KtorUserService(private val httpClient: HttpClient) : UserService {
         val uploadResult = safeCall<Unit> {
             httpClient.put {
                 url(urls.uploadUrl)
-                // Use set() so Supabase's Content-Type replaces the client's default
                 urls.headers.forEach { (key, value) -> headers[key] = value }
                 setBody(imageBytes)
             }
         }
         if (uploadResult is Result.Failure) return uploadResult
 
-        return httpClient.post<ConfirmProfilePictureRequest, Unit>(
-            route = "/users/profile/confirm-picture",
-            body = ConfirmProfilePictureRequest(urls.publicUrl)
+        val confirmResult = httpClient.post<ConfirmPhotoRequest, Unit>(
+            route = "/users/profile/photos/confirm",
+            body = ConfirmPhotoRequest(publicUrl = urls.publicUrl, index = index)
         )
+        if (confirmResult is Result.Failure) return confirmResult
+
+        return Result.Success(urls.publicUrl)
     }
 
-    override suspend fun deleteProfilePicture(): EmptyResult<DataError.Remote> {
-        return httpClient.delete(route = "/users/profile/picture")
+    override suspend fun deletePhoto(index: Int): EmptyResult<DataError.Remote> {
+        return httpClient.delete<Unit>(route = "/users/profile/photos/$index")
+    }
+
+    override suspend fun reorderPhotos(photos: List<String>): EmptyResult<DataError.Remote> {
+        return httpClient.put<ReorderPhotosRequest, Unit>(
+            route = "/users/profile/photos/reorder",
+            body = ReorderPhotosRequest(photos = photos)
+        )
     }
 
     override suspend fun updateLocation(
