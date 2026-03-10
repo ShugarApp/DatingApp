@@ -38,9 +38,18 @@ class ProfileViewModel(
                 username = authInfo.user.username,
                 userInitials = authInfo.user.username.take(2),
                 emailTextState = TextFieldState(initialText = authInfo.user.email),
-                profilePictureUrl = authInfo.user.profilePictureUrl,
+                photos = authInfo.user.photos,
                 city = authInfo.user.city,
-                country = authInfo.user.country
+                country = authInfo.user.country,
+                bio = authInfo.user.bio,
+                jobTitle = authInfo.user.jobTitle,
+                company = authInfo.user.company,
+                education = authInfo.user.education,
+                height = authInfo.user.height,
+                zodiac = authInfo.user.zodiac,
+                smoking = authInfo.user.smoking,
+                drinking = authInfo.user.drinking,
+                interests = authInfo.user.interests
             )
         } else currentState
     }
@@ -60,6 +69,26 @@ class ProfileViewModel(
     fun onAction(action: ProfileAction) {
         when (action) {
             is ProfileAction.OnUpdateLocation -> updateLocation()
+            is ProfileAction.OnAvatarClick -> loadProfilePreview()
+            is ProfileAction.OnDismissPreview -> _state.update { it.copy(showPreview = false) }
+        }
+    }
+
+    private fun loadProfilePreview() {
+        viewModelScope.launch {
+            _state.update { it.copy(showPreview = true, isLoadingPreview = true) }
+            userService.getMyProfile()
+                .onSuccess { user ->
+                    // Sync session so the combine doesn't overwrite with stale data
+                    val authInfo = sessionStorage.observeAuthInfo().firstOrNull()
+                    if (authInfo != null) {
+                        sessionStorage.set(authInfo.copy(user = user))
+                    }
+                    _state.update { it.copy(isLoadingPreview = false) }
+                }
+                .onFailure {
+                    _state.update { it.copy(isLoadingPreview = false) }
+                }
         }
     }
 
