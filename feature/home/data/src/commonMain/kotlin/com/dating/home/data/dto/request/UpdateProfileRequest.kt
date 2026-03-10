@@ -1,13 +1,9 @@
-package com.dating.core.domain.auth
+package com.dating.home.data.dto.request
 
-data class User(
-    val id: String,
-    val email: String,
-    val username: String,
-    val hasVerifiedEmail: Boolean,
-    val profilePictureUrl: String? = null,
-    val city: String? = null,
-    val country: String? = null,
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class UpdateProfileRequest(
     val bio: String? = null,
     val gender: String? = null,
     val birthDate: String? = null,
@@ -18,5 +14,5 @@ data class User(
     val zodiac: String? = null,
     val smoking: String? = null,
     val drinking: String? = null,
-    val interests: List<String> = emptyList()
+    val interests: List<String>? = null
 )

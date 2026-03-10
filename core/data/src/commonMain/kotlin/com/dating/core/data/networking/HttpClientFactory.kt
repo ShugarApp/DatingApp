@@ -64,6 +64,9 @@ class HttpClientFactory(
 
             install(Auth) {
                 bearer {
+                    sendWithoutRequest { request ->
+                        request.url.host.contains("aura-safe-dating.com")
+                    }
                     loadTokens {
                         sessionStorage
                             .observeAuthInfo()
@@ -76,6 +79,10 @@ class HttpClientFactory(
                             }
                     }
                     refreshTokens {
+                        // Don't refresh for external services (e.g. Supabase storage)
+                        if (!response.request.url.host.contains("aura-safe-dating.com")) {
+                            return@refreshTokens null
+                        }
                         if (response.request.url.encodedPath.contains("auth/")) {
                             return@refreshTokens null
                         }

@@ -21,7 +21,18 @@ fun UserSerializable.toDomain(): User {
         hasVerifiedEmail = hasVerifiedEmail,
         profilePictureUrl = profilePictureUrl,
         city = city,
-        country = country
+        country = country,
+        bio = bio,
+        gender = gender,
+        birthDate = birthDate,
+        jobTitle = jobTitle,
+        company = company,
+        education = education,
+        height = height,
+        zodiac = zodiac,
+        smoking = smoking,
+        drinking = drinking,
+        interests = interests
     )
 }
 
@@ -33,7 +44,18 @@ fun User.toSerializable(): UserSerializable {
         hasVerifiedEmail = hasVerifiedEmail,
         profilePictureUrl = profilePictureUrl,
         city = city,
-        country = country
+        country = country,
+        bio = bio,
+        gender = gender,
+        birthDate = birthDate,
+        jobTitle = jobTitle,
+        company = company,
+        education = education,
+        height = height,
+        zodiac = zodiac,
+        smoking = smoking,
+        drinking = drinking,
+        interests = interests
     )
 }
 

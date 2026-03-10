@@ -135,6 +135,16 @@
     <string name="edit_profile_company_placeholder">Add company</string>
     <string name="edit_profile_education">Education</string>
     <string name="edit_profile_education_placeholder">Add education</string>
+    <string name="edit_profile_gender">Género</string>
+    <string name="edit_profile_gender_male">Hombre</string>
+    <string name="edit_profile_gender_female">Mujer</string>
+    <string name="edit_profile_gender_other">Otro</string>
+    <string name="edit_profile_birth_date">Fecha de nacimiento</string>
+    <string name="edit_profile_birth_date_select">Seleccionar fecha</string>
+    <string name="edit_profile_bio_counter">%1$d / 500</string>
+    <string name="edit_profile_bio_error_long">La bio no puede superar los 500 caracteres</string>
+    <string name="edit_profile_birth_date_error">La fecha de nacimiento no puede ser en el futuro</string>
+    <string name="edit_profile_save_success">¡Perfil actualizado correctamente!</string>
     <string name="edit_profile_personal_info">Personal Information</string>
     <string name="edit_profile_height">Height</string>
     <string name="edit_profile_zodiac">Zodiac</string>
@@ -187,6 +197,14 @@
     <string name="interest_tech">Tech</string>
     <string name="interest_fashion">Fashion</string>
     <string name="interest_coffee">Coffee</string>
+    <string name="interest_fitness">Fitness</string>
+    <string name="interest_dancing">Dancing</string>
+    <string name="interest_sports">Sports</string>
+    <string name="interest_technology">Technology</string>
+    <string name="interest_food">Food</string>
+    <string name="interest_pets">Pets</string>
+    <string name="interest_nature">Nature</string>
+    <string name="interest_volunteering">Volunteering</string>
 
     <string name="mock_bio">Hello! I\'m a UX Designer who loves hiking and coffee.</string>
     <string name="mock_job">UX Designer</string>

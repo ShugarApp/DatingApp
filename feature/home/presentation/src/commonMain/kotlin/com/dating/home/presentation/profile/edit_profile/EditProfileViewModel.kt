@@ -5,62 +5,32 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import aura.feature.home.presentation.generated.resources.Res
 import aura.feature.home.presentation.generated.resources.error_invalid_file_type
-import aura.feature.home.presentation.generated.resources.interest_coffee
-import aura.feature.home.presentation.generated.resources.interest_design
-import aura.feature.home.presentation.generated.resources.interest_hiking
-import aura.feature.home.presentation.generated.resources.interest_music
 import com.dating.core.domain.auth.SessionStorage
 import com.dating.core.domain.util.onFailure
 import com.dating.core.domain.util.onSuccess
 import com.dating.core.presentation.util.UiText
 import com.dating.core.presentation.util.toUiText
-import com.dating.home.domain.participant.ChatParticipantRepository
+import com.dating.home.domain.user.UserService
+import kotlin.time.Clock
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.StringResource
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 class EditProfileViewModel(
-    private val chatParticipantRepository: ChatParticipantRepository,
     private val sessionStorage: SessionStorage,
+    private val userService: UserService
 ) : ViewModel() {
 
-    private var hasLoadedInitialData = false
-
     private val _state = MutableStateFlow(EditProfileState())
-    val state = combine(
-        _state,
-        sessionStorage.observeAuthInfo()
-    ) { currentState, authInfo ->
-        if (authInfo != null && !hasLoadedInitialData) {
-            currentState.copy(
-                profilePictureUrl = authInfo.user.profilePictureUrl,
-                // Mock Pre-fill for demo purposes
-                bioTextState = TextFieldState("Hello! I'm a UX Designer who loves hiking and coffee."),
-                jobTitleTextState = TextFieldState("UX Designer"),
-                companyTextState = TextFieldState("Spotify"),
-                educationTextState = TextFieldState("University of Arts"),
-                locationTextState = TextFieldState("New York, USA"),
-
-                heightTextState = TextFieldState("175 cm"),
-                zodiacTextState = TextFieldState("Leo"),
-                smokingTextState = TextFieldState("Reviewing"),
-                drinkingTextState = TextFieldState("Socially"),
-
-                selectedInterests = listOf(Res.string.interest_design, Res.string.interest_music, Res.string.interest_coffee, Res.string.interest_hiking),
-                photos = listOf(authInfo.user.profilePictureUrl, null, null, null, null, null)
-            )
-        } else currentState
-    }
-        .onStart {
-            if (!hasLoadedInitialData) {
-                hasLoadedInitialData = true
-            }
-        }
+    val state = _state
+        .onStart { loadProfile() }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000L),
@@ -73,115 +43,198 @@ class EditProfileViewModel(
             is EditProfileAction.OnDeletePictureClick -> showDeleteConfirmation()
             is EditProfileAction.OnConfirmDeleteClick -> deleteProfilePicture()
             is EditProfileAction.OnDismissDeleteConfirmationDialogClick -> dismissDeleteConfirmation()
-            is EditProfileAction.OnInterestSelected -> toggleInterest(action.interest)
-            is EditProfileAction.OnInterestRemoved -> toggleInterest(action.interest)
+            is EditProfileAction.OnInterestToggled -> toggleInterest(action.interest)
+            is EditProfileAction.OnSaveProfile -> saveProfile()
+            is EditProfileAction.OnGenderChanged -> _state.update { it.copy(gender = action.gender) }
+            is EditProfileAction.OnBirthDateChanged -> _state.update { it.copy(birthDate = action.birthDate, birthDateError = null) }
+            is EditProfileAction.OnHeightChanged -> _state.update { it.copy(height = action.height, heightError = null) }
+            is EditProfileAction.OnZodiacChanged -> _state.update { it.copy(zodiac = action.zodiac) }
+            is EditProfileAction.OnSmokingChanged -> _state.update { it.copy(smoking = action.smoking) }
+            is EditProfileAction.OnDrinkingChanged -> _state.update { it.copy(drinking = action.drinking) }
+            is EditProfileAction.OnDismissSuccessMessage -> _state.update { it.copy(showSuccessMessage = false) }
         }
     }
 
-    private fun toggleInterest(interest: StringResource) {
-        _state.update {
-            val currentInterests = it.selectedInterests.toMutableList()
-            if (currentInterests.contains(interest)) {
-                currentInterests.remove(interest)
-            } else {
-                currentInterests.add(interest)
-            }
-            it.copy(selectedInterests = currentInterests)
+    private fun loadProfile() {
+        viewModelScope.launch {
+            userService.getMyProfile()
+                .onSuccess { user ->
+                    _state.update {
+                        it.copy(
+                            profilePictureUrl = user.profilePictureUrl,
+                            bioTextState = TextFieldState(initialText = user.bio ?: ""),
+                            gender = user.gender,
+                            birthDate = user.birthDate,
+                            jobTitleTextState = TextFieldState(initialText = user.jobTitle ?: ""),
+                            companyTextState = TextFieldState(initialText = user.company ?: ""),
+                            educationTextState = TextFieldState(initialText = user.education ?: ""),
+                            height = user.height,
+                            zodiac = user.zodiac,
+                            smoking = user.smoking,
+                            drinking = user.drinking,
+                            selectedInterests = user.interests,
+                            photos = listOf(user.profilePictureUrl, null, null, null, null, null)
+                        )
+                    }
+                }
         }
     }
 
-    private fun deleteProfilePicture() {
-        if (state.value.isDeletingImage && state.value.profilePictureUrl == null) {
+    private fun saveProfile() {
+        if (_state.value.isSavingProfile) return
+
+        val bio = _state.value.bioTextState.text.toString().ifBlank { null }
+        if (bio != null && bio.length > 500) {
+            _state.update { it.copy(bioError = "La bio no puede superar los 500 caracteres") }
             return
+        }
+
+        val height = _state.value.height
+        if (height != null && (height < 100 || height > 250)) {
+            _state.update { it.copy(heightError = "La altura debe estar entre 100 y 250 cm") }
+            return
+        }
+
+        val interests = _state.value.selectedInterests
+        if (interests.size > 10) {
+            _state.update { it.copy(interestsError = "Máximo 10 intereses") }
+            return
+        }
+
+        val birthDate = _state.value.birthDate
+        if (birthDate != null) {
+            val today = Clock.System.now().toLocalDateTime(TimeZone.UTC).date
+            val selected = try { LocalDate.parse(birthDate) } catch (_: Exception) { null }
+            if (selected != null) {
+                if (selected > today) {
+                    _state.update { it.copy(birthDateError = "La fecha de nacimiento no puede ser en el futuro") }
+                    return
+                }
+                val eighteenYearsAgo = try {
+                    LocalDate(today.year - 18, today.monthNumber, today.dayOfMonth)
+                } catch (_: Exception) {
+                    LocalDate(today.year - 18, today.monthNumber, 28)
+                }
+                if (selected > eighteenYearsAgo) {
+                    _state.update { it.copy(birthDateError = "Debes tener al menos 18 años") }
+                    return
+                }
+            }
         }
 
         _state.update {
             it.copy(
-                isDeletingImage = true,
-                imageError = null,
-                showDeleteConfirmationDialog = false
+                isSavingProfile = true,
+                saveError = null,
+                bioError = null,
+                birthDateError = null,
+                heightError = null,
+                interestsError = null
             )
         }
 
         viewModelScope.launch {
-            chatParticipantRepository
-                .deleteProfilePicture()
+            userService.updateProfile(
+                bio = bio,
+                gender = _state.value.gender,
+                birthDate = _state.value.birthDate,
+                jobTitle = _state.value.jobTitleTextState.text.toString().ifBlank { null },
+                company = _state.value.companyTextState.text.toString().ifBlank { null },
+                education = _state.value.educationTextState.text.toString().ifBlank { null },
+                height = _state.value.height,
+                zodiac = _state.value.zodiac,
+                smoking = _state.value.smoking,
+                drinking = _state.value.drinking,
+                interests = _state.value.selectedInterests.ifEmpty { null }
+            ).onSuccess { user ->
+                _state.update {
+                    it.copy(
+                        isSavingProfile = false,
+                        gender = user.gender,
+                        birthDate = user.birthDate,
+                        height = user.height,
+                        zodiac = user.zodiac,
+                        smoking = user.smoking,
+                        drinking = user.drinking,
+                        selectedInterests = user.interests,
+                        showSuccessMessage = true
+                    )
+                }
+                sessionStorage.observeAuthInfo().firstOrNull()?.let { info ->
+                    sessionStorage.set(info.copy(user = user))
+                }
+            }.onFailure { error ->
+                _state.update { it.copy(isSavingProfile = false, saveError = error.toUiText()) }
+            }
+        }
+    }
+
+    private fun toggleInterest(interest: String) {
+        _state.update {
+            val current = it.selectedInterests.toMutableList()
+            if (current.contains(interest)) {
+                current.remove(interest)
+                it.copy(selectedInterests = current, interestsError = null)
+            } else {
+                if (current.size >= 10) {
+                    it.copy(interestsError = "Máximo 10 intereses")
+                } else {
+                    current.add(interest)
+                    it.copy(selectedInterests = current, interestsError = null)
+                }
+            }
+        }
+    }
+
+    private fun deleteProfilePicture() {
+        if (_state.value.isDeletingImage) return
+        _state.update { it.copy(isDeletingImage = true, imageError = null, showDeleteConfirmationDialog = false) }
+        viewModelScope.launch {
+            userService.deleteProfilePicture()
                 .onSuccess {
-                    _state.update {
-                        it.copy(
-                            isDeletingImage = false
-                        )
-                    }
+                    _state.update { it.copy(isDeletingImage = false, profilePictureUrl = null) }
+                    updateSessionPicture(null)
                 }
                 .onFailure { error ->
-                    _state.update {
-                        it.copy(
-                            imageError = error.toUiText(),
-                            isDeletingImage = false
-                        )
-                    }
+                    _state.update { it.copy(imageError = error.toUiText(), isDeletingImage = false) }
                 }
         }
     }
 
     private fun dismissDeleteConfirmation() {
-        _state.update {
-            it.copy(
-                showDeleteConfirmationDialog = false
-            )
-        }
+        _state.update { it.copy(showDeleteConfirmationDialog = false) }
     }
 
     private fun showDeleteConfirmation() {
-        _state.update {
-            it.copy(
-                showDeleteConfirmationDialog = true
-            )
-        }
+        _state.update { it.copy(showDeleteConfirmationDialog = true) }
     }
 
     private fun uploadProfilePicture(bytes: ByteArray, mimeType: String?) {
-        if (state.value.isUploadingImage) {
-            return
-        }
-
+        if (_state.value.isUploadingImage) return
         if (mimeType == null) {
-            _state.update {
-                it.copy(
-                    imageError = UiText.Resource(Res.string.error_invalid_file_type)
-                )
-            }
+            _state.update { it.copy(imageError = UiText.Resource(Res.string.error_invalid_file_type)) }
             return
         }
-
-        _state.update {
-            it.copy(
-                isUploadingImage = true,
-                imageError = null
-            )
-        }
-
+        _state.update { it.copy(isUploadingImage = true, imageError = null) }
         viewModelScope.launch {
-            chatParticipantRepository
-                .uploadProfilePicture(
-                    imageBytes = bytes,
-                    mimeType = mimeType
-                )
+            userService.uploadProfilePicture(imageBytes = bytes, mimeType = mimeType)
                 .onSuccess {
-                    _state.update {
-                        it.copy(
-                            isUploadingImage = false,
-                        )
+                    userService.getMyProfile().onSuccess { user ->
+                        _state.update { it.copy(isUploadingImage = false, profilePictureUrl = user.profilePictureUrl) }
+                        updateSessionPicture(user.profilePictureUrl)
                     }
                 }
                 .onFailure { error ->
-                    _state.update {
-                        it.copy(
-                            imageError = error.toUiText(),
-                            isUploadingImage = false
-                        )
-                    }
+                    _state.update { it.copy(imageError = error.toUiText(), isUploadingImage = false) }
                 }
+        }
+    }
+
+    private fun updateSessionPicture(url: String?) {
+        viewModelScope.launch {
+            sessionStorage.observeAuthInfo().firstOrNull()?.let { info ->
+                sessionStorage.set(info.copy(user = info.user.copy(profilePictureUrl = url)))
+            }
         }
     }
 }
