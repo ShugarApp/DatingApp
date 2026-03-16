@@ -3,11 +3,12 @@ package com.dating.home.presentation.chat.mappers
 import com.dating.home.domain.models.Chat
 import com.dating.home.presentation.chat.model.ChatUi
 
-fun Chat.toUi(localParticipantId: String): ChatUi {
+fun Chat.toUi(localParticipantId: String): ChatUi? {
     val (local, other) = participants.partition { it.userId == localParticipantId }
+    val localParticipant = local.firstOrNull() ?: return null
     return ChatUi(
         id = id,
-        localParticipant = local.first().toUi(),
+        localParticipant = localParticipant.toUi(),
         otherParticipants = other.map { it.toUi() },
         lastMessage = lastMessage,
         lastMessageSenderUsername = lastMessageSenderUsername

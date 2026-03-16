@@ -1,7 +1,9 @@
 package com.dating.home.presentation.profile.edit_profile
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,19 +45,37 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInWindow
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.IntOffset
+import kotlin.math.roundToInt
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import aura.feature.home.presentation.generated.resources.Res
 import aura.feature.home.presentation.generated.resources.add_photo
@@ -208,7 +228,8 @@ fun EditProfileScreen(
                 photos = state.photos,
                 uploadingSlots = state.uploadingSlots,
                 deletingSlots = state.deletingSlots,
-                onPhotoSlotClicked = { index -> onPhotoSlotClicked(index) }
+                onPhotoSlotClicked = { index -> onPhotoSlotClicked(index) },
+                onPhotosReordered = { newPhotos -> viewModel.onAction(EditProfileAction.OnPhotosReordered(newPhotos)) }
             )
             val imageError = state.imageError
             if (imageError != null) {
@@ -555,27 +576,118 @@ fun PhotoGrid(
     photos: List<String?>,
     uploadingSlots: Set<Int>,
     deletingSlots: Set<Int>,
-    onPhotoSlotClicked: (Int) -> Unit
+    onPhotoSlotClicked: (Int) -> Unit,
+    onPhotosReordered: (List<String?>) -> Unit = {}
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            for (index in 0..2) {
-                PhotoSlot(
-                    imageUrl = photos.getOrNull(index),
-                    isLoading = index in uploadingSlots || index in deletingSlots,
-                    modifier = Modifier.weight(1f),
-                    onSlotClicked = { onPhotoSlotClicked(index) }
-                )
+    var dragIndex by remember { mutableStateOf<Int?>(null) }
+    var hoverIndex by remember { mutableStateOf<Int?>(null) }
+    var dragOffset by remember { mutableStateOf(Offset.Zero) }
+    val slotBounds = remember { mutableStateMapOf<Int, Rect>() }
+    var containerCoords by remember { mutableStateOf<LayoutCoordinates?>(null) }
+    val density = LocalDensity.current
+
+    val liftScale by animateFloatAsState(
+        targetValue = if (dragIndex != null) 1.07f else 1f,
+        animationSpec = spring(dampingRatio = 0.55f, stiffness = Spring.StiffnessMedium)
+    )
+
+    Box(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier
+                .onGloballyPositioned { containerCoords = it }
+                .pointerInput(photos) {
+                    detectDragGesturesAfterLongPress(
+                        onDragStart = { offset ->
+                            dragIndex = slotBounds.entries
+                                .firstOrNull { (_, rect) -> rect.contains(offset) }
+                                ?.takeIf { photos.getOrNull(it.key) != null }?.key
+                            dragOffset = offset
+                        },
+                        onDrag = { change, _ ->
+                            change.consume()
+                            dragOffset = change.position
+                            hoverIndex = slotBounds.entries
+                                .firstOrNull { (_, rect) -> rect.contains(change.position) }?.key
+                        },
+                        onDragEnd = {
+                            val from = dragIndex
+                            val to = hoverIndex
+                            if (from != null && to != null && from != to) {
+                                val newPhotos = photos.toMutableList()
+                                val tmp = newPhotos[from]
+                                newPhotos[from] = newPhotos[to]
+                                newPhotos[to] = tmp
+                                onPhotosReordered(newPhotos)
+                            }
+                            dragIndex = null
+                            hoverIndex = null
+                        },
+                        onDragCancel = {
+                            dragIndex = null
+                            hoverIndex = null
+                        }
+                    )
+                }
+        ) {
+            for (row in 0..1) {
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    for (col in 0..2) {
+                        val index = row * 3 + col
+                        PhotoSlot(
+                            imageUrl = photos.getOrNull(index),
+                            isLoading = index in uploadingSlots || index in deletingSlots,
+                            isDragging = dragIndex == index,
+                            isHovered = hoverIndex == index && dragIndex != index,
+                            modifier = Modifier
+                                .weight(1f)
+                                .onGloballyPositioned { coords ->
+                                    val container = containerCoords ?: return@onGloballyPositioned
+                                    val pos = coords.positionInWindow() - container.positionInWindow()
+                                    slotBounds[index] = Rect(
+                                        offset = pos,
+                                        size = Size(coords.size.width.toFloat(), coords.size.height.toFloat())
+                                    )
+                                },
+                            onSlotClicked = { if (dragIndex == null) onPhotoSlotClicked(index) }
+                        )
+                    }
+                }
             }
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            for (index in 3..5) {
-                PhotoSlot(
-                    imageUrl = photos.getOrNull(index),
-                    isLoading = index in uploadingSlots || index in deletingSlots,
-                    modifier = Modifier.weight(1f),
-                    onSlotClicked = { onPhotoSlotClicked(index) }
-                )
+
+        // Floating drag item that follows the finger
+        val currentDragIndex = dragIndex
+        if (currentDragIndex != null) {
+            val photo = photos.getOrNull(currentDragIndex)
+            val bound = slotBounds[currentDragIndex]
+            if (photo != null && bound != null) {
+                val widthDp = with(density) { bound.width.toDp() }
+                val heightDp = with(density) { bound.height.toDp() }
+                Box(
+                    modifier = Modifier
+                        .offset {
+                            IntOffset(
+                                (dragOffset.x - bound.width / 2).roundToInt(),
+                                (dragOffset.y - bound.height / 2).roundToInt()
+                            )
+                        }
+                        .size(width = widthDp, height = heightDp)
+                        .graphicsLayer {
+                            scaleX = liftScale
+                            scaleY = liftScale
+                            shadowElevation = 24f * (liftScale - 1f) / 0.07f
+                            shape = RoundedCornerShape(16.dp)
+                            clip = true
+                        }
+                ) {
+                    AsyncImage(
+                        model = photo,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
         }
     }
@@ -586,16 +698,41 @@ fun PhotoSlot(
     imageUrl: String?,
     isLoading: Boolean,
     modifier: Modifier = Modifier,
+    isDragging: Boolean = false,
+    isHovered: Boolean = false,
     onSlotClicked: () -> Unit
 ) {
+    val borderColor by animateColorAsState(
+        targetValue = if (isHovered) MaterialTheme.colorScheme.primary else Color.Transparent,
+        animationSpec = tween(durationMillis = 150)
+    )
+    val contentScale by animateFloatAsState(
+        targetValue = if (isHovered) 0.94f else 1f,
+        animationSpec = spring(dampingRatio = 0.6f, stiffness = Spring.StiffnessMedium)
+    )
+
     Box(
         modifier = modifier
             .aspectRatio(0.75f)
             .clip(RoundedCornerShape(16.dp))
             .background(MaterialTheme.colorScheme.surfaceVariant)
-            .clickable(enabled = !isLoading, onClick = onSlotClicked),
+            .border(2.dp, borderColor, RoundedCornerShape(16.dp))
+            .graphicsLayer {
+                scaleX = contentScale
+                scaleY = contentScale
+                alpha = if (isDragging) 0f else 1f
+            }
+            .clickable(enabled = !isLoading && !isDragging, onClick = onSlotClicked),
         contentAlignment = Alignment.Center
     ) {
+        // Dashed placeholder shown when the slot is the drag origin
+        if (isDragging) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .border(2.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.4f), RoundedCornerShape(16.dp))
+            )
+        }
         if (imageUrl != null) {
             AsyncImage(
                 model = imageUrl,

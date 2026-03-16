@@ -1,5 +1,6 @@
 package com.dating.home.presentation.home.navigation
 
+import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -8,6 +9,8 @@ import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import com.dating.home.presentation.home.bottom_navigation.BottomNavigationContainer
 import com.dating.home.presentation.profile.edit_profile.EditProfileScreen
+import com.dating.home.presentation.profile.settings.DeleteAccountScreen
+import com.dating.home.presentation.profile.settings.PauseAccountScreen
 import com.dating.home.presentation.profile.settings.SettingsScreen
 import com.dating.home.presentation.detail.ProfileDetailScreen
 import com.dating.home.presentation.chat.chat_detail.ChatDetailRoot
@@ -38,9 +41,22 @@ fun NavGraphBuilder.homeGraph(
         }
 
         composable<HomeGraphRoutes.BottomNavContainer> { backStackEntry ->
+            val swipedUserId = backStackEntry.savedStateHandle.get<String>("swiped_user_id")
+            LaunchedEffect(swipedUserId) {
+                if (swipedUserId != null) {
+                    backStackEntry.savedStateHandle.remove<String>("swiped_user_id")
+                }
+            }
             BottomNavigationContainer(
+                swipedUserId = swipedUserId,
                 onNavigateToProfile = { userId, imageUrl ->
                     navController.navigate(HomeGraphRoutes.ProfileDetailRoute(userId, imageUrl))
+                },
+                onNavigateToMatchProfile = { userId, imageUrl ->
+                    navController.navigate(HomeGraphRoutes.ProfileDetailRoute(userId, imageUrl, isMatch = true))
+                },
+                onNavigateToOwnProfile = { userId, imageUrl ->
+                    navController.navigate(HomeGraphRoutes.ProfileDetailRoute(userId, imageUrl, isOwnProfile = true))
                 },
                 onNavigateToChatDetail = { chatId ->
                     navController.navigate(HomeGraphRoutes.ChatDetailRoute(chatId))
@@ -65,7 +81,14 @@ fun NavGraphBuilder.homeGraph(
             ProfileDetailScreen(
                 userId = route.userId,
                 imageUrl = route.encodedImageUrl,
-                onBack = { navController.popBackStack() }
+                isOwnProfile = route.isOwnProfile,
+                isMatch = route.isMatch,
+                onBack = { navController.popBackStack() },
+                onSwipedUser = { swipedUserId ->
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("swiped_user_id", swipedUserId)
+                }
             )
         }
 
@@ -81,7 +104,26 @@ fun NavGraphBuilder.homeGraph(
                 onLogout = onLogout,
                 onChangePassword = {
                     navController.navigate(HomeGraphRoutes.ChangePasswordRoute)
+                },
+                onDeleteAccount = {
+                    navController.navigate(HomeGraphRoutes.DeleteAccountRoute)
+                },
+                onPauseAccount = {
+                    navController.navigate(HomeGraphRoutes.PauseAccountRoute)
                 }
+            )
+        }
+
+        composable<HomeGraphRoutes.PauseAccountRoute> {
+            PauseAccountScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable<HomeGraphRoutes.DeleteAccountRoute> {
+            DeleteAccountScreen(
+                onBack = { navController.popBackStack() },
+                onDeleteAccount = onLogout
             )
         }
 

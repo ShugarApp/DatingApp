@@ -3,14 +3,13 @@ package com.dating.home.data.lifecycle
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import platform.Foundation.NSNotificationCenter
 import platform.Foundation.NSOperationQueue
 import platform.UIKit.UIApplication
 import platform.UIKit.UIApplicationDidBecomeActiveNotification
 import platform.UIKit.UIApplicationDidEnterBackgroundNotification
 import platform.UIKit.UIApplicationState
-import platform.UIKit.UIApplicationWillEnterForegroundNotification
-import platform.UIKit.UIApplicationWillResignActiveNotification
 
 actual class AppLifecycleObserver {
     actual val isInForeground: Flow<Boolean> = callbackFlow {
@@ -34,14 +33,6 @@ actual class AppLifecycleObserver {
             trySend(true)
         }
 
-        val willEnterForegroundObserver = notificationCenter.addObserverForName(
-            name = UIApplicationWillEnterForegroundNotification,
-            `object` = null,
-            queue = NSOperationQueue.mainQueue
-        ) {
-            trySend(true)
-        }
-
         val backgroundObserver = notificationCenter.addObserverForName(
             name = UIApplicationDidEnterBackgroundNotification,
             `object` = null,
@@ -50,19 +41,9 @@ actual class AppLifecycleObserver {
             trySend(false)
         }
 
-        val willResignActiveObserver = notificationCenter.addObserverForName(
-            name = UIApplicationWillResignActiveNotification,
-            `object` = null,
-            queue = NSOperationQueue.mainQueue
-        ) {
-            trySend(false)
-        }
-
         awaitClose {
             notificationCenter.removeObserver(foregroundObserver)
-            notificationCenter.removeObserver(willEnterForegroundObserver)
             notificationCenter.removeObserver(backgroundObserver)
-            notificationCenter.removeObserver(willResignActiveObserver)
         }
-    }
+    }.distinctUntilChanged()
 }

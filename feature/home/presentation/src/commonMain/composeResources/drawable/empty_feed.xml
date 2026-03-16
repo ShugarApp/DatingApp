@@ -1,0 +1,82 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+  <group>
+    <!-- Background circle -->
+    <path
+        android:pathData="M100,100m-85,0a85,85 0,1 1,170 0a85,85 0,1 1,-170 0"
+        android:fillColor="#FDE8EF"
+        android:fillAlpha="0.5"/>
+
+    <!-- Card stack - back card -->
+    <path
+        android:pathData="M72,55L138,55A8,8 0,0 1,146 63L146,137A8,8 0,0 1,138 145L72,145A8,8 0,0 1,64 137L64,63A8,8 0,0 1,72 55z"
+        android:fillColor="#E0E0E0"
+        android:strokeColor="#BDBDBD"
+        android:strokeWidth="1"/>
+
+    <!-- Card stack - front card -->
+    <path
+        android:pathData="M62,48L128,48A8,8 0,0 1,136 56L136,130A8,8 0,0 1,128 138L62,138A8,8 0,0 1,54 130L54,56A8,8 0,0 1,62 48z"
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#E8B4CB"
+        android:strokeWidth="1.5"/>
+
+    <!-- Profile avatar circle on card -->
+    <path
+        android:pathData="M95,78m-18,0a18,18 0,1 1,36 0a18,18 0,1 1,-36 0"
+        android:fillColor="#F8D7E6"/>
+
+    <!-- Person silhouette head -->
+    <path
+        android:pathData="M95,73m-7,0a7,7 0,1 1,14 0a7,7 0,1 1,-14 0"
+        android:fillColor="#D4829E"/>
+
+    <!-- Person silhouette body -->
+    <path
+        android:pathData="M95,96C88,96 82,90 82,90C82,88 87,85 95,85C103,85 108,88 108,90C108,90 102,96 95,96Z"
+        android:fillColor="#D4829E"/>
+
+    <!-- Lines on card (name placeholder) -->
+    <path
+        android:pathData="M76,104L114,104"
+        android:strokeColor="#E0E0E0"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"/>
+    <path
+        android:pathData="M82,112L108,112"
+        android:strokeColor="#EEEEEE"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"/>
+    <path
+        android:pathData="M78,119L112,119"
+        android:strokeColor="#EEEEEE"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"/>
+
+    <!-- Magnifying glass -->
+    <path
+        android:pathData="M145,135m-16,0a16,16 0,1 1,32 0a16,16 0,1 1,-32 0"
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#E8739A"
+        android:strokeWidth="3"/>
+    <path
+        android:pathData="M156,146L168,158"
+        android:strokeColor="#E8739A"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"/>
+
+    <!-- Small sparkles -->
+    <path
+        android:pathData="M40,70L43,65L46,70L43,75Z"
+        android:fillColor="#F0A0C0"/>
+    <path
+        android:pathData="M150,50L152,46L154,50L152,54Z"
+        android:fillColor="#F0A0C0"/>
+    <path
+        android:pathData="M48,130L50,127L52,130L50,133Z"
+        android:fillColor="#E8B4CB"/>
+  </group>
+</vector>

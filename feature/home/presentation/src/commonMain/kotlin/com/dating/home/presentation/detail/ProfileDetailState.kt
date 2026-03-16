@@ -16,6 +16,6 @@ sealed interface ProfileDetailAction {
 }
 
 sealed interface ProfileDetailEvent {
-    data object NavigateBack : ProfileDetailEvent
-    data class ShowMatch(val userName: String) : ProfileDetailEvent
+    data class NavigateBack(val swipedUserId: String? = null) : ProfileDetailEvent
+    data class ShowMatch(val userName: String, val swipedUserId: String) : ProfileDetailEvent
 }

@@ -1,0 +1,101 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+  <group>
+    <!-- Background circle -->
+    <path
+        android:pathData="M100,100m-85,0a85,85 0,1 1,170 0a85,85 0,1 1,-170 0"
+        android:fillColor="#FDE8EF"
+        android:fillAlpha="0.5"/>
+
+    <!-- Cloud body -->
+    <path
+        android:pathData="M60,105C50,105 42,97 42,87C42,77 50,69 60,69C61,62 67,56 75,56C78,48 86,42 96,42C109,42 119,50 121,61C122,61 123,60 124,60C133,60 140,67 140,76C140,76 141,76 142,76C151,76 158,83 158,92C158,101 151,108 142,108L60,105Z"
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#E8B4CB"
+        android:strokeWidth="1.5"/>
+
+    <!-- Lightning bolt -->
+    <path
+        android:pathData="M105,80L95,100L105,100L93,120"
+        android:strokeColor="#E8739A"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:fillColor="#00000000"/>
+
+    <!-- Disconnected cable left -->
+    <path
+        android:pathData="M55,135C55,135 65,130 75,135"
+        android:strokeColor="#D4829E"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"/>
+
+    <!-- Disconnected cable left plug -->
+    <path
+        android:pathData="M75,133L79,131M75,137L79,135"
+        android:strokeColor="#D4829E"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"/>
+
+    <!-- Disconnected cable right -->
+    <path
+        android:pathData="M145,135C145,135 135,130 125,135"
+        android:strokeColor="#D4829E"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"/>
+
+    <!-- Disconnected cable right plug -->
+    <path
+        android:pathData="M125,133L121,131M125,137L121,135"
+        android:strokeColor="#D4829E"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"/>
+
+    <!-- X mark on cloud -->
+    <path
+        android:pathData="M88,75L80,83M80,75L88,83"
+        android:strokeColor="#E8739A"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"/>
+
+    <!-- Wi-Fi slash -->
+    <path
+        android:pathData="M100,148C103,148 106,150 106,153C106,156 103,158 100,158C97,158 94,156 94,153C94,150 97,148 100,148Z"
+        android:fillColor="#D4829E"/>
+    <path
+        android:pathData="M85,143C90,139 95,137 100,137C105,137 110,139 115,143"
+        android:strokeColor="#D4829E"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"/>
+    <path
+        android:pathData="M75,135C82,129 91,126 100,126C109,126 118,129 125,135"
+        android:strokeColor="#D4829E"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"/>
+
+    <!-- Diagonal slash over wifi -->
+    <path
+        android:pathData="M82,155L118,125"
+        android:strokeColor="#E8739A"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"/>
+
+    <!-- Small sparkles -->
+    <path
+        android:pathData="M40,70L43,65L46,70L43,75Z"
+        android:fillColor="#F0A0C0"/>
+    <path
+        android:pathData="M155,55L157,51L159,55L157,59Z"
+        android:fillColor="#F0A0C0"/>
+    <path
+        android:pathData="M48,120L50,117L52,120L50,123Z"
+        android:fillColor="#E8B4CB"/>
+  </group>
+</vector>

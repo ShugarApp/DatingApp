@@ -36,6 +36,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.onEach
@@ -71,6 +72,7 @@ class KtorWebSocketConnector(
 
     private val isInForeground = appLifecycleObserver
         .isInForeground
+        .distinctUntilChanged()
         .onEach { isInForeground ->
             if (isInForeground) {
                 connectionRetryHandler.resetDelay()
@@ -113,24 +115,19 @@ class KtorWebSocketConnector(
                 null
             }
 
-            else -> {
-                logger.info("App in foreground & connected. Establishing connection...")
-
-                if (_connectionState.value !in listOf(
-                        ConnectionState.CONNECTING,
-                        ConnectionState.CONNECTED
-                    )
-                ) {
-                    _connectionState.value = ConnectionState.CONNECTING
-                }
-
-                authInfo
-            }
+            else -> authInfo
         }
-    }.flatMapLatest { authInfo ->
+    }
+    .distinctUntilChanged { old, new ->
+        // Both null (stay disconnected) or both non-null with same token (don't reconnect)
+        (old == null && new == null) || (old != null && new != null && old.accessToken == new.accessToken)
+    }
+    .flatMapLatest { authInfo ->
         if (authInfo == null) {
             emptyFlow()
         } else {
+            logger.info("App in foreground & connected. Establishing connection...")
+            _connectionState.value = ConnectionState.CONNECTING
             createWebSocketFlow(authInfo.accessToken)
                 // Catch block to transform exceptions for platform compatibility
                 .catch { e ->
@@ -164,8 +161,6 @@ class KtorWebSocketConnector(
     }
 
     private fun createWebSocketFlow(accessToken: String) = callbackFlow {
-        _connectionState.value = ConnectionState.CONNECTING
-
         currentSession = httpClient.webSocketSession(
             urlString = "${UrlConstants.BASE_URL_WS}/chat"
         ) {

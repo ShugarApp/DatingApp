@@ -50,4 +50,10 @@ class KtorMatchingService(private val httpClient: HttpClient) : MatchingService 
             route = "/matching/matches"
         ).map { list -> list.map { it.toDomain() } }
     }
+
+    override suspend fun getLikes(): Result<List<User>, DataError.Remote> {
+        return httpClient.get<List<UserSerializable>>(
+            route = "/matching/likes"
+        ).map { list -> list.map { it.toDomain() } }
+    }
 }

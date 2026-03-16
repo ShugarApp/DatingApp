@@ -5,6 +5,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -14,33 +16,44 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Help
-import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Verified
+import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -57,17 +70,25 @@ import aura.feature.home.presentation.generated.resources.profile_safety_legal
 import aura.feature.home.presentation.generated.resources.profile_settings_dashboard
 import aura.feature.home.presentation.generated.resources.profile_support
 import aura.feature.home.presentation.generated.resources.profile_verify
+import coil3.compose.AsyncImage
 import com.dating.core.designsystem.components.avatar.AvatarSize
 import com.dating.core.designsystem.components.avatar.ChirpAvatarPhoto
 import com.dating.core.designsystem.components.cards.AccessCardItem
 import com.dating.core.designsystem.components.cards.AccessCardList
+import com.dating.core.designsystem.components.chips.ChirpChip
 import com.dating.core.designsystem.theme.extended
 import com.dating.core.presentation.permissions.Permission
 import com.dating.core.presentation.permissions.PermissionState
 import com.dating.core.presentation.permissions.rememberPermissionController
+import com.dating.core.presentation.util.rememberOpenUrl
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+
+private const val URL_SAFETY = "https://aura.dating/safety"
+private const val URL_PRIVACY = "https://aura.dating/privacy"
+private const val URL_HELP = "https://support.aura.dating"
+private const val URL_GUIDELINES = "https://aura.dating/guidelines"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,12 +97,15 @@ fun ProfileScreen(
     onSettings: () -> Unit,
     onVerification: () -> Unit,
     onSubscriptions: () -> Unit,
+    onNavigateToProfile: (String, String?) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ProfileViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val permissionController = rememberPermissionController()
     val coroutineScope = rememberCoroutineScope()
+    val openUrl = rememberOpenUrl()
+    val previewSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     Scaffold(
         modifier = modifier.fillMaxSize().padding(top = 32.dp)
@@ -101,7 +125,7 @@ fun ProfileScreen(
                     displayText = state.userInitials,
                     size = AvatarSize.PROFILE,
                     imageUrl = state.profilePictureUrl,
-                    onClick = {},
+                    onClick = { onNavigateToProfile(state.userId, state.profilePictureUrl) },
                     modifier = Modifier.align(Alignment.Center)
                 )
             }
@@ -203,12 +227,12 @@ fun ProfileScreen(
                 AccessCardItem(
                     icon = Icons.Default.Security,
                     title = stringResource(Res.string.profile_safety_center),
-                    onClick = { /* Todo */ }
+                    onClick = { openUrl(URL_SAFETY) }
                 )
                 AccessCardItem(
-                    icon = Icons.Default.Lock, // Or Gavel/Policy
+                    icon = Icons.Default.Lock,
                     title = stringResource(Res.string.profile_privacy_policy),
-                    onClick = { /* Todo */ }
+                    onClick = { openUrl(URL_PRIVACY) }
                 )
             }
             Spacer(modifier = Modifier.height(24.dp))
@@ -218,15 +242,36 @@ fun ProfileScreen(
                 AccessCardItem(
                     icon = Icons.Default.Help,
                     title = stringResource(Res.string.profile_help_support),
-                    onClick = { /* Todo */ }
+                    onClick = { openUrl(URL_HELP) }
                 )
                 AccessCardItem(
-                    icon = Icons.Default.Favorite, // Heart/Hand
+                    icon = Icons.Default.Favorite,
                     title = stringResource(Res.string.profile_community_guidelines),
-                    onClick = { /* Todo */ }
+                    onClick = { openUrl(URL_GUIDELINES) }
                 )
             }
             Spacer(modifier = Modifier.padding(bottom = 30.dp))
+        }
+    }
+
+    if (state.showPreview) {
+        ModalBottomSheet(
+            onDismissRequest = { viewModel.onAction(ProfileAction.OnDismissPreview) },
+            sheetState = previewSheetState
+        ) {
+            if (state.isLoadingPreview) {
+                Box(
+                    modifier = Modifier.fillMaxWidth().height(500.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                ProfilePreviewContent(
+                    state = state,
+                    onClose = { viewModel.onAction(ProfileAction.OnDismissPreview) }
+                )
+            }
         }
     }
 }
@@ -269,5 +314,197 @@ fun ProfileDashboardCard(
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.extended.textPrimary
         )
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun ProfilePreviewContent(
+    state: ProfileState,
+    onClose: () -> Unit
+) {
+    val location = listOfNotNull(state.city, state.country).joinToString(", ")
+    val details = listOfNotNull(
+        state.height?.let { "$it cm" },
+        state.zodiac,
+        state.smoking,
+        state.drinking
+    )
+    val photos = state.photos.ifEmpty { listOfNotNull(state.profilePictureUrl) }
+    val pagerState = rememberPagerState(pageCount = { photos.size.coerceAtLeast(1) })
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState())
+            .padding(bottom = 32.dp)
+    ) {
+        // Photo pager header
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(500.dp)
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+        ) {
+            if (photos.isEmpty()) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = Icons.Default.Info,
+                        contentDescription = null,
+                        modifier = Modifier.size(64.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            } else {
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier.fillMaxSize()
+                ) { page ->
+                    AsyncImage(
+                        model = photos[page],
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+            }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.6f)),
+                            startY = 300f
+                        )
+                    )
+            )
+
+            // Page indicators
+            if (photos.size > 1) {
+                Row(
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .padding(top = 12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    repeat(photos.size) { index ->
+                        Box(
+                            modifier = Modifier
+                                .height(3.dp)
+                                .width(if (pagerState.currentPage == index) 24.dp else 16.dp)
+                                .clip(RoundedCornerShape(2.dp))
+                                .background(
+                                    if (pagerState.currentPage == index) Color.White
+                                    else Color.White.copy(alpha = 0.5f)
+                                )
+                        )
+                    }
+                }
+            }
+
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(16.dp)
+            ) {
+                Text(
+                    text = state.username,
+                    style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+                    color = Color.White
+                )
+                if (location.isNotEmpty()) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Outlined.LocationOn,
+                            contentDescription = null,
+                            tint = Color.White.copy(alpha = 0.8f),
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = location,
+                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+                            color = Color.White.copy(alpha = 0.8f)
+                        )
+                    }
+                }
+            }
+
+            IconButton(
+                onClick = onClose,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = 12.dp, end = 12.dp)
+                    .background(Color.Black.copy(alpha = 0.3f), CircleShape)
+                    .size(40.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = null,
+                    tint = Color.White
+                )
+            }
+        }
+
+        // Bio
+        if (!state.bio.isNullOrBlank()) {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = state.bio,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+        }
+
+        // Details chips (height, zodiac, smoking, drinking)
+        if (details.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(16.dp))
+            FlowRow(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                details.forEach { detail ->
+                    ChirpChip(text = detail, isSelected = false)
+                }
+            }
+        }
+
+        // Job / Education
+        val workLine = listOfNotNull(state.jobTitle, state.company).joinToString(" @ ")
+        if (workLine.isNotBlank()) {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = workLine,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+        }
+        if (!state.education.isNullOrBlank()) {
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = state.education,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+        }
+
+        // Interests
+        if (state.interests.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(16.dp))
+            FlowRow(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                state.interests.forEach { interest ->
+                    ChirpChip(text = interest, isSelected = true)
+                }
+            }
+        }
     }
 }

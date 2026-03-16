@@ -19,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -107,44 +108,43 @@ fun ChatListScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             MainTopAppBar(title = "Chats")
-            when {
-                state.isLoading -> {
-                    CircularProgressIndicator(
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
+            PullToRefreshBox(
+                isRefreshing = state.isLoading,
+                onRefresh = { onAction(ChatListAction.OnRefresh) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            ) {
+                when {
+                    state.chats.isEmpty() && !state.isLoading -> {
+                        EmptySection(
+                            title = stringResource(Res.string.no_chats),
+                            description = stringResource(Res.string.no_chats_subtitle),
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 8.dp)
+                        )
+                    }
 
-                state.chats.isEmpty() -> {
-                    EmptySection(
-                        title = stringResource(Res.string.no_chats),
-                        description = stringResource(Res.string.no_chats_subtitle),
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxWidth()
-                            .padding(horizontal = 8.dp)
-                    )
-                }
-
-                else -> {
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                    ) {
-                        items(
-                            items = state.chats,
-                            key = { it.id }
-                        ) { chatUi ->
-                            ChatListItemUi(
-                                chat = chatUi,
-                                isSelected = chatUi.id == state.selectedChatId,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        onAction(ChatListAction.OnSelectChat(chatUi.id))
-                                    }
-                            )
-                            ChirpHorizontalDivider()
+                    else -> {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            items(
+                                items = state.chats,
+                                key = { it.id }
+                            ) { chatUi ->
+                                ChatListItemUi(
+                                    chat = chatUi,
+                                    isSelected = chatUi.id == state.selectedChatId,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            onAction(ChatListAction.OnSelectChat(chatUi.id))
+                                        }
+                                )
+                                ChirpHorizontalDivider()
+                            }
                         }
                     }
                 }

@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
+import kotlin.math.abs
 
 class ProfileViewModel(
     private val chatParticipantRepository: ChatParticipantRepository,
@@ -25,6 +26,13 @@ class ProfileViewModel(
     private val userService: UserService,
     private val locationProvider: LocationProvider
 ) : ViewModel() {
+
+    companion object {
+        private var hasProfileSynced = false
+        private var hasLocationSentThisSession = false
+        private var lastSentLatitude: Double? = null
+        private var lastSentLongitude: Double? = null
+    }
 
     private var hasLoadedInitialData = false
 
@@ -35,17 +43,30 @@ class ProfileViewModel(
     ) { currentState, authInfo ->
         if (authInfo != null) {
             currentState.copy(
+                userId = authInfo.user.id,
                 username = authInfo.user.username,
                 userInitials = authInfo.user.username.take(2),
                 emailTextState = TextFieldState(initialText = authInfo.user.email),
-                profilePictureUrl = authInfo.user.profilePictureUrl,
+                photos = authInfo.user.photos,
                 city = authInfo.user.city,
-                country = authInfo.user.country
+                country = authInfo.user.country,
+                bio = authInfo.user.bio,
+                jobTitle = authInfo.user.jobTitle,
+                company = authInfo.user.company,
+                education = authInfo.user.education,
+                height = authInfo.user.height,
+                zodiac = authInfo.user.zodiac,
+                smoking = authInfo.user.smoking,
+                drinking = authInfo.user.drinking,
+                interests = authInfo.user.interests
             )
         } else currentState
     }
         .onStart {
             if (!hasLoadedInitialData) {
+                if (!hasProfileSynced) {
+                    syncProfileOnce()
+                }
                 fetchLocalParticipantDetails()
                 updateLocationOnAppOpen()
                 hasLoadedInitialData = true
@@ -53,13 +74,46 @@ class ProfileViewModel(
         }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000L),
+            started = SharingStarted.Lazily,
             initialValue = ProfileState()
         )
 
     fun onAction(action: ProfileAction) {
         when (action) {
             is ProfileAction.OnUpdateLocation -> updateLocation()
+            is ProfileAction.OnAvatarClick -> loadProfilePreview()
+            is ProfileAction.OnDismissPreview -> _state.update { it.copy(showPreview = false) }
+        }
+    }
+
+    private fun loadProfilePreview() {
+        viewModelScope.launch {
+            _state.update { it.copy(showPreview = true, isLoadingPreview = true) }
+            userService.getMyProfile()
+                .onSuccess { user ->
+                    // Sync session so the combine doesn't overwrite with stale data
+                    val authInfo = sessionStorage.observeAuthInfo().firstOrNull()
+                    if (authInfo != null) {
+                        sessionStorage.set(authInfo.copy(user = user))
+                    }
+                    _state.update { it.copy(isLoadingPreview = false) }
+                }
+                .onFailure {
+                    _state.update { it.copy(isLoadingPreview = false) }
+                }
+        }
+    }
+
+    private fun syncProfileOnce() {
+        viewModelScope.launch {
+            userService.getMyProfile()
+                .onSuccess { user ->
+                    val authInfo = sessionStorage.observeAuthInfo().firstOrNull()
+                    if (authInfo != null) {
+                        sessionStorage.set(authInfo.copy(user = user))
+                    }
+                    hasProfileSynced = true
+                }
         }
     }
 
@@ -69,11 +123,28 @@ class ProfileViewModel(
         }
     }
 
+    private fun hasLocationChangedSignificantly(lat: Double, lng: Double): Boolean {
+        val prevLat = lastSentLatitude ?: return true
+        val prevLng = lastSentLongitude ?: return true
+        // ~0.0005 degrees ≈ 50 meters
+        return abs(lat - prevLat) > 0.0005 || abs(lng - prevLng) > 0.0005
+    }
+
     private fun updateLocationOnAppOpen() {
+        if (hasLocationSentThisSession) return
         viewModelScope.launch {
             val location = locationProvider.getLastKnownLocation() ?: return@launch
+            if (!hasLocationChangedSignificantly(location.latitude, location.longitude)) {
+                hasLocationSentThisSession = true
+                return@launch
+            }
             userService.updateLocation(location.latitude, location.longitude)
-                .onSuccess { updatedUser -> persistLocationToSession(updatedUser.city, updatedUser.country) }
+                .onSuccess { updatedUser ->
+                    lastSentLatitude = location.latitude
+                    lastSentLongitude = location.longitude
+                    hasLocationSentThisSession = true
+                    persistLocationToSession(updatedUser.city, updatedUser.country)
+                }
         }
     }
 

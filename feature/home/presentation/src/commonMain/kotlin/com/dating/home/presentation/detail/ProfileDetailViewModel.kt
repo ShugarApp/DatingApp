@@ -42,12 +42,10 @@ class ProfileDetailViewModel(
     fun onAction(action: ProfileDetailAction) {
         when (action) {
             is ProfileDetailAction.OnBack -> {
-                viewModelScope.launch { _events.send(ProfileDetailEvent.NavigateBack) }
+                viewModelScope.launch { _events.send(ProfileDetailEvent.NavigateBack()) }
             }
             is ProfileDetailAction.OnSwipeRight -> swipe(action.userId, SwipeAction.LIKE)
-            is ProfileDetailAction.OnSwipeLeft -> {
-                viewModelScope.launch { _events.send(ProfileDetailEvent.NavigateBack) }
-            }
+            is ProfileDetailAction.OnSwipeLeft -> swipe(action.userId, SwipeAction.DISLIKE)
         }
     }
 
@@ -57,13 +55,13 @@ class ProfileDetailViewModel(
                 .onSuccess { result ->
                     if (result.isMatch) {
                         val name = _state.value.user?.username ?: ""
-                        _events.send(ProfileDetailEvent.ShowMatch(name))
+                        _events.send(ProfileDetailEvent.ShowMatch(name, userId))
                     } else {
-                        _events.send(ProfileDetailEvent.NavigateBack)
+                        _events.send(ProfileDetailEvent.NavigateBack(swipedUserId = userId))
                     }
                 }
                 .onFailure {
-                    _events.send(ProfileDetailEvent.NavigateBack)
+                    _events.send(ProfileDetailEvent.NavigateBack(swipedUserId = userId))
                 }
         }
     }

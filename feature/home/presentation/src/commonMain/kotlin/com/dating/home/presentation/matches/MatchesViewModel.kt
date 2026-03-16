@@ -24,46 +24,73 @@ class MatchesViewModel(
     val events = _events.receiveAsFlow()
 
     init {
-        loadMatches()
+        loadData()
     }
 
     fun onAction(action: MatchesAction) {
         when (action) {
-            is MatchesAction.OnRefresh -> loadMatches()
+            is MatchesAction.OnRefresh -> loadData()
+            is MatchesAction.OnTabSelected -> {
+                _state.update { it.copy(selectedTab = action.tab) }
+            }
             is MatchesAction.OnMatchClick -> {
                 viewModelScope.launch {
                     _events.send(MatchesEvent.NavigateToProfile(action.matchId, action.imageUrl))
                 }
             }
             is MatchesAction.OnStartChat -> startChat(action.matchId)
+            is MatchesAction.OnLikeClick -> {
+                viewModelScope.launch {
+                    _events.send(MatchesEvent.NavigateToProfile(action.userId, action.imageUrl))
+                }
+            }
         }
     }
 
-    private fun loadMatches() {
+    private fun loadData() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, error = null) }
-            matchingService.getMatches()
-                .onSuccess { users ->
-                    _state.update {
-                        it.copy(
-                            isLoading = false,
-                            matches = users.map { user ->
-                                Match(
-                                    id = user.id,
-                                    username = user.username,
-                                    profilePictureUrl = user.profilePictureUrl,
-                                    city = user.city,
-                                    country = user.country
-                                )
-                            }
-                        )
+
+            launch {
+                matchingService.getMatches()
+                    .onSuccess { users ->
+                        _state.update {
+                            it.copy(
+                                matches = users.map { user -> user.toMatch() }
+                            )
+                        }
                     }
-                }
-                .onFailure { error ->
-                    _state.update { it.copy(isLoading = false, error = error.toUiText()) }
-                }
+                    .onFailure { error ->
+                        _state.update { it.copy(error = error.toUiText()) }
+                    }
+            }
+
+            launch {
+                matchingService.getLikes()
+                    .onSuccess { users ->
+                        _state.update {
+                            it.copy(
+                                likes = users.map { user -> user.toMatch() }
+                            )
+                        }
+                    }
+                    .onFailure { error ->
+                        _state.update { it.copy(error = error.toUiText()) }
+                    }
+            }
+        }.invokeOnCompletion {
+            _state.update { it.copy(isLoading = false) }
         }
     }
+
+    private fun com.dating.core.domain.auth.User.toMatch() = Match(
+        id = id,
+        username = username,
+        profilePictureUrl = profilePictureUrl,
+        photos = photos,
+        city = city,
+        country = country
+    )
 
     private fun startChat(matchId: String) {
         viewModelScope.launch {
