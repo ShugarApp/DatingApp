@@ -33,7 +33,7 @@ class ChatListViewModel(
         }
 
         currentState.copy(
-            chats = chats.map { it.toUi(authInfo.user.id) },
+            chats = chats.mapNotNull { it.toUi(authInfo.user.id) },
             localParticipant = authInfo.user.toUi()
         )
     }
@@ -60,7 +60,17 @@ class ChatListViewModel(
                 }
             }
 
+            ChatListAction.OnRefresh -> refresh()
+
             else -> Unit
+        }
+    }
+
+    private fun refresh() {
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
+            repository.fetchChats()
+            _state.update { it.copy(isLoading = false) }
         }
     }
 

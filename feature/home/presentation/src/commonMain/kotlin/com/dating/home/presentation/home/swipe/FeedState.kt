@@ -1,16 +1,18 @@
 package com.dating.home.presentation.home.swipe
 
-import com.dating.core.presentation.util.UiText
+import com.dating.core.domain.discovery.Gender
 
 data class FeedState(
     val isLoading: Boolean = false,
     val feedItems: List<FeedItem> = emptyList(),
-    val error: UiText? = null,
+    val hasConnectionError: Boolean = false,
     val maxDistance: Double? = null,
+    val showMe: Gender = Gender.WOMEN,
     val minAge: Int = 18,
     val maxAge: Int = 50,
     val showMatchDialog: Boolean = false,
-    val matchedUserName: String? = null
+    val matchedUserName: String? = null,
+    val showCompleteProfileDialog: Boolean = false
 )
 
 data class FeedItem(
@@ -26,12 +28,20 @@ sealed interface FeedAction {
     data class OnSwipeRight(val userId: String) : FeedAction
     data class OnSwipeLeft(val userId: String) : FeedAction
     data class OnUserClick(val userId: String, val imageUrl: String?) : FeedAction
-    data class OnMaxDistanceChanged(val distance: Double?) : FeedAction
-    data class OnAgeRangeChanged(val minAge: Int, val maxAge: Int) : FeedAction
+    data class OnFiltersApplied(
+        val distance: Double?,
+        val gender: Gender,
+        val minAge: Int,
+        val maxAge: Int
+    ) : FeedAction
     data object OnDismissMatchDialog : FeedAction
+    data object OnCompleteProfileClick : FeedAction
+    data object OnDismissCompleteProfileDialog : FeedAction
+    data object OnScreenResumed : FeedAction
+    data class OnUserSwiped(val userId: String) : FeedAction
 }
 
 sealed interface FeedEvent {
-    data class Error(val error: UiText) : FeedEvent
     data class NavigateToProfile(val userId: String, val imageUrl: String?) : FeedEvent
+    data object NavigateToEditProfile : FeedEvent
 }

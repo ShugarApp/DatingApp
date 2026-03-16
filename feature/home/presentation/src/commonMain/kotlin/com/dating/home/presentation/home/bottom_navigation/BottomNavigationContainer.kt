@@ -18,11 +18,14 @@ import com.dating.home.presentation.profile.profile.ProfileScreen
 @Composable
 fun BottomNavigationContainer(
     onNavigateToProfile: (String, String?) -> Unit,
+    onNavigateToMatchProfile: (String, String?) -> Unit,
+    onNavigateToOwnProfile: (String, String?) -> Unit,
     onNavigateToChatDetail: (String) -> Unit,
     onEditProfile: () -> Unit,
     onSettings: () -> Unit,
     onVerification: () -> Unit,
     onSubscriptions: () -> Unit,
+    swipedUserId: String? = null,
     modifier: Modifier = Modifier
 ) {
     var selectedSection by rememberSaveable { mutableStateOf(BottomNavSection.FEED) }
@@ -45,12 +48,16 @@ fun BottomNavigationContainer(
         ) {
             when (selectedSection) {
                 BottomNavSection.FEED -> {
-                    FeedRoot(onNavigateToProfile = onNavigateToProfile)
+                    FeedRoot(
+                        onNavigateToProfile = onNavigateToProfile,
+                        onNavigateToEditProfile = onEditProfile,
+                        swipedUserId = swipedUserId
+                    )
                 }
 
                 BottomNavSection.MATCHES -> {
                     MatchesRoot(
-                        onNavigateToProfile = onNavigateToProfile,
+                        onNavigateToProfile = onNavigateToMatchProfile,
                         onNavigateToChatDetail = onNavigateToChatDetail
                     )
                 }
@@ -67,7 +74,8 @@ fun BottomNavigationContainer(
                         onEditProfile = onEditProfile,
                         onSettings = onSettings,
                         onVerification = onVerification,
-                        onSubscriptions = onSubscriptions
+                        onSubscriptions = onSubscriptions,
+                        onNavigateToProfile = onNavigateToOwnProfile
                     )
                 }
             }

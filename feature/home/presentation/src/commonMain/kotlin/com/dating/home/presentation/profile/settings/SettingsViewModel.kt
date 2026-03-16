@@ -4,6 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dating.core.domain.auth.AuthService
 import com.dating.core.domain.auth.SessionStorage
+import com.dating.core.domain.discovery.DiscoveryPreferencesStorage
+import com.dating.core.domain.location.LocationProvider
+import com.dating.core.domain.preferences.ThemePreferences
+import com.dating.core.domain.util.Result
+import com.dating.core.domain.util.onFailure
+import com.dating.core.domain.util.onSuccess
+import com.dating.core.presentation.util.toUiText
+import com.dating.home.domain.user.UserService
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -16,7 +24,11 @@ import kotlinx.coroutines.launch
 
 class SettingsViewModel(
     private val authService: AuthService,
-    private val sessionStorage: SessionStorage
+    private val sessionStorage: SessionStorage,
+    private val userService: UserService,
+    private val discoveryPreferences: DiscoveryPreferencesStorage,
+    private val locationProvider: LocationProvider,
+    private val themePreferences: ThemePreferences
 ) : ViewModel() {
 
     private val _events = Channel<SettingsEvent>()
@@ -25,9 +37,19 @@ class SettingsViewModel(
     private val _state = MutableStateFlow(SettingsState())
     val state = combine(
         _state,
-        sessionStorage.observeAuthInfo()
-    ) { currentState, authInfo ->
-        if (authInfo != null) currentState.copy(username = authInfo.user.username) else currentState
+        sessionStorage.observeAuthInfo(),
+        discoveryPreferences.observe(),
+        themePreferences.observeThemePreference()
+    ) { currentState, authInfo, discovery, theme ->
+        currentState.copy(
+            username = authInfo?.user?.username ?: currentState.username,
+            isAccountPaused = authInfo?.user?.isPaused ?: currentState.isAccountPaused,
+            maxDistance = discovery.maxDistance,
+            showMe = discovery.showMe,
+            minAge = discovery.minAge,
+            maxAge = discovery.maxAge,
+            themePreference = theme
+        )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000L),
@@ -39,33 +61,115 @@ class SettingsViewModel(
             SettingsAction.OnLogoutClick -> showLogoutConfirmation()
             SettingsAction.OnConfirmLogoutClick -> logout()
             SettingsAction.OnDismissLogoutConfirmationDialogClick -> dismissLogoutConfirmation()
+            SettingsAction.OnConfirmPauseAccountClick -> togglePauseAccount()
+            SettingsAction.OnConfirmDeleteAccountClick -> deleteAccount()
+
+            SettingsAction.OnLocationClick -> updateLocation()
+            SettingsAction.OnMaxDistanceClick -> _state.update { it.copy(showDistanceDialog = true) }
+            SettingsAction.OnShowMeClick -> _state.update { it.copy(showGenderDialog = true) }
+            SettingsAction.OnAgeRangeClick -> _state.update { it.copy(showAgeRangeDialog = true) }
+            SettingsAction.OnDismissDiscoveryDialog -> _state.update {
+                it.copy(showDistanceDialog = false, showGenderDialog = false, showAgeRangeDialog = false)
+            }
+            is SettingsAction.OnMaxDistanceChanged -> {
+                viewModelScope.launch { discoveryPreferences.updateMaxDistance(action.distance) }
+                _state.update { it.copy(showDistanceDialog = false) }
+            }
+            is SettingsAction.OnShowMeChanged -> {
+                viewModelScope.launch { discoveryPreferences.updateShowMe(action.gender) }
+                _state.update { it.copy(showGenderDialog = false) }
+            }
+            is SettingsAction.OnAgeRangeChanged -> {
+                viewModelScope.launch { discoveryPreferences.updateAgeRange(action.minAge, action.maxAge) }
+                _state.update { it.copy(showAgeRangeDialog = false) }
+            }
+
+            SettingsAction.OnDismissError -> _state.update { it.copy(errorMessage = null) }
+            SettingsAction.OnThemeClick -> _state.update { it.copy(showThemeDialog = true) }
+            is SettingsAction.OnThemeChanged -> {
+                viewModelScope.launch { themePreferences.updateThemePreference(action.theme) }
+                _state.update { it.copy(showThemeDialog = false) }
+            }
         }
     }
 
     private fun showLogoutConfirmation() {
-        _state.update {
-            it.copy(
-                showLogoutConfirmationDialog = true
-            )
-        }
+        _state.update { it.copy(showLogoutConfirmationDialog = true) }
     }
 
     private fun dismissLogoutConfirmation() {
-        _state.update {
-            it.copy(
-                showLogoutConfirmationDialog = false
-            )
-        }
+        _state.update { it.copy(showLogoutConfirmationDialog = false) }
     }
 
     private fun logout() {
         dismissLogoutConfirmation()
         viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
             val authInfo = sessionStorage.observeAuthInfo().first()
-            val refreshToken = authInfo?.refreshToken ?: return@launch
+            val refreshToken = authInfo?.refreshToken ?: run {
+                _state.update { it.copy(isLoading = false) }
+                return@launch
+            }
             authService.logout(refreshToken)
-            sessionStorage.set(null)
-            _events.send(SettingsEvent.OnLogoutSuccess)
+                .onSuccess {
+                    sessionStorage.set(null)
+                    _events.send(SettingsEvent.OnLogoutSuccess)
+                }
+                .onFailure { error ->
+                    _state.update { it.copy(isLoading = false, errorMessage = error.toUiText()) }
+                }
+        }
+    }
+
+    private fun updateLocation() {
+        viewModelScope.launch {
+            _state.update { it.copy(isUpdatingLocation = true, locationUpdateSuccess = null) }
+            val location = locationProvider.getLastKnownLocation()
+            if (location != null) {
+                val result = userService.updateLocation(location.latitude, location.longitude)
+                _state.update {
+                    it.copy(
+                        isUpdatingLocation = false,
+                        locationUpdateSuccess = result is Result.Success
+                    )
+                }
+            } else {
+                _state.update { it.copy(isUpdatingLocation = false, locationUpdateSuccess = false) }
+            }
+        }
+    }
+
+    private fun togglePauseAccount() {
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
+            val currentIsPaused = state.value.isAccountPaused
+            userService.pauseAccount(!currentIsPaused)
+                .onSuccess { user ->
+                    _state.update { it.copy(isLoading = false) }
+                    val authInfo = sessionStorage.observeAuthInfo().first()
+                    if (authInfo != null) {
+                        sessionStorage.set(authInfo.copy(user = user))
+                    }
+                    _events.send(SettingsEvent.OnPauseAccountToggled)
+                }
+                .onFailure { error ->
+                    _state.update { it.copy(isLoading = false, errorMessage = error.toUiText()) }
+                }
+        }
+    }
+
+    private fun deleteAccount() {
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
+            userService.deleteAccount()
+                .onSuccess {
+                    _state.update { it.copy(isLoading = false) }
+                    sessionStorage.set(null)
+                    _events.send(SettingsEvent.OnDeleteAccountSuccess)
+                }
+                .onFailure { error ->
+                    _state.update { it.copy(isLoading = false, errorMessage = error.toUiText()) }
+                }
         }
     }
 }

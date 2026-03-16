@@ -80,9 +80,15 @@ import com.dating.core.designsystem.theme.extended
 import com.dating.core.presentation.permissions.Permission
 import com.dating.core.presentation.permissions.PermissionState
 import com.dating.core.presentation.permissions.rememberPermissionController
+import com.dating.core.presentation.util.rememberOpenUrl
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+
+private const val URL_SAFETY = "https://aura.dating/safety"
+private const val URL_PRIVACY = "https://aura.dating/privacy"
+private const val URL_HELP = "https://support.aura.dating"
+private const val URL_GUIDELINES = "https://aura.dating/guidelines"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -91,12 +97,14 @@ fun ProfileScreen(
     onSettings: () -> Unit,
     onVerification: () -> Unit,
     onSubscriptions: () -> Unit,
+    onNavigateToProfile: (String, String?) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ProfileViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val permissionController = rememberPermissionController()
     val coroutineScope = rememberCoroutineScope()
+    val openUrl = rememberOpenUrl()
     val previewSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     Scaffold(
@@ -117,7 +125,7 @@ fun ProfileScreen(
                     displayText = state.userInitials,
                     size = AvatarSize.PROFILE,
                     imageUrl = state.profilePictureUrl,
-                    onClick = { viewModel.onAction(ProfileAction.OnAvatarClick) },
+                    onClick = { onNavigateToProfile(state.userId, state.profilePictureUrl) },
                     modifier = Modifier.align(Alignment.Center)
                 )
             }
@@ -219,12 +227,12 @@ fun ProfileScreen(
                 AccessCardItem(
                     icon = Icons.Default.Security,
                     title = stringResource(Res.string.profile_safety_center),
-                    onClick = { /* Todo */ }
+                    onClick = { openUrl(URL_SAFETY) }
                 )
                 AccessCardItem(
-                    icon = Icons.Default.Lock, // Or Gavel/Policy
+                    icon = Icons.Default.Lock,
                     title = stringResource(Res.string.profile_privacy_policy),
-                    onClick = { /* Todo */ }
+                    onClick = { openUrl(URL_PRIVACY) }
                 )
             }
             Spacer(modifier = Modifier.height(24.dp))
@@ -234,12 +242,12 @@ fun ProfileScreen(
                 AccessCardItem(
                     icon = Icons.Default.Help,
                     title = stringResource(Res.string.profile_help_support),
-                    onClick = { /* Todo */ }
+                    onClick = { openUrl(URL_HELP) }
                 )
                 AccessCardItem(
-                    icon = Icons.Default.Favorite, // Heart/Hand
+                    icon = Icons.Default.Favorite,
                     title = stringResource(Res.string.profile_community_guidelines),
-                    onClick = { /* Todo */ }
+                    onClick = { openUrl(URL_GUIDELINES) }
                 )
             }
             Spacer(modifier = Modifier.padding(bottom = 30.dp))

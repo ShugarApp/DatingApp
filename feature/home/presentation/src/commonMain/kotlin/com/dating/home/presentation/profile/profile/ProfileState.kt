@@ -3,6 +3,7 @@ package com.dating.home.presentation.profile.profile
 import androidx.compose.foundation.text.input.TextFieldState
 
 data class ProfileState(
+    val userId: String = "",
     val username: String = "",
     val userInitials: String = "--",
     val photos: List<String> = emptyList(),

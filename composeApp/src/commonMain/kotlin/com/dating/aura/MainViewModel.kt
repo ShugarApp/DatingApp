@@ -46,7 +46,7 @@ class MainViewModel(
 
     private var previousRefreshToken: String? = null
     private var currentDeviceToken: String? = null
-    private var previousDeviceToken: String? = null
+    private var isTokenRegistered = false
 
     init {
         viewModelScope.launch {
@@ -72,6 +72,7 @@ class MainViewModel(
                     currentDeviceToken?.let {
                         deviceTokenService.unregisterToken(it)
                     }
+                    isTokenRegistered = false
                     eventChannel.send(MainEvent.OnSessionExpired)
                 }
 
@@ -81,7 +82,8 @@ class MainViewModel(
                 pushNotificationService.observeDeviceToken()
             ) { authInfo, deviceToken ->
                 currentDeviceToken = deviceToken
-                if(authInfo != null && deviceToken != previousDeviceToken && deviceToken != null) {
+                if(authInfo != null && deviceToken != null && !isTokenRegistered) {
+                    isTokenRegistered = true
                     registerDeviceToken(deviceToken, PlatformUtils.getOSName())
                 }
             }

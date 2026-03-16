@@ -14,6 +14,7 @@ import com.dating.core.domain.util.Result
 import com.dating.core.domain.util.map
 import com.dating.home.data.dto.request.ConfirmPhotoRequest
 import com.dating.home.data.dto.request.LocationRequest
+import com.dating.home.data.dto.request.PauseAccountRequest
 import com.dating.home.data.dto.request.ReorderPhotosRequest
 import com.dating.home.data.dto.request.UpdateProfileRequest
 import com.dating.home.data.dto.response.ProfilePictureUploadUrlsResponse
@@ -119,6 +120,17 @@ class KtorUserService(private val httpClient: HttpClient) : UserService {
     override suspend fun getUserById(id: String): Result<User, DataError.Remote> {
         return httpClient.get<UserSerializable>(
             route = "/users/$id"
+        ).map { it.toDomain() }
+    }
+
+    override suspend fun deleteAccount(): EmptyResult<DataError.Remote> {
+        return httpClient.delete<Unit>(route = "/users/profile")
+    }
+
+    override suspend fun pauseAccount(pause: Boolean): Result<User, DataError.Remote> {
+        return httpClient.put<PauseAccountRequest, UserSerializable>(
+            route = "/users/profile/pause",
+            body = PauseAccountRequest(pause = pause)
         ).map { it.toDomain() }
     }
 }

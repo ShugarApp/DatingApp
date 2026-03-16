@@ -22,4 +22,6 @@ interface MatchingService {
     ): Result<SwipeResult, DataError.Remote>
 
     suspend fun getMatches(): Result<List<User>, DataError.Remote>
+
+    suspend fun getLikes(): Result<List<User>, DataError.Remote>
 }

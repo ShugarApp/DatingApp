@@ -21,5 +21,6 @@ data class UserSerializable(
     val zodiac: String? = null,
     val smoking: String? = null,
     val drinking: String? = null,
-    val interests: List<String> = emptyList()
+    val interests: List<String> = emptyList(),
+    val isPaused: Boolean = false
 )

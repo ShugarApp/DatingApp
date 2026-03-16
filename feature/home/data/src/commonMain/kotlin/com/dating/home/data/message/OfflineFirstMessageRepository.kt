@@ -66,7 +66,6 @@ class OfflineFirstMessageRepository(
 
     override suspend fun retryMessage(messageId: String): EmptyResult<DataError> {
         return safeDatabaseUpdate {
-            println("Message ID retry $messageId")
             val message = database.chatMessageDao.getMessageById(messageId)
                 ?: return Result.Failure(DataError.Local.NOT_FOUND)
 

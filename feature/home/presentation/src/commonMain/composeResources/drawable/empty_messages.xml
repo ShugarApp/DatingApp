@@ -1,0 +1,61 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+  <group>
+    <!-- Background circle -->
+    <path
+        android:pathData="M100,100m-85,0a85,85 0,1 1,170 0a85,85 0,1 1,-170 0"
+        android:fillColor="#FDE8EF"
+        android:fillAlpha="0.5"/>
+
+    <!-- Back chat bubble (right) -->
+    <path
+        android:pathData="M70,60L140,60A10,10 0,0 1,150 70L150,100A10,10 0,0 1,140 110L130,110L135,125L115,110L70,110A10,10 0,0 1,60 100L60,70A10,10 0,0 1,70 60z"
+        android:fillColor="#F0B8D0"/>
+
+    <!-- Front chat bubble (left) -->
+    <path
+        android:pathData="M55,80L125,80A10,10 0,0 1,135 90L135,120A10,10 0,0 1,125 130L80,130L65,145L70,130L55,130A10,10 0,0 1,45 120L45,90A10,10 0,0 1,55 80z"
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#E8B4CB"
+        android:strokeWidth="1.5"/>
+
+    <!-- Chat lines on front bubble -->
+    <path
+        android:pathData="M62,98L118,98"
+        android:strokeColor="#E8B4CB"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"/>
+    <path
+        android:pathData="M62,108L100,108"
+        android:strokeColor="#F0D4E0"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"/>
+
+    <!-- Heart on back bubble -->
+    <path
+        android:pathData="M105,78C105,74 101,71 99,74C97,77 99,81 105,86C105,86 105,78 105,78Z"
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.8"/>
+    <path
+        android:pathData="M105,78C105,74 109,71 111,74C113,77 111,81 105,86C105,86 105,78 105,78Z"
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.8"/>
+
+    <!-- Sparkles -->
+    <path
+        android:pathData="M40,70L43,65L46,70L43,75Z"
+        android:fillColor="#F0A0C0"/>
+    <path
+        android:pathData="M155,65L158,60L161,65L158,70Z"
+        android:fillColor="#F0A0C0"/>
+    <path
+        android:pathData="M48,135L50,132L52,135L50,138Z"
+        android:fillColor="#E8B4CB"/>
+    <path
+        android:pathData="M145,130L147,127L149,130L147,133Z"
+        android:fillColor="#E8B4CB"/>
+  </group>
+</vector>

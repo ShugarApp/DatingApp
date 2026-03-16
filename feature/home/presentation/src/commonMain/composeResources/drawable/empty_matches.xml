@@ -1,0 +1,74 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+  <group>
+    <!-- Background circle -->
+    <path
+        android:pathData="M100,100m-85,0a85,85 0,1 1,170 0a85,85 0,1 1,-170 0"
+        android:fillColor="#FDE8EF"
+        android:fillAlpha="0.5"/>
+
+    <!-- Left heart -->
+    <path
+        android:pathData="M72,95C72,78 56,68 48,78C40,88 48,105 72,120C72,120 72,95 72,95Z"
+        android:fillColor="#F8D7E6"/>
+    <path
+        android:pathData="M72,95C72,78 88,68 96,78C104,88 96,105 72,120C72,120 72,95 72,95Z"
+        android:fillColor="#F0B8D0"/>
+
+    <!-- Right heart -->
+    <path
+        android:pathData="M128,95C128,78 112,68 104,78C96,88 104,105 128,120C128,120 128,95 128,95Z"
+        android:fillColor="#F8D7E6"/>
+    <path
+        android:pathData="M128,95C128,78 144,68 152,78C160,88 152,105 128,120C128,120 128,95 128,95Z"
+        android:fillColor="#F0B8D0"/>
+
+    <!-- Connection dotted line between hearts -->
+    <path
+        android:pathData="M82,98L118,98"
+        android:strokeColor="#E8739A"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M85,98L89,98M93,98L97,98M101,98L105,98M109,98L113,98"/>
+
+    <!-- Center small heart -->
+    <path
+        android:pathData="M100,82C100,76 95,72 92,76C89,80 92,86 100,92C100,92 100,82 100,82Z"
+        android:fillColor="#E8739A"/>
+    <path
+        android:pathData="M100,82C100,76 105,72 108,76C111,80 108,86 100,92C100,92 100,82 100,82Z"
+        android:fillColor="#E8739A"/>
+
+    <!-- Sparkles around -->
+    <path
+        android:pathData="M60,55L63,50L66,55L63,60Z"
+        android:fillColor="#F0A0C0"/>
+    <path
+        android:pathData="M140,55L143,50L146,55L143,60Z"
+        android:fillColor="#F0A0C0"/>
+    <path
+        android:pathData="M100,45L102,41L104,45L102,49Z"
+        android:fillColor="#E8B4CB"/>
+    <path
+        android:pathData="M45,110L47,107L49,110L47,113Z"
+        android:fillColor="#E8B4CB"/>
+    <path
+        android:pathData="M155,110L157,107L159,110L157,113Z"
+        android:fillColor="#E8B4CB"/>
+
+    <!-- Bottom text lines (representing message) -->
+    <path
+        android:pathData="M75,140L125,140"
+        android:strokeColor="#E0C4D0"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"/>
+    <path
+        android:pathData="M82,148L118,148"
+        android:strokeColor="#EDD8E2"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"/>
+  </group>
+</vector>
