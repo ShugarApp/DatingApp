@@ -7,6 +7,7 @@ enum class MatchesTab { MATCHES, LIKES }
 data class MatchesState(
     val selectedTab: MatchesTab = MatchesTab.MATCHES,
     val isLoading: Boolean = false,
+    val isCreatingChat: Boolean = false,
     val matches: List<Match> = emptyList(),
     val likes: List<Match> = emptyList(),
     val error: UiText? = null

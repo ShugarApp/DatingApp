@@ -32,6 +32,7 @@ import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -124,7 +125,8 @@ fun MatchesScreen(
                                 MatchesTab.MATCHES -> MatchCard(
                                     match = match,
                                     onClick = { onAction(MatchesAction.OnMatchClick(match.id, match.profilePictureUrl)) },
-                                    onStartChat = { onAction(MatchesAction.OnStartChat(match.id)) }
+                                    onStartChat = { onAction(MatchesAction.OnStartChat(match.id)) },
+                                    isChatLoading = state.isCreatingChat
                                 )
                                 MatchesTab.LIKES -> LikeCard(
                                     match = match,
@@ -217,6 +219,7 @@ private fun MatchCard(
     match: Match,
     onClick: () -> Unit,
     onStartChat: () -> Unit,
+    isChatLoading: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -275,13 +278,22 @@ private fun MatchCard(
 
             Button(
                 onClick = onStartChat,
+                enabled = !isChatLoading,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Icon(
-                    imageVector = Icons.Default.Send,
-                    contentDescription = null,
-                    modifier = Modifier.size(16.dp)
-                )
+                if (isChatLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(16.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.Send,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(stringResource(Res.string.matches_chat))
             }

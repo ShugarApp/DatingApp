@@ -27,7 +27,9 @@ import com.dating.home.presentation.chat.model.MessageUi
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -59,6 +61,10 @@ class ChatDetailViewModel(
 
     private var currentPaginator: Paginator<String?, ChatMessage>? = null
 
+    private var lastTypingSentMs: Long = 0L
+    private val typingUsers = MutableStateFlow<Map<String, String>>(emptyMap()) // userId -> username
+    private val typingTimeoutJobs = mutableMapOf<String, Job>()
+
     private val chatInfoFlow = _chatId
         .onEach { chatId ->
             if (chatId != null) {
@@ -86,15 +92,17 @@ class ChatDetailViewModel(
     private val stateWithMessages = combine(
         _state,
         chatInfoFlow,
-        sessionStorage.observeAuthInfo()
-    ) { currentState, chatInfo, authInfo ->
+        sessionStorage.observeAuthInfo(),
+        typingUsers
+    ) { currentState, chatInfo, authInfo, typing ->
         if (authInfo == null) {
             return@combine ChatDetailState()
         }
 
         currentState.copy(
             chatUi = chatInfo.chat.toUi(authInfo.user.id),
-            messages = chatInfo.messages.toUiList(authInfo.user.id)
+            messages = chatInfo.messages.toUiList(authInfo.user.id),
+            typingUsernames = typing.values.toList()
         )
     }
 
@@ -111,6 +119,7 @@ class ChatDetailViewModel(
                 observeConnectionState()
                 observeChatMessages()
                 observeCanSendMessage()
+                observeTypingIndicators()
                 hasLoadedInitialData = true
             }
         }
@@ -136,6 +145,7 @@ class ChatDetailViewModel(
             ChatDetailAction.OnHideBanner -> hideBanner()
             is ChatDetailAction.OnTopVisibleIndexChanged -> updateBanner(action.topVisibleIndex)
             is ChatDetailAction.OnFirstVisibleIndexChanged -> updateNearBottom(action.index)
+            is ChatDetailAction.OnTextChanged -> onTextChanged(action.text)
             else -> Unit
         }
     }
@@ -309,11 +319,66 @@ class ChatDetailViewModel(
         }.launchIn(viewModelScope)
     }
 
+    private fun observeTypingIndicators() {
+        connectionClient
+            .typingIndicators
+            .onEach { indicator ->
+                val currentChatId = _chatId.value ?: return@onEach
+                if (indicator.chatId != currentChatId) return@onEach
+
+                val username = state.value.chatUi
+                    ?.otherParticipants
+                    ?.firstOrNull { it.id == indicator.userId }
+                    ?.username
+                    ?: return@onEach
+
+                typingUsers.update { it + (indicator.userId to username) }
+
+                typingTimeoutJobs[indicator.userId]?.cancel()
+                typingTimeoutJobs[indicator.userId] = viewModelScope.launch {
+                    delay(TYPING_TIMEOUT_MS)
+                    typingUsers.update { it - indicator.userId }
+                    typingTimeoutJobs.remove(indicator.userId)
+                }
+            }
+            .launchIn(viewModelScope)
+
+        connectionClient
+            .chatMessages
+            .onEach { message ->
+                typingUsers.update { it - message.senderId }
+                typingTimeoutJobs[message.senderId]?.cancel()
+                typingTimeoutJobs.remove(message.senderId)
+            }
+            .launchIn(viewModelScope)
+    }
+
+    private fun onTextChanged(text: String) {
+        val chatId = _chatId.value ?: return
+        if (text.isEmpty()) return
+
+        val now = kotlin.time.Clock.System.now().toEpochMilliseconds()
+        if (now - lastTypingSentMs < TYPING_DEBOUNCE_MS) return
+        lastTypingSentMs = now
+
+        viewModelScope.launch {
+            connectionClient.sendTyping(chatId)
+        }
+    }
+
+    private fun clearTypingState() {
+        typingTimeoutJobs.values.forEach { it.cancel() }
+        typingTimeoutJobs.clear()
+        typingUsers.update { emptyMap() }
+        lastTypingSentMs = 0L
+    }
+
     private fun observeConnectionState() {
         connectionClient
             .connectionState
             .onEach { connectionState ->
                 if (connectionState == ConnectionState.CONNECTED) {
+                    clearTypingState()
                     currentPaginator?.loadNextItems()
                 }
 
@@ -414,11 +479,17 @@ class ChatDetailViewModel(
     }
 
     private fun switchChat(chatId: String?) {
+        clearTypingState()
         _chatId.update { chatId }
         viewModelScope.launch {
             chatId?.let {
                 chatRepository.fetchChatById(chatId)
             }
         }
+    }
+
+    companion object {
+        private const val TYPING_DEBOUNCE_MS = 3000L
+        private const val TYPING_TIMEOUT_MS = 5000L
     }
 }

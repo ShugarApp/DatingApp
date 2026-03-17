@@ -3,6 +3,7 @@ package com.dating.home.data.chat
 import com.dating.core.domain.auth.SessionStorage
 import com.dating.home.data.dto.websocket.IncomingWebSocketDto
 import com.dating.home.data.dto.websocket.IncomingWebSocketType
+import com.dating.home.data.dto.websocket.OutgoingWebSocketDto
 import com.dating.home.data.dto.websocket.WebSocketMessageDto
 import com.dating.home.data.mappers.toDomain
 import com.dating.home.data.mappers.toEntity
@@ -10,6 +11,7 @@ import com.dating.home.data.network.KtorWebSocketConnector
 import com.dating.home.database.AppChatDatabase
 import com.dating.home.domain.chat.ChatConnectionClient
 import com.dating.home.domain.chat.ChatRepository
+import com.dating.home.domain.models.TypingIndicator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.filterIsInstance
@@ -28,10 +30,16 @@ class WebSocketChatConnectionClient(
     private val applicationScope: CoroutineScope
 ) : ChatConnectionClient {
 
-    override val chatMessages = webSocketConnector
+    private val parsedMessages = webSocketConnector
         .messages
         .mapNotNull { parseIncomingMessage(it) }
         .onEach { handleIncomingMessage(it) }
+        .shareIn(
+            applicationScope,
+            SharingStarted.WhileSubscribed(5000)
+        )
+
+    override val chatMessages = parsedMessages
         .filterIsInstance<IncomingWebSocketDto.NewMessageDto>()
         .mapNotNull {
             database.chatMessageDao.getMessageById(it.id)?.toDomain()
@@ -41,7 +49,29 @@ class WebSocketChatConnectionClient(
             SharingStarted.WhileSubscribed(5000)
         )
 
+    override val typingIndicators = parsedMessages
+        .filterIsInstance<IncomingWebSocketDto.TypingIndicatorDto>()
+        .mapNotNull { dto ->
+            TypingIndicator(
+                chatId = dto.chatId,
+                userId = dto.userId
+            )
+        }
+        .shareIn(
+            applicationScope,
+            SharingStarted.WhileSubscribed(5000)
+        )
+
     override val connectionState = webSocketConnector.connectionState
+
+    override suspend fun sendTyping(chatId: String) {
+        val dto = OutgoingWebSocketDto.Typing(chatId = chatId)
+        val webSocketMessage = WebSocketMessageDto(
+            type = dto.type.name,
+            payload = json.encodeToString(dto)
+        )
+        webSocketConnector.sendMessage(json.encodeToString(webSocketMessage))
+    }
 
     private fun parseIncomingMessage(message: WebSocketMessageDto): IncomingWebSocketDto? {
         return when (message.type) {
@@ -61,6 +91,10 @@ class WebSocketChatConnectionClient(
                 json.decodeFromString<IncomingWebSocketDto.ChatParticipantsChangedDto>(message.payload)
             }
 
+            IncomingWebSocketType.TYPING_INDICATOR.name -> {
+                json.decodeFromString<IncomingWebSocketDto.TypingIndicatorDto>(message.payload)
+            }
+
             else -> null
         }
     }
@@ -71,6 +105,7 @@ class WebSocketChatConnectionClient(
             is IncomingWebSocketDto.MessageDeletedDto -> deleteMessage(message)
             is IncomingWebSocketDto.NewMessageDto -> handleNewMessage(message)
             is IncomingWebSocketDto.ProfilePictureUpdated -> updateProfilePicture(message)
+            is IncomingWebSocketDto.TypingIndicatorDto -> Unit
         }
     }
 

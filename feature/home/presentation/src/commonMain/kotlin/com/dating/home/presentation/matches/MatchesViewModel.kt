@@ -5,16 +5,19 @@ import androidx.lifecycle.viewModelScope
 import com.dating.core.domain.util.onFailure
 import com.dating.core.domain.util.onSuccess
 import com.dating.core.presentation.util.toUiText
+import com.dating.home.domain.chat.ChatRepository
 import com.dating.home.domain.matching.MatchingService
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class MatchesViewModel(
-    private val matchingService: MatchingService
+    private val matchingService: MatchingService,
+    private val chatRepository: ChatRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(MatchesState())
@@ -94,7 +97,26 @@ class MatchesViewModel(
 
     private fun startChat(matchId: String) {
         viewModelScope.launch {
-            _events.send(MatchesEvent.NavigateToChat(matchId))
+            _state.update { it.copy(isCreatingChat = true) }
+
+            val existingChat = chatRepository.getChats().first()
+                .firstOrNull { chat ->
+                    chat.participants.any { it.userId == matchId }
+                }
+
+            if (existingChat != null) {
+                _events.send(MatchesEvent.NavigateToChat(existingChat.id))
+            } else {
+                chatRepository.createChat(otherUserIds = listOf(matchId))
+                    .onSuccess { chat ->
+                        _events.send(MatchesEvent.NavigateToChat(chat.id))
+                    }
+                    .onFailure { error ->
+                        _events.send(MatchesEvent.Error(error.toUiText()))
+                    }
+            }
+
+            _state.update { it.copy(isCreatingChat = false) }
         }
     }
 }

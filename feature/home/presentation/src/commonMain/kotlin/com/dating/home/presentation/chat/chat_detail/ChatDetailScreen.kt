@@ -53,6 +53,7 @@ import com.dating.home.presentation.chat.chat_detail.components.MessageBannerLis
 import com.dating.home.presentation.chat.chat_detail.components.MessageBox
 import com.dating.home.presentation.chat.chat_detail.components.MessageList
 import com.dating.home.presentation.chat.chat_detail.components.PaginationScrollListener
+import com.dating.home.presentation.chat.chat_detail.components.TypingIndicator
 import com.dating.core.designsystem.components.header.TopAppBarGeneric
 import com.dating.home.presentation.chat.components.EmptySection
 import com.dating.home.presentation.chat.model.ChatUi
@@ -285,6 +286,11 @@ fun ChatDetailScreen(
                                 .weight(1f)
                         )
 
+                        TypingIndicator(
+                            typingUsernames = state.typingUsernames,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
                         AnimatedVisibility(
                             visible = !configuration.isWideScreen
                         ) {
@@ -294,6 +300,9 @@ fun ChatDetailScreen(
                                 connectionState = state.connectionState,
                                 onSendClick = {
                                     onAction(ChatDetailAction.OnSendMessageClick)
+                                },
+                                onTextChanged = { text ->
+                                    onAction(ChatDetailAction.OnTextChanged(text))
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -317,12 +326,19 @@ fun ChatDetailScreen(
                     DynamicRoundedCornerColumn(
                         isCornersRounded = configuration.isWideScreen
                     ) {
+                        TypingIndicator(
+                            typingUsernames = state.typingUsernames,
+                            modifier = Modifier.fillMaxWidth()
+                        )
                         MessageBox(
                             messageTextFieldState = state.messageTextFieldState,
                             isSendButtonEnabled = state.canSendMessage,
                             connectionState = state.connectionState,
                             onSendClick = {
                                 onAction(ChatDetailAction.OnSendMessageClick)
+                            },
+                            onTextChanged = { text ->
+                                onAction(ChatDetailAction.OnTextChanged(text))
                             },
                             modifier = Modifier
                                 .fillMaxWidth()

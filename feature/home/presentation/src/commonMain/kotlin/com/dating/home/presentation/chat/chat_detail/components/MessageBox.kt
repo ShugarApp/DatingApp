@@ -14,6 +14,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
@@ -45,9 +47,16 @@ fun MessageBox(
     isSendButtonEnabled: Boolean,
     connectionState: ConnectionState,
     onSendClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onTextChanged: (String) -> Unit = {}
 ) {
     val isConnected = connectionState == ConnectionState.CONNECTED
+
+    LaunchedEffect(messageTextFieldState) {
+        snapshotFlow { messageTextFieldState.text.toString() }
+            .collect { text -> onTextChanged(text) }
+    }
+
     ChirpMultiLineTextField(
         state = messageTextFieldState,
         modifier = modifier
