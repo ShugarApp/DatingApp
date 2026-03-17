@@ -70,7 +70,6 @@ import kotlin.math.roundToInt
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import shugar.feature.home.presentation.generated.resources.Res
-import shugar.feature.home.presentation.generated.resources.app_name_feed
 import shugar.feature.home.presentation.generated.resources.empty_feed
 import shugar.feature.home.presentation.generated.resources.error_connection
 import shugar.feature.home.presentation.generated.resources.feed_complete_profile_confirm
@@ -116,7 +115,6 @@ fun FeedScreen(
         modifier = modifier,
         topBar = {
             MainTopAppBar(
-                title = stringResource(Res.string.app_name_feed),
                 actions = {
                     IconButton(onClick = { showFilterSheet = true }) {
                         Icon(
