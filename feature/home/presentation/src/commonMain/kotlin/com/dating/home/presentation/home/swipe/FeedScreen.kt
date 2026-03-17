@@ -155,7 +155,7 @@ fun FeedScreen(
                         onRefresh = { onAction(FeedAction.OnRefresh) },
                         onOpenFilters = { showFilterSheet = true }
                     )
-                } else if (!state.isLoading) {
+                } else if (state.feedItems.isNotEmpty()) {
                     val visibleItems = state.feedItems.take(3).reversed()
                     visibleItems.forEach { feedItem ->
                         val isTopCard = feedItem == state.feedItems.first()
