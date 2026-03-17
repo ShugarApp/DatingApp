@@ -39,7 +39,7 @@ class FeedViewModel(
                     showMe = prefs.showMe
                 )
             }
-            loadFeed()
+            loadFeed(page = 0, isInitialLoad = true)
             isInitialized = true
             checkCompleteProfilePrompt()
         }
@@ -54,7 +54,7 @@ class FeedViewModel(
 
     fun onAction(action: FeedAction) {
         when (action) {
-            is FeedAction.OnRefresh -> loadFeed()
+            is FeedAction.OnRefresh -> resetAndLoadFeed()
             is FeedAction.OnSwipeRight -> swipe(action.userId, SwipeAction.LIKE)
             is FeedAction.OnSwipeLeft -> swipe(action.userId, SwipeAction.DISLIKE)
             is FeedAction.OnUserClick -> {
@@ -69,7 +69,9 @@ class FeedViewModel(
                         showMe = action.gender,
                         minAge = action.minAge,
                         maxAge = action.maxAge,
-                        feedItems = emptyList()
+                        feedItems = emptyList(),
+                        currentPage = 0,
+                        hasMore = true
                     )
                 }
                 viewModelScope.launch {
@@ -77,7 +79,7 @@ class FeedViewModel(
                     discoveryPreferences.updateShowMe(action.gender)
                     discoveryPreferences.updateAgeRange(action.minAge, action.maxAge)
                 }
-                loadFeed()
+                loadFeed(page = 0, isInitialLoad = true)
             }
             FeedAction.OnDismissMatchDialog -> {
                 _state.update { it.copy(showMatchDialog = false, matchedUserName = null) }
@@ -98,6 +100,7 @@ class FeedViewModel(
                 _state.update { current ->
                     current.copy(feedItems = current.feedItems.filter { it.userId != action.userId })
                 }
+                prefetchIfNeeded()
             }
         }
     }
@@ -117,17 +120,34 @@ class FeedViewModel(
                         maxAge = prefs.maxAge,
                         maxDistance = prefs.maxDistance,
                         showMe = prefs.showMe,
-                        feedItems = emptyList()
+                        feedItems = emptyList(),
+                        currentPage = 0,
+                        hasMore = true
                     )
                 }
-                loadFeed()
+                loadFeed(page = 0, isInitialLoad = true)
             }
         }
     }
 
-    private fun loadFeed() {
+    private fun resetAndLoadFeed() {
+        _state.update {
+            it.copy(
+                feedItems = emptyList(),
+                currentPage = 0,
+                hasMore = true
+            )
+        }
+        loadFeed(page = 0, isInitialLoad = true)
+    }
+
+    private fun loadFeed(page: Int, isInitialLoad: Boolean) {
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true, hasConnectionError = false) }
+            if (isInitialLoad) {
+                _state.update { it.copy(isLoading = true, hasConnectionError = false) }
+            } else {
+                _state.update { it.copy(isFetchingMore = true) }
+            }
             val s = _state.value
             val genderFilter = when (s.showMe) {
                 Gender.EVERYONE -> null
@@ -137,36 +157,55 @@ class FeedViewModel(
                 gender = genderFilter,
                 minAge = s.minAge,
                 maxAge = s.maxAge,
-                maxDistance = s.maxDistance
+                maxDistance = s.maxDistance,
+                page = page,
+                size = PAGE_SIZE
             )
                 .onSuccess { users ->
+                    val newItems = users.map { user ->
+                        FeedItem(
+                            userId = user.id,
+                            username = user.username,
+                            profilePictureUrl = user.profilePictureUrl,
+                            city = user.city,
+                            country = user.country
+                        )
+                    }
                     _state.update {
                         it.copy(
                             isLoading = false,
-                            feedItems = users.map { user ->
-                                FeedItem(
-                                    userId = user.id,
-                                    username = user.username,
-                                    profilePictureUrl = user.profilePictureUrl,
-                                    city = user.city,
-                                    country = user.country
-                                )
-                            }
+                            isFetchingMore = false,
+                            feedItems = if (isInitialLoad) newItems else it.feedItems + newItems,
+                            currentPage = page,
+                            hasMore = newItems.isNotEmpty()
                         )
                     }
                 }
                 .onFailure { _ ->
-                    _state.update { it.copy(isLoading = false, hasConnectionError = true) }
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            isFetchingMore = false,
+                            hasConnectionError = isInitialLoad
+                        )
+                    }
                 }
+        }
+    }
+
+    private fun prefetchIfNeeded() {
+        val s = _state.value
+        if (s.feedItems.size <= PREFETCH_THRESHOLD && s.hasMore && !s.isFetchingMore && !s.isLoading) {
+            loadFeed(page = s.currentPage + 1, isInitialLoad = false)
         }
     }
 
     private fun swipe(userId: String, action: SwipeAction) {
         val matchedName = _state.value.feedItems.firstOrNull { it.userId == userId }?.username
-        // Remove from feed immediately
         _state.update { current ->
             current.copy(feedItems = current.feedItems.filter { it.userId != userId })
         }
+        prefetchIfNeeded()
         viewModelScope.launch {
             matchingService.swipe(swipedId = userId, action = action)
                 .onSuccess { result ->
@@ -178,5 +217,10 @@ class FeedViewModel(
                 }
                 .onFailure { /* swipe errors are non-critical, feed already updated */ }
         }
+    }
+
+    companion object {
+        private const val PAGE_SIZE = 20
+        private const val PREFETCH_THRESHOLD = 5
     }
 }

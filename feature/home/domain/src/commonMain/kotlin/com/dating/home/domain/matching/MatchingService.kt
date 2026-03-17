@@ -13,7 +13,9 @@ interface MatchingService {
         gender: String? = null,
         minAge: Int? = null,
         maxAge: Int? = null,
-        maxDistance: Double? = null
+        maxDistance: Double? = null,
+        page: Int = 0,
+        size: Int = 20
     ): Result<List<User>, DataError.Remote>
 
     suspend fun swipe(

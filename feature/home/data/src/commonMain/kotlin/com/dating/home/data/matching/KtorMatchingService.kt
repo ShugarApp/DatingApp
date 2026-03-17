@@ -21,13 +21,17 @@ class KtorMatchingService(private val httpClient: HttpClient) : MatchingService 
         gender: String?,
         minAge: Int?,
         maxAge: Int?,
-        maxDistance: Double?
+        maxDistance: Double?,
+        page: Int,
+        size: Int
     ): Result<List<User>, DataError.Remote> {
         val params = buildMap<String, Any> {
             if (gender != null) put("gender", gender)
             if (minAge != null) put("minAge", minAge)
             if (maxAge != null) put("maxAge", maxAge)
             if (maxDistance != null) put("maxDistance", maxDistance)
+            put("page", page)
+            put("size", size)
         }
         return httpClient.get<List<UserSerializable>>(
             route = "/matching/feed",

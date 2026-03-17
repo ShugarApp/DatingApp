@@ -123,12 +123,12 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.math.roundToInt
 
-private const val URL_HELP = "https://support.aura.dating"
-private const val URL_SAFETY = "https://aura.dating/safety"
-private const val URL_PRIVACY = "https://aura.dating/privacy"
-private const val URL_TERMS = "https://aura.dating/terms"
-private const val URL_GUIDELINES = "https://aura.dating/guidelines"
-private const val URL_LICENSES = "https://aura.dating/licenses"
+private const val URL_HELP = "https://aura-safe-dating.com/#"
+private const val URL_SAFETY = "https://aura-safe-dating.com/#"
+private const val URL_PRIVACY = "https://aura-safe-dating.com/#"
+private const val URL_TERMS = "https://aura-safe-dating.com/#"
+private const val URL_GUIDELINES = "https://aura-safe-dating.com/#"
+private const val URL_LICENSES = "https://aura-safe-dating.com/#"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

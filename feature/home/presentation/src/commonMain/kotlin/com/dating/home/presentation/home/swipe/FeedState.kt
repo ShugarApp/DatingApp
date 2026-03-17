@@ -12,7 +12,10 @@ data class FeedState(
     val maxAge: Int = 50,
     val showMatchDialog: Boolean = false,
     val matchedUserName: String? = null,
-    val showCompleteProfileDialog: Boolean = false
+    val showCompleteProfileDialog: Boolean = false,
+    val currentPage: Int = 0,
+    val hasMore: Boolean = true,
+    val isFetchingMore: Boolean = false
 )
 
 data class FeedItem(
