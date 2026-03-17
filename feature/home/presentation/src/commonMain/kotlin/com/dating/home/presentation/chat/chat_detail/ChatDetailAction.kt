@@ -19,4 +19,5 @@ sealed interface ChatDetailAction {
     data object OnHideBanner: ChatDetailAction
     data class OnFirstVisibleIndexChanged(val index: Int): ChatDetailAction
     data class OnTopVisibleIndexChanged(val topVisibleIndex: Int): ChatDetailAction
+    data class OnTextChanged(val text: String): ChatDetailAction
 }
