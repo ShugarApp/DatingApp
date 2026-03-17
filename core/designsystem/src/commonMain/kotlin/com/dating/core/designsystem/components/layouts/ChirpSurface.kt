@@ -16,8 +16,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import aura.core.designsystem.generated.resources.Res
-import aura.core.designsystem.generated.resources.logo_chirp
+import shugar.core.designsystem.generated.resources.Res
+import shugar.core.designsystem.generated.resources.logo_chirp
 import com.dating.core.designsystem.theme.AppTheme
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview

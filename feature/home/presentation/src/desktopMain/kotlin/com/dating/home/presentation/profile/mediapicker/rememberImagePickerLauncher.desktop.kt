@@ -3,8 +3,8 @@ package com.dating.home.presentation.profile.mediapicker
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import aura.feature.chat.presentation.generated.resources.Res
-import aura.feature.chat.presentation.generated.resources.select_a_profile_picture
+import shugar.feature.chat.presentation.generated.resources.Res
+import shugar.feature.chat.presentation.generated.resources.select_a_profile_picture
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch

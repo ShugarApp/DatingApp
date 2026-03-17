@@ -6,8 +6,8 @@ val appDataDirectory: File
     get() {
         val userHome = System.getProperty("user.home")
         return when (currentOs) {
-            DesktopOs.WINDOWS -> File(System.getenv("APPDATA"), "Aura")
-            DesktopOs.MACOS -> File(userHome, "Library/Application Support/Aura")
-            DesktopOs.LINUX -> File(userHome, ".local/share/Aura")
+            DesktopOs.WINDOWS -> File(System.getenv("APPDATA"), "Shugar")
+            DesktopOs.MACOS -> File(userHome, "Library/Application Support/Shugar")
+            DesktopOs.LINUX -> File(userHome, ".local/share/Shugar")
         }
     }

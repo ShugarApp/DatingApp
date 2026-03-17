@@ -33,6 +33,6 @@ abstract class AppChatDatabase : RoomDatabase() {
     abstract val chatParticipantsCrossRefDao: ChatParticipantsCrossRefDao
 
     companion object Companion {
-        const val DB_NAME = "aura.db"
+        const val DB_NAME = "shugar.db"
     }
 }

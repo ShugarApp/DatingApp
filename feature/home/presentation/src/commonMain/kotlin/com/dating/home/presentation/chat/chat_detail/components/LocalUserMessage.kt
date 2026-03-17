@@ -13,11 +13,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import aura.feature.home.presentation.generated.resources.Res
-import aura.feature.home.presentation.generated.resources.delete_for_everyone
-import aura.feature.home.presentation.generated.resources.reload_icon
-import aura.feature.home.presentation.generated.resources.retry
-import aura.feature.home.presentation.generated.resources.you
+import shugar.feature.home.presentation.generated.resources.Res
+import shugar.feature.home.presentation.generated.resources.delete_for_everyone
+import shugar.feature.home.presentation.generated.resources.reload_icon
+import shugar.feature.home.presentation.generated.resources.retry
+import shugar.feature.home.presentation.generated.resources.you
 import com.dating.home.domain.models.ChatMessageDeliveryStatus
 import com.dating.home.presentation.chat.model.MessageUi
 import com.dating.core.designsystem.components.chat.ChirpChatBubble

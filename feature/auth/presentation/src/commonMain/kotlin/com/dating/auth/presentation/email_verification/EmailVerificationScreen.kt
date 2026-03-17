@@ -17,17 +17,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import aura.feature.auth.presentation.generated.resources.Res
-import aura.feature.auth.presentation.generated.resources.close
-import aura.feature.auth.presentation.generated.resources.email_verified_failed
-import aura.feature.auth.presentation.generated.resources.email_verified_failed_desc
-import aura.feature.auth.presentation.generated.resources.email_verified_successfully
-import aura.feature.auth.presentation.generated.resources.email_verified_successfully_desc
-import aura.feature.auth.presentation.generated.resources.login
-import aura.feature.auth.presentation.generated.resources.verifying_account
 import com.dating.core.designsystem.components.brand.ChirpFailureIcon
 import com.dating.core.designsystem.components.brand.ChirpSuccessIcon
-import com.dating.core.designsystem.components.buttons.AppButtonStyle
 import com.dating.core.designsystem.components.buttons.ChirpButton
 import com.dating.core.designsystem.components.layouts.AuthSnackbarScaffold
 import com.dating.core.designsystem.components.layouts.ChirpSimpleResultLayout
@@ -36,6 +27,14 @@ import com.dating.core.designsystem.theme.extended
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
+import shugar.feature.auth.presentation.generated.resources.Res
+import shugar.feature.auth.presentation.generated.resources.close
+import shugar.feature.auth.presentation.generated.resources.email_verified_failed
+import shugar.feature.auth.presentation.generated.resources.email_verified_failed_desc
+import shugar.feature.auth.presentation.generated.resources.email_verified_successfully
+import shugar.feature.auth.presentation.generated.resources.email_verified_successfully_desc
+import shugar.feature.auth.presentation.generated.resources.login
+import shugar.feature.auth.presentation.generated.resources.verifying_account
 
 @Composable
 fun EmailVerificationRoot(

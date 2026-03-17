@@ -1,8 +1,8 @@
-import com.dating.aura.convention.applyHierarchyTemplate
-import com.dating.aura.convention.configureAndroidTarget
-import com.dating.aura.convention.configureDesktopTarget
-import com.dating.aura.convention.configureIosTargets
-import com.dating.aura.convention.libs
+import app.shugar.shugar.convention.applyHierarchyTemplate
+import app.shugar.shugar.convention.configureAndroidTarget
+import app.shugar.shugar.convention.configureDesktopTarget
+import app.shugar.shugar.convention.configureIosTargets
+import app.shugar.shugar.convention.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure

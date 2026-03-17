@@ -3,9 +3,9 @@ package com.dating.auth.presentation.login
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import aura.feature.auth.presentation.generated.resources.Res
-import aura.feature.auth.presentation.generated.resources.error_email_not_verified
-import aura.feature.auth.presentation.generated.resources.error_invalid_credentials
+import shugar.feature.auth.presentation.generated.resources.Res
+import shugar.feature.auth.presentation.generated.resources.error_email_not_verified
+import shugar.feature.auth.presentation.generated.resources.error_invalid_credentials
 import com.dating.core.domain.auth.AuthService
 import com.dating.core.domain.auth.SessionStorage
 import com.dating.core.domain.util.DataError

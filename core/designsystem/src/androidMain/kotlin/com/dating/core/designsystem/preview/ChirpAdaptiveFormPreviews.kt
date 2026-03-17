@@ -15,7 +15,7 @@ import com.dating.core.designsystem.theme.AppTheme
 fun AppAdaptiveFormLayoutLightPreview() {
     AppTheme {
         AppAdaptiveFormLayout(
-            headerText = "Welcome to Aura!",
+            headerText = "Welcome to Shugar!",
             errorText = "Login failed!",
             logo = { AppBrandLogo() },
             formContent = {

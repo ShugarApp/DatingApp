@@ -12,10 +12,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import aura.feature.home.presentation.generated.resources.Res
-import aura.feature.home.presentation.generated.resources.group_chat
-import aura.feature.home.presentation.generated.resources.only_you
-import aura.feature.home.presentation.generated.resources.you
+import shugar.feature.home.presentation.generated.resources.Res
+import shugar.feature.home.presentation.generated.resources.group_chat
+import shugar.feature.home.presentation.generated.resources.only_you
+import shugar.feature.home.presentation.generated.resources.you
 import com.dating.home.presentation.chat.model.ChatUi
 import com.dating.core.designsystem.components.avatar.ChirpStackedAvatars
 import com.dating.core.designsystem.theme.extended

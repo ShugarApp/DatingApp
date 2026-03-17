@@ -4,9 +4,9 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import aura.feature.auth.presentation.generated.resources.Res
-import aura.feature.auth.presentation.generated.resources.error_reset_password_token_invalid
-import aura.feature.auth.presentation.generated.resources.error_same_password
+import shugar.feature.auth.presentation.generated.resources.Res
+import shugar.feature.auth.presentation.generated.resources.error_reset_password_token_invalid
+import shugar.feature.auth.presentation.generated.resources.error_same_password
 import com.dating.core.domain.auth.AuthService
 import com.dating.core.domain.util.DataError
 import com.dating.core.domain.util.onFailure

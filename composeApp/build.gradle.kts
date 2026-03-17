@@ -66,10 +66,10 @@ kotlin {
 
 compose.desktop {
     application {
-        mainClass = "com.dating.aura.MainKt"
+        mainClass = "app.shugar.shugar.MainKt"
 
         nativeDistributions {
-            packageName = "com.dating.aura"
+            packageName = "app.shugar.shugar"
         }
     }
 }

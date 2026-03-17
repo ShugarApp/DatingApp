@@ -23,9 +23,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import aura.feature.home.presentation.generated.resources.Res
-import aura.feature.home.presentation.generated.resources.feed_swipe_like
-import aura.feature.home.presentation.generated.resources.feed_swipe_nope
+import shugar.feature.home.presentation.generated.resources.Res
+import shugar.feature.home.presentation.generated.resources.feed_swipe_like
+import shugar.feature.home.presentation.generated.resources.feed_swipe_nope
 import com.dating.core.designsystem.theme.extended
 import kotlin.math.abs
 import kotlin.math.roundToInt

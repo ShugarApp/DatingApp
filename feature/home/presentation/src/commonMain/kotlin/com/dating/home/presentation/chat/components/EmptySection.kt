@@ -17,8 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import aura.feature.home.presentation.generated.resources.Res
-import aura.feature.home.presentation.generated.resources.empty_messages
+import shugar.feature.home.presentation.generated.resources.Res
+import shugar.feature.home.presentation.generated.resources.empty_messages
 import com.dating.core.designsystem.theme.AppTheme
 import com.dating.core.presentation.util.DeviceConfiguration
 import com.dating.core.presentation.util.currentDeviceConfiguration

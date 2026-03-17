@@ -9,11 +9,11 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import aura.feature.home.presentation.generated.resources.Res
-import aura.feature.home.presentation.generated.resources.bottom_nav_feed
-import aura.feature.home.presentation.generated.resources.bottom_nav_matches
-import aura.feature.home.presentation.generated.resources.bottom_nav_messages
-import aura.feature.home.presentation.generated.resources.bottom_nav_profile
+import shugar.feature.home.presentation.generated.resources.Res
+import shugar.feature.home.presentation.generated.resources.bottom_nav_feed
+import shugar.feature.home.presentation.generated.resources.bottom_nav_matches
+import shugar.feature.home.presentation.generated.resources.bottom_nav_messages
+import shugar.feature.home.presentation.generated.resources.bottom_nav_profile
 import org.jetbrains.compose.resources.stringResource
 
 @Composable

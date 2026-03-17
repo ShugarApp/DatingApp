@@ -4,8 +4,8 @@ import androidx.compose.foundation.text.input.clearText
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import aura.feature.home.presentation.generated.resources.Res
-import aura.feature.home.presentation.generated.resources.error_participant_not_found
+import shugar.feature.home.presentation.generated.resources.Res
+import shugar.feature.home.presentation.generated.resources.error_participant_not_found
 import com.dating.home.domain.participant.ChatParticipantService
 import com.dating.home.domain.chat.ChatRepository
 import com.dating.home.presentation.chat.components.manage_chat.ManageChatAction

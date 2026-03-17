@@ -25,10 +25,10 @@ import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import aura.feature.home.presentation.generated.resources.Res
-import aura.feature.home.presentation.generated.resources.cloud_off_icon
-import aura.feature.home.presentation.generated.resources.send
-import aura.feature.home.presentation.generated.resources.send_a_message
+import shugar.feature.home.presentation.generated.resources.Res
+import shugar.feature.home.presentation.generated.resources.cloud_off_icon
+import shugar.feature.home.presentation.generated.resources.send
+import shugar.feature.home.presentation.generated.resources.send_a_message
 import com.dating.home.domain.models.ConnectionState
 import com.dating.home.presentation.chat.util.toUiText
 import com.dating.core.designsystem.components.buttons.ChirpButton

@@ -3,8 +3,8 @@ package com.dating.home.presentation.profile.edit_profile
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import aura.feature.home.presentation.generated.resources.Res
-import aura.feature.home.presentation.generated.resources.error_invalid_file_type
+import shugar.feature.home.presentation.generated.resources.Res
+import shugar.feature.home.presentation.generated.resources.error_invalid_file_type
 import com.dating.core.domain.auth.SessionStorage
 import com.dating.core.domain.util.onFailure
 import com.dating.core.domain.util.onSuccess

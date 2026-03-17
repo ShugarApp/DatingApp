@@ -21,8 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import aura.core.designsystem.generated.resources.Res
-import aura.core.designsystem.generated.resources.dismiss_dialog
+import shugar.core.designsystem.generated.resources.Res
+import shugar.core.designsystem.generated.resources.dismiss_dialog
 import com.dating.core.designsystem.components.buttons.ChirpButton
 import com.dating.core.designsystem.components.buttons.AppButtonStyle
 import com.dating.core.designsystem.theme.AppTheme

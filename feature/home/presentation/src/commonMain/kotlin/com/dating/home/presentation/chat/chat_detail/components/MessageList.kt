@@ -19,10 +19,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import aura.feature.home.presentation.generated.resources.Res
-import aura.feature.home.presentation.generated.resources.no_messages
-import aura.feature.home.presentation.generated.resources.no_messages_subtitle
-import aura.feature.home.presentation.generated.resources.retry
+import shugar.feature.home.presentation.generated.resources.Res
+import shugar.feature.home.presentation.generated.resources.no_messages
+import shugar.feature.home.presentation.generated.resources.no_messages_subtitle
+import shugar.feature.home.presentation.generated.resources.retry
 import com.dating.home.presentation.chat.components.EmptySection
 import com.dating.home.presentation.chat.model.MessageUi
 import com.dating.core.designsystem.components.buttons.ChirpButton

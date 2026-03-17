@@ -1,21 +1,21 @@
 package com.dating.core.presentation.util
 
-import aura.core.presentation.generated.resources.Res
-import aura.core.presentation.generated.resources.error_bad_request
-import aura.core.presentation.generated.resources.error_conflict
-import aura.core.presentation.generated.resources.error_disk_full
-import aura.core.presentation.generated.resources.error_forbidden
-import aura.core.presentation.generated.resources.error_no_internet
-import aura.core.presentation.generated.resources.error_not_found
-import aura.core.presentation.generated.resources.error_payload_too_large
-import aura.core.presentation.generated.resources.error_request_timeout
-import aura.core.presentation.generated.resources.error_serialization
-import aura.core.presentation.generated.resources.error_server
-import aura.core.presentation.generated.resources.error_service_unavailable
-import aura.core.presentation.generated.resources.error_too_many_requests
-import aura.core.presentation.generated.resources.error_unable_to_send_message
-import aura.core.presentation.generated.resources.error_unauthorized
-import aura.core.presentation.generated.resources.error_unknown
+import shugar.core.presentation.generated.resources.Res
+import shugar.core.presentation.generated.resources.error_bad_request
+import shugar.core.presentation.generated.resources.error_conflict
+import shugar.core.presentation.generated.resources.error_disk_full
+import shugar.core.presentation.generated.resources.error_forbidden
+import shugar.core.presentation.generated.resources.error_no_internet
+import shugar.core.presentation.generated.resources.error_not_found
+import shugar.core.presentation.generated.resources.error_payload_too_large
+import shugar.core.presentation.generated.resources.error_request_timeout
+import shugar.core.presentation.generated.resources.error_serialization
+import shugar.core.presentation.generated.resources.error_server
+import shugar.core.presentation.generated.resources.error_service_unavailable
+import shugar.core.presentation.generated.resources.error_too_many_requests
+import shugar.core.presentation.generated.resources.error_unable_to_send_message
+import shugar.core.presentation.generated.resources.error_unauthorized
+import shugar.core.presentation.generated.resources.error_unknown
 import com.dating.core.domain.util.DataError
 
 fun DataError.toUiText(): UiText {

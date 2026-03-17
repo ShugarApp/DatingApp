@@ -17,8 +17,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
-import aura.feature.home.presentation.generated.resources.Res
-import aura.feature.home.presentation.generated.resources.cancel
+import shugar.feature.home.presentation.generated.resources.Res
+import shugar.feature.home.presentation.generated.resources.cancel
 import com.dating.home.presentation.chat.components.ChatParticipantSearchTextSection
 import com.dating.home.presentation.chat.components.ChatParticipantsSelectionSection
 import com.dating.home.presentation.chat.components.ManageChatButtonSection

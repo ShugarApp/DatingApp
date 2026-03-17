@@ -49,21 +49,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import aura.feature.home.presentation.generated.resources.Res
-import aura.feature.home.presentation.generated.resources.empty_matches
-import aura.feature.home.presentation.generated.resources.feed_error_retry
-import aura.feature.home.presentation.generated.resources.likes_empty_desc
-import aura.feature.home.presentation.generated.resources.likes_empty_title
-import aura.feature.home.presentation.generated.resources.matches_chat
-import aura.feature.home.presentation.generated.resources.matches_empty_desc
-import aura.feature.home.presentation.generated.resources.matches_empty_title
-import aura.feature.home.presentation.generated.resources.matches_tab_likes
-import aura.feature.home.presentation.generated.resources.matches_tab_matches
-import aura.feature.home.presentation.generated.resources.matches_title
 import coil3.compose.AsyncImage
-import com.dating.core.designsystem.components.header.MainTopAppBar
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import shugar.feature.home.presentation.generated.resources.Res
+import shugar.feature.home.presentation.generated.resources.empty_matches
+import shugar.feature.home.presentation.generated.resources.feed_error_retry
+import shugar.feature.home.presentation.generated.resources.likes_empty_desc
+import shugar.feature.home.presentation.generated.resources.likes_empty_title
+import shugar.feature.home.presentation.generated.resources.matches_chat
+import shugar.feature.home.presentation.generated.resources.matches_empty_desc
+import shugar.feature.home.presentation.generated.resources.matches_empty_title
+import shugar.feature.home.presentation.generated.resources.matches_tab_likes
+import shugar.feature.home.presentation.generated.resources.matches_tab_matches
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

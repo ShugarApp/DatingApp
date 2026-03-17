@@ -3,8 +3,8 @@ package com.dating.home.presentation.chat.create_chat
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import aura.feature.home.presentation.generated.resources.Res
-import aura.feature.home.presentation.generated.resources.create_chat
+import shugar.feature.home.presentation.generated.resources.Res
+import shugar.feature.home.presentation.generated.resources.create_chat
 import com.dating.home.domain.models.Chat
 import com.dating.home.presentation.chat.components.manage_chat.ManageChatAction
 import com.dating.home.presentation.chat.components.manage_chat.ManageChatScreen

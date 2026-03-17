@@ -16,16 +16,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import aura.core.designsystem.generated.resources.Res as DesignSystemRes
-import aura.core.designsystem.generated.resources.arrow_left_icon
-import aura.core.designsystem.generated.resources.dots_icon
-import aura.core.designsystem.generated.resources.log_out_icon
-import aura.feature.home.presentation.generated.resources.Res
-import aura.feature.home.presentation.generated.resources.chat_members
-import aura.feature.home.presentation.generated.resources.go_back
-import aura.feature.home.presentation.generated.resources.leave_chat
-import aura.feature.home.presentation.generated.resources.open_chat_options_menu
-import aura.feature.home.presentation.generated.resources.users_icon
+import shugar.core.designsystem.generated.resources.Res as DesignSystemRes
+import shugar.core.designsystem.generated.resources.arrow_left_icon
+import shugar.core.designsystem.generated.resources.dots_icon
+import shugar.core.designsystem.generated.resources.log_out_icon
+import shugar.feature.home.presentation.generated.resources.Res
+import shugar.feature.home.presentation.generated.resources.chat_members
+import shugar.feature.home.presentation.generated.resources.go_back
+import shugar.feature.home.presentation.generated.resources.leave_chat
+import shugar.feature.home.presentation.generated.resources.open_chat_options_menu
+import shugar.feature.home.presentation.generated.resources.users_icon
 import com.dating.home.domain.models.ChatMessage
 import com.dating.home.domain.models.ChatMessageDeliveryStatus
 import com.dating.home.presentation.chat.components.ChatItemHeaderRow

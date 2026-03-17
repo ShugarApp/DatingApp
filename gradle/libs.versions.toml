@@ -50,7 +50,7 @@ moko = "0.19.1"
 buildkonfig = "0.17.1"
 kermit = "2.0.6"
 
-projectApplicationId = "com.dating.aura"
+projectApplicationId = "app.shugar.shugar"
 projectVersionName = "1.0"
 projectMinSdkVersion = "26"
 projectTargetSdkVersion = "36"
@@ -58,7 +58,7 @@ projectCompileSdkVersion = "36"
 projectVersionCode = "1"
 
 # Desktop Version
-desktopPackageName = "Aura"
+desktopPackageName = "Shugar"
 desktopPackageVersion = "1.0.0"
 runner = "1.7.0"
 junit = "1.3.0"
