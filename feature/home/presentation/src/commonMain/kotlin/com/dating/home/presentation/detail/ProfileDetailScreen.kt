@@ -81,10 +81,10 @@ import shugar.feature.home.presentation.generated.resources.profile_like
 import shugar.feature.home.presentation.generated.resources.profile_pass
 import shugar.feature.home.presentation.generated.resources.profile_work_education
 import androidx.compose.material3.Button
-import aura.feature.home.presentation.generated.resources.block_user
-import aura.feature.home.presentation.generated.resources.block_user_title
-import aura.feature.home.presentation.generated.resources.block_user_desc
-import aura.feature.home.presentation.generated.resources.cancel
+import shugar.feature.home.presentation.generated.resources.block_user
+import shugar.feature.home.presentation.generated.resources.block_user_title
+import shugar.feature.home.presentation.generated.resources.block_user_desc
+import shugar.feature.home.presentation.generated.resources.cancel
 import coil3.compose.AsyncImage
 import com.dating.core.designsystem.components.dialogs.DestructiveConfirmationDialog
 import com.dating.core.designsystem.theme.extended

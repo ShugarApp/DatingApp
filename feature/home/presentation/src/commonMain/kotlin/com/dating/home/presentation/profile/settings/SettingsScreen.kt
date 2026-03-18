@@ -123,6 +123,7 @@ import com.dating.core.presentation.util.rememberOpenUrl
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.math.roundToInt
+import shugar.feature.home.presentation.generated.resources.settings_blocked_users
 
 private const val URL_HELP = "https://aura-safe-dating.com/#"
 private const val URL_SAFETY = "https://aura-safe-dating.com/#"

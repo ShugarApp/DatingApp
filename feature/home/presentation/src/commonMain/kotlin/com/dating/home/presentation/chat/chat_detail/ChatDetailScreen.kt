@@ -47,10 +47,10 @@ import shugar.feature.home.presentation.generated.resources.no_chat_selected
 import shugar.feature.home.presentation.generated.resources.select_a_chat
 import com.dating.home.domain.models.ChatMessage
 import com.dating.home.domain.models.ChatMessageDeliveryStatus
-import aura.feature.home.presentation.generated.resources.block_user
-import aura.feature.home.presentation.generated.resources.block_user_title
-import aura.feature.home.presentation.generated.resources.block_user_desc
-import aura.feature.home.presentation.generated.resources.cancel
+import shugar.feature.home.presentation.generated.resources.block_user
+import shugar.feature.home.presentation.generated.resources.block_user_title
+import shugar.feature.home.presentation.generated.resources.block_user_desc
+import shugar.feature.home.presentation.generated.resources.cancel
 import com.dating.core.designsystem.components.dialogs.DestructiveConfirmationDialog
 import com.dating.home.presentation.chat.chat_detail.components.ChatDetailHeader
 import com.dating.home.presentation.chat.chat_detail.components.DateChip

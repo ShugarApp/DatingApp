@@ -43,6 +43,7 @@ import kotlin.time.Clock
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import shugar.feature.home.presentation.generated.resources.block_user
 
 @Composable
 fun ChatDetailHeader(
