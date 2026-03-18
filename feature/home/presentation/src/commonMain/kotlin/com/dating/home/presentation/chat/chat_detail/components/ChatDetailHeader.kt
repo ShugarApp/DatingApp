@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Block
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
@@ -23,6 +25,7 @@ import aura.core.designsystem.generated.resources.log_out_icon
 import aura.feature.home.presentation.generated.resources.Res
 import aura.feature.home.presentation.generated.resources.chat_members
 import aura.feature.home.presentation.generated.resources.go_back
+import aura.feature.home.presentation.generated.resources.block_user
 import aura.feature.home.presentation.generated.resources.leave_chat
 import aura.feature.home.presentation.generated.resources.open_chat_options_menu
 import aura.feature.home.presentation.generated.resources.users_icon
@@ -50,6 +53,7 @@ fun ChatDetailHeader(
     onDismissChatOptions: () -> Unit,
     onManageChatClick: () -> Unit,
     onLeaveChatClick: () -> Unit,
+    onBlockUserClick: () -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -58,7 +62,7 @@ fun ChatDetailHeader(
             .fillMaxWidth()
             .background(color = MaterialTheme.colorScheme.surface),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         ChirpIconButton(
             onClick = onBackClick
@@ -67,7 +71,7 @@ fun ChatDetailHeader(
                 imageVector = vectorResource(DesignSystemRes.drawable.arrow_left_icon),
                 contentDescription = stringResource(Res.string.go_back),
                 modifier = Modifier.size(20.dp),
-                tint = MaterialTheme.colorScheme.extended.textSecondary
+                tint = MaterialTheme.colorScheme.onSurface
             )
         }
 
@@ -94,7 +98,7 @@ fun ChatDetailHeader(
                     imageVector = vectorResource(DesignSystemRes.drawable.dots_icon),
                     contentDescription = stringResource(Res.string.open_chat_options_menu),
                     modifier = Modifier.size(20.dp),
-                    tint = MaterialTheme.colorScheme.extended.textSecondary
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
             }
 
@@ -107,6 +111,12 @@ fun ChatDetailHeader(
                         icon = vectorResource(Res.drawable.users_icon),
                         contentColor = MaterialTheme.colorScheme.extended.textSecondary,
                         onClick = onManageChatClick
+                    ),
+                    DropDownItem(
+                        title = stringResource(Res.string.block_user),
+                        icon = Icons.Default.Block,
+                        contentColor = MaterialTheme.colorScheme.extended.destructiveHover,
+                        onClick = onBlockUserClick
                     ),
                     DropDownItem(
                         title = stringResource(Res.string.leave_chat),
@@ -164,6 +174,7 @@ fun ChatDetailHeaderPreview() {
                     onChatOptionsClick = {},
                     onManageChatClick = {},
                     onLeaveChatClick = {},
+                    onBlockUserClick = {},
                     onDismissChatOptions = {},
                     onBackClick = {},
                 )

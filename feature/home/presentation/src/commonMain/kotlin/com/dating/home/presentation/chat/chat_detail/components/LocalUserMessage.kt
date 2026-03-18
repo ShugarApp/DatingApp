@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
@@ -40,16 +41,30 @@ fun LocalUserMessage(
 ) {
     Row(
         modifier = modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .padding(start = 48.dp),
         verticalAlignment = Alignment.Bottom,
         horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)
     ) {
+        if (message.deliveryStatus == ChatMessageDeliveryStatus.FAILED) {
+            IconButton(
+                onClick = onRetryClick
+            ) {
+                Icon(
+                    imageVector = vectorResource(Res.drawable.reload_icon),
+                    contentDescription = stringResource(Res.string.retry),
+                    tint = MaterialTheme.colorScheme.error
+                )
+            }
+        }
+
         Box {
             ChirpChatBubble(
                 messageContent = message.content,
                 sender = stringResource(Res.string.you),
                 formattedDateTime = message.formattedSentTime.asString(),
                 trianglePosition = TrianglePosition.RIGHT,
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
                 messageStatus = {
                     MessageStatus(
                         status = message.deliveryStatus
@@ -72,18 +87,6 @@ fun LocalUserMessage(
                     ),
                 )
             )
-        }
-
-        if(message.deliveryStatus == ChatMessageDeliveryStatus.FAILED) {
-            IconButton(
-                onClick = onRetryClick
-            ) {
-                Icon(
-                    imageVector = vectorResource(Res.drawable.reload_icon),
-                    contentDescription = stringResource(Res.string.retry),
-                    tint = MaterialTheme.colorScheme.error
-                )
-            }
         }
     }
 }

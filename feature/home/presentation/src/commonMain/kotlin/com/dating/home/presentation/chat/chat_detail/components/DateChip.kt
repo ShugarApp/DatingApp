@@ -1,7 +1,6 @@
 package com.dating.home.presentation.chat.chat_detail.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.dating.core.designsystem.theme.extended
 
 @Composable
 fun DateChip(
@@ -22,23 +20,18 @@ fun DateChip(
         modifier = modifier
             .clip(RoundedCornerShape(100))
             .background(
-                color = MaterialTheme.colorScheme.surface
-            )
-            .border(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.outline,
-                shape = RoundedCornerShape(100)
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.8f)
             )
     ) {
         Text(
             text = date,
             modifier = Modifier
                 .padding(
-                    vertical = 4.dp,
-                    horizontal = 12.dp
+                    vertical = 6.dp,
+                    horizontal = 16.dp
                 ),
             style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.extended.textPlaceholder
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }

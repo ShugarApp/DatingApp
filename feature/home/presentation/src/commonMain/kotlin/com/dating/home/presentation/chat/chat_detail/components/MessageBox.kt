@@ -7,10 +7,15 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,7 +38,6 @@ import aura.feature.home.presentation.generated.resources.send
 import aura.feature.home.presentation.generated.resources.send_a_message
 import com.dating.home.domain.models.ConnectionState
 import com.dating.home.presentation.chat.util.toUiText
-import com.dating.core.designsystem.components.buttons.ChirpButton
 import com.dating.core.designsystem.components.textfields.ChirpMultiLineTextField
 import com.dating.core.designsystem.theme.AppTheme
 import com.dating.core.designsystem.theme.extended
@@ -77,7 +81,6 @@ fun MessageBox(
         ),
         onKeyboardAction = onSendClick,
         bottomContent = {
-            Spacer(modifier = Modifier.weight(1f))
             if (!isConnected) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -96,11 +99,25 @@ fun MessageBox(
                     )
                 }
             }
-            ChirpButton(
-                text = stringResource(Res.string.send),
+            Spacer(modifier = Modifier.weight(1f))
+            FilledIconButton(
                 onClick = onSendClick,
-                enabled = isConnected && isSendButtonEnabled
-            )
+                enabled = isConnected && isSendButtonEnabled,
+                shape = CircleShape,
+                colors = IconButtonDefaults.filledIconButtonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                    disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
+                    disabledContentColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f)
+                ),
+                modifier = Modifier.size(40.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.Send,
+                    contentDescription = stringResource(Res.string.send),
+                    modifier = Modifier.size(20.dp)
+                )
+            }
         }
     )
 }

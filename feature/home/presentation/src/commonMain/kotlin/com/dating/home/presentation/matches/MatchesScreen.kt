@@ -28,12 +28,15 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -60,9 +63,7 @@ import aura.feature.home.presentation.generated.resources.matches_empty_desc
 import aura.feature.home.presentation.generated.resources.matches_empty_title
 import aura.feature.home.presentation.generated.resources.matches_tab_likes
 import aura.feature.home.presentation.generated.resources.matches_tab_matches
-import aura.feature.home.presentation.generated.resources.matches_title
 import coil3.compose.AsyncImage
-import com.dating.core.designsystem.components.header.MainTopAppBar
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -130,7 +131,9 @@ fun MatchesScreen(
                                 )
                                 MatchesTab.LIKES -> LikeCard(
                                     match = match,
-                                    onClick = { onAction(MatchesAction.OnLikeClick(match.id, match.profilePictureUrl)) }
+                                    onClick = { onAction(MatchesAction.OnLikeClick(match.id, match.profilePictureUrl)) },
+                                    onLike = { onAction(MatchesAction.OnLikeUser(match.id)) },
+                                    onDislike = { onAction(MatchesAction.OnDislikeUser(match.id)) }
                                 )
                             }
                         }
@@ -305,6 +308,8 @@ private fun MatchCard(
 private fun LikeCard(
     match: Match,
     onClick: () -> Unit,
+    onLike: () -> Unit,
+    onDislike: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -359,25 +364,37 @@ private fun LikeCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Default.Favorite,
-                    contentDescription = null,
-                    modifier = Modifier.size(14.dp),
-                    tint = MaterialTheme.colorScheme.error
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = "Le gustas",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.error,
-                    fontWeight = FontWeight.Medium
-                )
+                FilledTonalButton(
+                    onClick = onDislike,
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.filledTonalButtonColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                        contentColor = MaterialTheme.colorScheme.onErrorContainer
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+
+                Button(
+                    onClick = onLike,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Favorite,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
             }
         }
     }

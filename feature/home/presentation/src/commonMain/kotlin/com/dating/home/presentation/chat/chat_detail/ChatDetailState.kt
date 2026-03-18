@@ -21,7 +21,9 @@ data class ChatDetailState(
     val isChatOptionsOpen: Boolean = false,
     val isNearBottom: Boolean = false,
     val connectionState: ConnectionState = ConnectionState.DISCONNECTED,
-    val typingUsernames: List<String> = emptyList()
+    val typingUsernames: List<String> = emptyList(),
+    val showBlockDialog: Boolean = false,
+    val isBlocking: Boolean = false
 )
 
 data class BannerState(

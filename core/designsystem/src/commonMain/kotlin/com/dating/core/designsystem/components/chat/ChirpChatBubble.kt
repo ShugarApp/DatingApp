@@ -35,7 +35,7 @@ fun ChirpChatBubble(
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.extended.surfaceHigher,
     messageStatus: @Composable (() -> Unit)? = null,
-    triangleSize: Dp = 16.dp,
+    triangleSize: Dp = 10.dp,
     onLongClick: (() -> Unit)? = null
 ) {
     val padding = 12.dp
@@ -71,26 +71,8 @@ fun ChirpChatBubble(
                 bottom = padding
             )
             .width(IntrinsicSize.Max),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = sender,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.extended.textSecondary,
-                modifier = Modifier.weight(1f)
-            )
-            Spacer(modifier = Modifier.width(20.dp))
-            Text(
-                text = formattedDateTime,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.extended.textSecondary,
-            )
-        }
         Text(
             text = messageContent,
             style = MaterialTheme.typography.bodyLarge,
@@ -98,7 +80,30 @@ fun ChirpChatBubble(
             modifier = Modifier
                 .fillMaxWidth()
         )
-        messageStatus?.invoke()
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = sender,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.extended.textSecondary,
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                Text(
+                    text = formattedDateTime,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.extended.textSecondary,
+                )
+                messageStatus?.invoke()
+            }
+        }
     }
 }
 

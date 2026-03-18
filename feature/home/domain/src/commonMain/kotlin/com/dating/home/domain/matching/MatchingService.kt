@@ -2,6 +2,7 @@ package com.dating.home.domain.matching
 
 import com.dating.core.domain.auth.User
 import com.dating.core.domain.util.DataError
+import com.dating.core.domain.util.EmptyResult
 import com.dating.core.domain.util.Result
 
 enum class SwipeAction { LIKE, DISLIKE }

@@ -3,6 +3,7 @@ package com.dating.home.presentation.chat.chat_list
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,12 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -29,11 +25,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import aura.feature.home.presentation.generated.resources.Res
-import aura.feature.home.presentation.generated.resources.create_chat
 import aura.feature.home.presentation.generated.resources.no_chats
 import aura.feature.home.presentation.generated.resources.no_chats_subtitle
-import com.dating.core.designsystem.components.brand.ChirpHorizontalDivider
-import com.dating.core.designsystem.components.buttons.ChirpFloatingActionButton
 import com.dating.core.designsystem.components.header.MainTopAppBar
 import com.dating.core.designsystem.theme.AppTheme
 import com.dating.core.presentation.permissions.Permission
@@ -88,19 +81,7 @@ fun ChatListScreen(
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         contentWindowInsets = WindowInsets.safeDrawing,
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        floatingActionButton = {
-            ChirpFloatingActionButton(
-                onClick = {
-                    onAction(ChatListAction.OnCreateChatClick)
-                }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = stringResource(Res.string.create_chat)
-                )
-            }
-        }
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { innerPadding ->
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -122,13 +103,18 @@ fun ChatListScreen(
                             description = stringResource(Res.string.no_chats_subtitle),
                             modifier = Modifier
                                 .fillMaxSize()
-                                .padding(horizontal = 8.dp)
+                                .padding(horizontal = 16.dp)
                         )
                     }
 
                     else -> {
                         LazyColumn(
-                            modifier = Modifier.fillMaxSize()
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(
+                                horizontal = 12.dp,
+                                vertical = 8.dp
+                            ),
+                            verticalArrangement = Arrangement.spacedBy(6.dp)
                         ) {
                             items(
                                 items = state.chats,
@@ -143,7 +129,6 @@ fun ChatListScreen(
                                             onAction(ChatListAction.OnSelectChat(chatUi.id))
                                         }
                                 )
-                                ChirpHorizontalDivider()
                             }
                         }
                     }

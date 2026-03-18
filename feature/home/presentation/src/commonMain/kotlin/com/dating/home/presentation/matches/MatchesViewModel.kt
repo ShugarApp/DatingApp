@@ -7,6 +7,7 @@ import com.dating.core.domain.util.onSuccess
 import com.dating.core.presentation.util.toUiText
 import com.dating.home.domain.chat.ChatRepository
 import com.dating.home.domain.matching.MatchingService
+import com.dating.home.domain.matching.SwipeAction
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -47,6 +48,8 @@ class MatchesViewModel(
                     _events.send(MatchesEvent.NavigateToProfile(action.userId, action.imageUrl))
                 }
             }
+            is MatchesAction.OnLikeUser -> swipeLike(action.userId, SwipeAction.LIKE)
+            is MatchesAction.OnDislikeUser -> swipeLike(action.userId, SwipeAction.DISLIKE)
         }
     }
 
@@ -94,6 +97,22 @@ class MatchesViewModel(
         city = city,
         country = country
     )
+
+    private fun swipeLike(userId: String, action: SwipeAction) {
+        viewModelScope.launch {
+            _state.update { it.copy(likes = it.likes.filter { like -> like.id != userId }) }
+            matchingService.swipe(userId, action)
+                .onSuccess { result ->
+                    if (result.isMatch) {
+                        loadData()
+                    }
+                }
+                .onFailure { error ->
+                    _events.send(MatchesEvent.Error(error.toUiText()))
+                    loadData()
+                }
+        }
+    }
 
     private fun startChat(matchId: String) {
         viewModelScope.launch {

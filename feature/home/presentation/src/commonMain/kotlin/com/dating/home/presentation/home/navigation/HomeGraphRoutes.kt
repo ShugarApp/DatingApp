@@ -35,4 +35,7 @@ sealed interface HomeGraphRoutes {
 
     @Serializable
     data object DeleteAccountRoute : HomeGraphRoutes
+
+    @Serializable
+    data object BlockedUsersRoute : HomeGraphRoutes
 }

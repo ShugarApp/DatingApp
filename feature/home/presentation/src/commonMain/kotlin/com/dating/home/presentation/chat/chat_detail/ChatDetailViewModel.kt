@@ -15,6 +15,7 @@ import com.dating.core.domain.util.onFailure
 import com.dating.core.domain.util.onSuccess
 import com.dating.core.presentation.util.UiText
 import com.dating.core.presentation.util.toUiText
+import com.dating.home.domain.block.BlockService
 import com.dating.home.domain.chat.ChatConnectionClient
 import com.dating.home.domain.chat.ChatRepository
 import com.dating.home.domain.message.MessageRepository
@@ -49,7 +50,8 @@ class ChatDetailViewModel(
     private val chatRepository: ChatRepository,
     private val sessionStorage: SessionStorage,
     private val messageRepository: MessageRepository,
-    private val connectionClient: ChatConnectionClient
+    private val connectionClient: ChatConnectionClient,
+    private val blockService: BlockService
 ) : ViewModel() {
 
     private val eventChannel = Channel<ChatDetailEvent>()
@@ -146,6 +148,9 @@ class ChatDetailViewModel(
             is ChatDetailAction.OnTopVisibleIndexChanged -> updateBanner(action.topVisibleIndex)
             is ChatDetailAction.OnFirstVisibleIndexChanged -> updateNearBottom(action.index)
             is ChatDetailAction.OnTextChanged -> onTextChanged(action.text)
+            ChatDetailAction.OnBlockUserClick -> onBlockUserClick()
+            ChatDetailAction.OnConfirmBlockUser -> confirmBlockUser()
+            ChatDetailAction.OnDismissBlockDialog -> _state.update { it.copy(showBlockDialog = false) }
             else -> Unit
         }
     }
@@ -460,6 +465,36 @@ class ChatDetailViewModel(
                             error.toUiText()
                         )
                     )
+                }
+        }
+    }
+
+    private fun onBlockUserClick() {
+        _state.update { it.copy(isChatOptionsOpen = false, showBlockDialog = true) }
+    }
+
+    private fun confirmBlockUser() {
+        val otherUserId = state.value.chatUi?.otherParticipants?.firstOrNull()?.id ?: return
+        viewModelScope.launch {
+            _state.update { it.copy(isBlocking = true) }
+            blockService.blockUser(otherUserId)
+                .onSuccess {
+                    _state.update {
+                        it.copy(
+                            isBlocking = false,
+                            showBlockDialog = false,
+                            chatUi = null,
+                            messages = emptyList(),
+                            bannerState = BannerState()
+                        )
+                    }
+                    state.value.messageTextFieldState.clearText()
+                    _chatId.update { null }
+                    eventChannel.send(ChatDetailEvent.OnUserBlocked)
+                }
+                .onFailure { error ->
+                    _state.update { it.copy(isBlocking = false, showBlockDialog = false) }
+                    eventChannel.send(ChatDetailEvent.OnError(error.toUiText()))
                 }
         }
     }

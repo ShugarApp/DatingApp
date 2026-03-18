@@ -12,6 +12,7 @@ import com.dating.home.presentation.profile.edit_profile.EditProfileScreen
 import com.dating.home.presentation.profile.settings.DeleteAccountScreen
 import com.dating.home.presentation.profile.settings.PauseAccountScreen
 import com.dating.home.presentation.profile.settings.SettingsScreen
+import com.dating.home.presentation.profile.settings.blocked.BlockedUsersScreen
 import com.dating.home.presentation.detail.ProfileDetailScreen
 import com.dating.home.presentation.chat.chat_detail.ChatDetailRoot
 import com.dating.home.presentation.profile.verification.VerificationScreen
@@ -110,6 +111,9 @@ fun NavGraphBuilder.homeGraph(
                 },
                 onPauseAccount = {
                     navController.navigate(HomeGraphRoutes.PauseAccountRoute)
+                },
+                onBlockedUsers = {
+                    navController.navigate(HomeGraphRoutes.BlockedUsersRoute)
                 }
             )
         }
@@ -124,6 +128,12 @@ fun NavGraphBuilder.homeGraph(
             DeleteAccountScreen(
                 onBack = { navController.popBackStack() },
                 onDeleteAccount = onLogout
+            )
+        }
+
+        composable<HomeGraphRoutes.BlockedUsersRoute> {
+            BlockedUsersScreen(
+                onBack = { navController.popBackStack() }
             )
         }
 

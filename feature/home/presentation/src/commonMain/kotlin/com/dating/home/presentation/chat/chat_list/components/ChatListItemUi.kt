@@ -1,21 +1,15 @@
 package com.dating.home.presentation.chat.chat_list.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -39,23 +33,24 @@ fun ChatListItemUi(
     modifier: Modifier = Modifier
 ) {
     val isGroupChat = chat.otherParticipants.size > 1
-    Row(
-        modifier = modifier
-            .height(IntrinsicSize.Min)
-            .background(
-                color = if(isSelected) {
-                    MaterialTheme.colorScheme.surface
-                } else {
-                    MaterialTheme.colorScheme.extended.surfaceLower
-                }
-            )
-            .fillMaxWidth()
+    Card(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(
+            containerColor = if (isSelected) {
+                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+            } else {
+                MaterialTheme.colorScheme.surface
+            }
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = if (isSelected) 4.dp else 1.dp
+        )
     ) {
         Column(
             modifier = Modifier
-                .weight(1f)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .fillMaxWidth()
+                .padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             ChatItemHeaderRow(
                 chat = chat,
@@ -68,11 +63,11 @@ fun ChatListItemUi(
                 val previewMessage = buildAnnotatedString {
                     withStyle(
                         style = SpanStyle(
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.extended.textSecondary,
                         )
                     ) {
-                        if(chat.lastMessageSenderUsername != null) {
+                        if (chat.lastMessageSenderUsername != null) {
                             append(chat.lastMessageSenderUsername + ": ")
                         }
                     }
@@ -81,19 +76,12 @@ fun ChatListItemUi(
                 Text(
                     text = previewMessage,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.extended.textSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
             }
         }
-        Box(
-            modifier = Modifier
-                .alpha(if(isSelected) 1f else 0f)
-                .background(MaterialTheme.colorScheme.primary)
-                .width(4.dp)
-                .fillMaxHeight()
-        )
     }
 }
 
@@ -101,40 +89,72 @@ fun ChatListItemUi(
 @Preview
 fun ChatListItemUiPreview() {
     AppTheme(darkTheme = true) {
-        ChatListItemUi(
-            isSelected = true,
-            modifier = Modifier
-                .fillMaxWidth(),
-            chat = ChatUi(
-                id = "1",
-                localParticipant = ChatParticipantUi(
+        Column(
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+            modifier = Modifier.padding(12.dp)
+        ) {
+            ChatListItemUi(
+                isSelected = true,
+                modifier = Modifier.fillMaxWidth(),
+                chat = ChatUi(
                     id = "1",
-                    username = "Philipp",
-                    initials = "PH",
-                ),
-                otherParticipants = listOf(
-                    ChatParticipantUi(
-                        id = "2",
-                        username = "Cinderella",
-                        initials = "CI",
+                    localParticipant = ChatParticipantUi(
+                        id = "1",
+                        username = "Philipp",
+                        initials = "PH",
                     ),
-                    ChatParticipantUi(
-                        id = "3",
-                        username = "Josh",
-                        initials = "JO",
-                    )
-                ),
-                lastMessage = ChatMessage(
-                    id = "1",
-                    chatId = "1",
-                    content = "This is a last chat message that was sent by Philipp " +
-                            "and goes over multiple lines to showcase the ellipsis",
-                    createdAt = Clock.System.now(),
-                    senderId = "1",
-                    deliveryStatus = ChatMessageDeliveryStatus.SENT
-                ),
-                lastMessageSenderUsername = "Philipp"
+                    otherParticipants = listOf(
+                        ChatParticipantUi(
+                            id = "2",
+                            username = "Cinderella",
+                            initials = "CI",
+                        ),
+                        ChatParticipantUi(
+                            id = "3",
+                            username = "Josh",
+                            initials = "JO",
+                        )
+                    ),
+                    lastMessage = ChatMessage(
+                        id = "1",
+                        chatId = "1",
+                        content = "This is a last chat message that was sent by Philipp " +
+                                "and goes over multiple lines to showcase the ellipsis",
+                        createdAt = Clock.System.now(),
+                        senderId = "1",
+                        deliveryStatus = ChatMessageDeliveryStatus.SENT
+                    ),
+                    lastMessageSenderUsername = "Philipp"
+                )
             )
-        )
+            ChatListItemUi(
+                isSelected = false,
+                modifier = Modifier.fillMaxWidth(),
+                chat = ChatUi(
+                    id = "2",
+                    localParticipant = ChatParticipantUi(
+                        id = "1",
+                        username = "Philipp",
+                        initials = "PH",
+                    ),
+                    otherParticipants = listOf(
+                        ChatParticipantUi(
+                            id = "4",
+                            username = "Sarah",
+                            initials = "SA",
+                        )
+                    ),
+                    lastMessage = ChatMessage(
+                        id = "2",
+                        chatId = "2",
+                        content = "Hey! How are you?",
+                        createdAt = Clock.System.now(),
+                        senderId = "4",
+                        deliveryStatus = ChatMessageDeliveryStatus.SENT
+                    ),
+                    lastMessageSenderUsername = "Sarah"
+                )
+            )
+        }
     }
 }
