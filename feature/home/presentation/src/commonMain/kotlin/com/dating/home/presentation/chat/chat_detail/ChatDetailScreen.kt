@@ -47,6 +47,11 @@ import shugar.feature.home.presentation.generated.resources.no_chat_selected
 import shugar.feature.home.presentation.generated.resources.select_a_chat
 import com.dating.home.domain.models.ChatMessage
 import com.dating.home.domain.models.ChatMessageDeliveryStatus
+import aura.feature.home.presentation.generated.resources.block_user
+import aura.feature.home.presentation.generated.resources.block_user_title
+import aura.feature.home.presentation.generated.resources.block_user_desc
+import aura.feature.home.presentation.generated.resources.cancel
+import com.dating.core.designsystem.components.dialogs.DestructiveConfirmationDialog
 import com.dating.home.presentation.chat.chat_detail.components.ChatDetailHeader
 import com.dating.home.presentation.chat.chat_detail.components.DateChip
 import com.dating.home.presentation.chat.chat_detail.components.MessageBannerListener
@@ -91,6 +96,7 @@ fun ChatDetailRoot(
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
             ChatDetailEvent.OnChatLeft -> onBack()
+            ChatDetailEvent.OnUserBlocked -> onBack()
             ChatDetailEvent.OnNewMessage -> {
                 scope.launch {
                     messageListState.animateScrollToItem(0)
@@ -138,6 +144,19 @@ fun ChatDetailRoot(
         },
         snackbarState = snackbarState
     )
+
+    if (state.showBlockDialog) {
+        val username = state.chatUi?.otherParticipants?.firstOrNull()?.username ?: ""
+        DestructiveConfirmationDialog(
+            title = stringResource(Res.string.block_user_title, username),
+            description = stringResource(Res.string.block_user_desc),
+            confirmButtonText = stringResource(Res.string.block_user),
+            cancelButtonText = stringResource(Res.string.cancel),
+            onConfirmClick = { viewModel.onAction(ChatDetailAction.OnConfirmBlockUser) },
+            onCancelClick = { viewModel.onAction(ChatDetailAction.OnDismissBlockDialog) },
+            onDismiss = { viewModel.onAction(ChatDetailAction.OnDismissBlockDialog) }
+        )
+    }
 }
 
 @Composable
@@ -253,6 +272,9 @@ fun ChatDetailScreen(
                                 },
                                 onLeaveChatClick = {
                                     onAction(ChatDetailAction.OnLeaveChatClick)
+                                },
+                                onBlockUserClick = {
+                                    onAction(ChatDetailAction.OnBlockUserClick)
                                 },
                                 onBackClick = {
                                     onAction(ChatDetailAction.OnBackClick)

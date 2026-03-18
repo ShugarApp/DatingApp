@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Cake
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
@@ -138,6 +139,7 @@ fun SettingsScreen(
     onChangePassword: () -> Unit,
     onDeleteAccount: () -> Unit,
     onPauseAccount: () -> Unit,
+    onBlockedUsers: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SettingsViewModel = koinViewModel()
 ) {
@@ -227,6 +229,11 @@ fun SettingsScreen(
                         stringResource(Res.string.settings_pause_account)
                     },
                     onClick = onPauseAccount
+                )
+                AccessCardItem(
+                    icon = Icons.Default.Block,
+                    title = stringResource(Res.string.settings_blocked_users),
+                    onClick = onBlockedUsers
                 )
                 AccessCardItem(
                     icon = Icons.Default.PersonOff,

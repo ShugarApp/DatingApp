@@ -28,6 +28,8 @@ sealed interface MatchesAction {
     data class OnMatchClick(val matchId: String, val imageUrl: String?) : MatchesAction
     data class OnStartChat(val matchId: String) : MatchesAction
     data class OnLikeClick(val userId: String, val imageUrl: String?) : MatchesAction
+    data class OnLikeUser(val userId: String) : MatchesAction
+    data class OnDislikeUser(val userId: String) : MatchesAction
 }
 
 sealed interface MatchesEvent {

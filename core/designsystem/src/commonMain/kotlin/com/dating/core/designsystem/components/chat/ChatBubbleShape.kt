@@ -19,8 +19,8 @@ enum class TrianglePosition {
 
 class ChatBubbleShape(
     private val trianglePosition: TrianglePosition,
-    private val triangleSize: Dp = 16.dp,
-    private val cornerRadius: Dp = 8.dp
+    private val triangleSize: Dp = 10.dp,
+    private val cornerRadius: Dp = 16.dp
 ): Shape {
 
     override fun createOutline(

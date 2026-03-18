@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.dating.core.domain.util.onFailure
 import com.dating.core.domain.util.onSuccess
 import com.dating.core.presentation.util.toUiText
+import com.dating.home.domain.block.BlockService
 import com.dating.home.domain.matching.MatchingService
 import com.dating.home.domain.matching.SwipeAction
 import com.dating.home.domain.user.UserService
@@ -17,7 +18,8 @@ import kotlinx.coroutines.launch
 
 class ProfileDetailViewModel(
     private val userService: UserService,
-    private val matchingService: MatchingService
+    private val matchingService: MatchingService,
+    private val blockService: BlockService
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ProfileDetailState())
@@ -46,6 +48,29 @@ class ProfileDetailViewModel(
             }
             is ProfileDetailAction.OnSwipeRight -> swipe(action.userId, SwipeAction.LIKE)
             is ProfileDetailAction.OnSwipeLeft -> swipe(action.userId, SwipeAction.DISLIKE)
+            is ProfileDetailAction.OnBlockClick -> {
+                _state.update { it.copy(showBlockDialog = true) }
+            }
+            ProfileDetailAction.OnConfirmBlock -> confirmBlock()
+            ProfileDetailAction.OnDismissBlockDialog -> {
+                _state.update { it.copy(showBlockDialog = false) }
+            }
+        }
+    }
+
+    private fun confirmBlock() {
+        val userId = _state.value.user?.id ?: return
+        viewModelScope.launch {
+            _state.update { it.copy(isBlocking = true) }
+            blockService.blockUser(userId)
+                .onSuccess {
+                    _state.update { it.copy(isBlocking = false, showBlockDialog = false) }
+                    _events.send(ProfileDetailEvent.OnUserBlocked)
+                }
+                .onFailure {
+                    _state.update { it.copy(isBlocking = false, showBlockDialog = false) }
+                    _events.send(ProfileDetailEvent.NavigateBack())
+                }
         }
     }
 

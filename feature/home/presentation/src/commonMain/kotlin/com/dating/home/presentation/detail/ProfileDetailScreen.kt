@@ -31,6 +31,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Cake
+import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Info
@@ -80,7 +81,12 @@ import shugar.feature.home.presentation.generated.resources.profile_like
 import shugar.feature.home.presentation.generated.resources.profile_pass
 import shugar.feature.home.presentation.generated.resources.profile_work_education
 import androidx.compose.material3.Button
+import aura.feature.home.presentation.generated.resources.block_user
+import aura.feature.home.presentation.generated.resources.block_user_title
+import aura.feature.home.presentation.generated.resources.block_user_desc
+import aura.feature.home.presentation.generated.resources.cancel
 import coil3.compose.AsyncImage
+import com.dating.core.designsystem.components.dialogs.DestructiveConfirmationDialog
 import com.dating.core.designsystem.theme.extended
 import com.dating.core.domain.auth.User
 import com.dating.core.presentation.util.ObserveAsEvents
@@ -123,6 +129,7 @@ fun ProfileDetailScreen(
                 matchName = event.userName
                 showMatchDialog = true
             }
+            ProfileDetailEvent.OnUserBlocked -> onBack()
         }
     }
 
@@ -143,8 +150,10 @@ fun ProfileDetailScreen(
                         fallbackImageUrl = imageUrl,
                         onBack = onBack,
                         hideActions = isOwnProfile || isMatch,
+                        showBlockButton = !isOwnProfile,
                         onSwipeLeft = { viewModel.onAction(ProfileDetailAction.OnSwipeLeft(userId)) },
-                        onSwipeRight = { viewModel.onAction(ProfileDetailAction.OnSwipeRight(userId)) }
+                        onSwipeRight = { viewModel.onAction(ProfileDetailAction.OnSwipeRight(userId)) },
+                        onBlockClick = { viewModel.onAction(ProfileDetailAction.OnBlockClick(userId)) }
                     )
                 }
                 else -> {
@@ -174,6 +183,19 @@ fun ProfileDetailScreen(
                 }
             }
         }
+    }
+
+    if (state.showBlockDialog) {
+        val blockUsername = state.user?.username ?: ""
+        DestructiveConfirmationDialog(
+            title = stringResource(Res.string.block_user_title, blockUsername),
+            description = stringResource(Res.string.block_user_desc),
+            confirmButtonText = stringResource(Res.string.block_user),
+            cancelButtonText = stringResource(Res.string.cancel),
+            onConfirmClick = { viewModel.onAction(ProfileDetailAction.OnConfirmBlock) },
+            onCancelClick = { viewModel.onAction(ProfileDetailAction.OnDismissBlockDialog) },
+            onDismiss = { viewModel.onAction(ProfileDetailAction.OnDismissBlockDialog) }
+        )
     }
 
     if (showMatchDialog) {
@@ -218,8 +240,10 @@ private fun ProfileDetailContent(
     fallbackImageUrl: String?,
     onBack: () -> Unit,
     hideActions: Boolean = false,
+    showBlockButton: Boolean = false,
     onSwipeLeft: () -> Unit,
-    onSwipeRight: () -> Unit
+    onSwipeRight: () -> Unit,
+    onBlockClick: () -> Unit = {}
 ) {
     val photos = user.photos.ifEmpty { listOfNotNull(fallbackImageUrl) }
     val pagerState = rememberPagerState { photos.size.coerceAtLeast(1) }
@@ -384,6 +408,24 @@ private fun ProfileDetailContent(
                         contentDescription = stringResource(Res.string.go_back),
                         tint = Color.White
                     )
+                }
+
+                // Block button
+                if (showBlockButton) {
+                    IconButton(
+                        onClick = onBlockClick,
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(top = 48.dp, end = 16.dp)
+                            .background(Color.Black.copy(alpha = 0.3f), CircleShape)
+                            .size(40.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Block,
+                            contentDescription = stringResource(Res.string.block_user),
+                            tint = Color.White
+                        )
+                    }
                 }
             }
 

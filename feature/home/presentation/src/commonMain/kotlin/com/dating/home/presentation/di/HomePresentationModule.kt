@@ -11,6 +11,7 @@ import com.dating.home.presentation.matches.MatchesViewModel
 import com.dating.home.presentation.profile.edit_profile.EditProfileViewModel
 import com.dating.home.presentation.profile.profile.ProfileViewModel
 import com.dating.home.presentation.profile.settings.SettingsViewModel
+import com.dating.home.presentation.profile.settings.blocked.BlockedUsersViewModel
 import com.dating.home.presentation.profile.settings.changepassword.ChangePasswordViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
@@ -28,4 +29,5 @@ val homePresentationModule = module {
     viewModelOf(::ChangePasswordViewModel)
     viewModelOf(::EditProfileViewModel)
     viewModelOf(::ProfileDetailViewModel)
+    viewModelOf(::BlockedUsersViewModel)
 }
