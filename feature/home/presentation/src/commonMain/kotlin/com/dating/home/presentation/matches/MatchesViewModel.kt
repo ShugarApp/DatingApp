@@ -50,6 +50,13 @@ class MatchesViewModel(
             }
             is MatchesAction.OnLikeUser -> swipeLike(action.userId, SwipeAction.LIKE)
             is MatchesAction.OnDislikeUser -> swipeLike(action.userId, SwipeAction.DISLIKE)
+            is MatchesAction.OnDeleteMatchClick -> {
+                _state.update { it.copy(showDeleteMatchDialog = true, matchToDelete = action.match) }
+            }
+            MatchesAction.OnConfirmDeleteMatch -> confirmDeleteMatch()
+            MatchesAction.OnDismissDeleteMatchDialog -> {
+                _state.update { it.copy(showDeleteMatchDialog = false, matchToDelete = null) }
+            }
         }
     }
 
@@ -98,15 +105,44 @@ class MatchesViewModel(
         country = country
     )
 
+    private fun confirmDeleteMatch() {
+        val match = _state.value.matchToDelete ?: return
+        viewModelScope.launch {
+            _state.update { it.copy(isDeletingMatch = true) }
+            matchingService.deleteMatch(match.id)
+                .onSuccess {
+                    _state.update { state ->
+                        state.copy(
+                            matches = state.matches.filter { it.id != match.id },
+                            showDeleteMatchDialog = false,
+                            matchToDelete = null,
+                            isDeletingMatch = false
+                        )
+                    }
+                    _events.send(MatchesEvent.MatchDeleted)
+                }
+                .onFailure { error ->
+                    _state.update { it.copy(showDeleteMatchDialog = false, matchToDelete = null, isDeletingMatch = false) }
+                    _events.send(MatchesEvent.Error(error.toUiText()))
+                }
+        }
+    }
+
     private fun swipeLike(userId: String, action: SwipeAction) {
         viewModelScope.launch {
-            _state.update { it.copy(likes = it.likes.filter { like -> like.id != userId }) }
-            matchingService.swipe(userId, action)
-                .onSuccess { result ->
-                    if (result.isMatch) {
-                        loadData()
-                    }
+            val likedUser = _state.value.likes.find { it.id == userId }
+            _state.update { state ->
+                val updatedLikes = state.likes.filter { it.id != userId }
+                if (action == SwipeAction.LIKE && likedUser != null) {
+                    state.copy(
+                        likes = updatedLikes,
+                        matches = state.matches + likedUser
+                    )
+                } else {
+                    state.copy(likes = updatedLikes)
                 }
+            }
+            matchingService.swipe(userId, action)
                 .onFailure { error ->
                     _events.send(MatchesEvent.Error(error.toUiText()))
                     loadData()

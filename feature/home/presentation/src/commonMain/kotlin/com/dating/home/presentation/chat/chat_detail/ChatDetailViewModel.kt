@@ -18,6 +18,7 @@ import com.dating.core.presentation.util.toUiText
 import com.dating.home.domain.block.BlockService
 import com.dating.home.domain.chat.ChatConnectionClient
 import com.dating.home.domain.chat.ChatRepository
+import com.dating.home.domain.matching.MatchingService
 import com.dating.home.domain.message.MessageRepository
 import com.dating.home.domain.models.ChatMessage
 import com.dating.home.domain.models.ConnectionState
@@ -51,7 +52,8 @@ class ChatDetailViewModel(
     private val sessionStorage: SessionStorage,
     private val messageRepository: MessageRepository,
     private val connectionClient: ChatConnectionClient,
-    private val blockService: BlockService
+    private val blockService: BlockService,
+    private val matchingService: MatchingService
 ) : ViewModel() {
 
     private val eventChannel = Channel<ChatDetailEvent>()
@@ -151,6 +153,9 @@ class ChatDetailViewModel(
             ChatDetailAction.OnBlockUserClick -> onBlockUserClick()
             ChatDetailAction.OnConfirmBlockUser -> confirmBlockUser()
             ChatDetailAction.OnDismissBlockDialog -> _state.update { it.copy(showBlockDialog = false) }
+            ChatDetailAction.OnDeleteMatchClick -> onDeleteMatchClick()
+            ChatDetailAction.OnConfirmDeleteMatch -> confirmDeleteMatch()
+            ChatDetailAction.OnDismissDeleteMatchDialog -> _state.update { it.copy(showDeleteMatchDialog = false) }
             else -> Unit
         }
     }
@@ -494,6 +499,36 @@ class ChatDetailViewModel(
                 }
                 .onFailure { error ->
                     _state.update { it.copy(isBlocking = false, showBlockDialog = false) }
+                    eventChannel.send(ChatDetailEvent.OnError(error.toUiText()))
+                }
+        }
+    }
+
+    private fun onDeleteMatchClick() {
+        _state.update { it.copy(isChatOptionsOpen = false, showDeleteMatchDialog = true) }
+    }
+
+    private fun confirmDeleteMatch() {
+        val otherUserId = state.value.chatUi?.otherParticipants?.firstOrNull()?.id ?: return
+        viewModelScope.launch {
+            _state.update { it.copy(isDeletingMatch = true) }
+            matchingService.deleteMatch(otherUserId)
+                .onSuccess {
+                    _state.update {
+                        it.copy(
+                            isDeletingMatch = false,
+                            showDeleteMatchDialog = false,
+                            chatUi = null,
+                            messages = emptyList(),
+                            bannerState = BannerState()
+                        )
+                    }
+                    state.value.messageTextFieldState.clearText()
+                    _chatId.update { null }
+                    eventChannel.send(ChatDetailEvent.OnMatchDeleted)
+                }
+                .onFailure { error ->
+                    _state.update { it.copy(isDeletingMatch = false, showDeleteMatchDialog = false) }
                     eventChannel.send(ChatDetailEvent.OnError(error.toUiText()))
                 }
         }

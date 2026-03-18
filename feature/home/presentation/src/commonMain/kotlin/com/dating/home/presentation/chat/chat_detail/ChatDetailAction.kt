@@ -23,4 +23,7 @@ sealed interface ChatDetailAction {
     data object OnBlockUserClick: ChatDetailAction
     data object OnConfirmBlockUser: ChatDetailAction
     data object OnDismissBlockDialog: ChatDetailAction
+    data object OnDeleteMatchClick: ChatDetailAction
+    data object OnConfirmDeleteMatch: ChatDetailAction
+    data object OnDismissDeleteMatchDialog: ChatDetailAction
 }

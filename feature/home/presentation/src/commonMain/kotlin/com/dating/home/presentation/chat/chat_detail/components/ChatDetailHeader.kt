@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.HeartBroken
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
@@ -26,6 +27,7 @@ import aura.feature.home.presentation.generated.resources.Res
 import aura.feature.home.presentation.generated.resources.chat_members
 import aura.feature.home.presentation.generated.resources.go_back
 import aura.feature.home.presentation.generated.resources.block_user
+import aura.feature.home.presentation.generated.resources.delete_match
 import aura.feature.home.presentation.generated.resources.leave_chat
 import aura.feature.home.presentation.generated.resources.open_chat_options_menu
 import aura.feature.home.presentation.generated.resources.users_icon
@@ -54,6 +56,7 @@ fun ChatDetailHeader(
     onManageChatClick: () -> Unit,
     onLeaveChatClick: () -> Unit,
     onBlockUserClick: () -> Unit,
+    onDeleteMatchClick: () -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -111,6 +114,12 @@ fun ChatDetailHeader(
                         icon = vectorResource(Res.drawable.users_icon),
                         contentColor = MaterialTheme.colorScheme.extended.textSecondary,
                         onClick = onManageChatClick
+                    ),
+                    DropDownItem(
+                        title = stringResource(Res.string.delete_match),
+                        icon = Icons.Default.HeartBroken,
+                        contentColor = MaterialTheme.colorScheme.extended.destructiveHover,
+                        onClick = onDeleteMatchClick
                     ),
                     DropDownItem(
                         title = stringResource(Res.string.block_user),
@@ -175,6 +184,7 @@ fun ChatDetailHeaderPreview() {
                     onManageChatClick = {},
                     onLeaveChatClick = {},
                     onBlockUserClick = {},
+                    onDeleteMatchClick = {},
                     onDismissChatOptions = {},
                     onBackClick = {},
                 )

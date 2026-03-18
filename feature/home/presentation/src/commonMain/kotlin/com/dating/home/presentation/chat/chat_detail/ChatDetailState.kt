@@ -23,7 +23,9 @@ data class ChatDetailState(
     val connectionState: ConnectionState = ConnectionState.DISCONNECTED,
     val typingUsernames: List<String> = emptyList(),
     val showBlockDialog: Boolean = false,
-    val isBlocking: Boolean = false
+    val isBlocking: Boolean = false,
+    val showDeleteMatchDialog: Boolean = false,
+    val isDeletingMatch: Boolean = false
 )
 
 data class BannerState(

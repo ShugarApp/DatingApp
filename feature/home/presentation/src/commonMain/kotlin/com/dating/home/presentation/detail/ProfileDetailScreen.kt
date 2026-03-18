@@ -85,6 +85,10 @@ import aura.feature.home.presentation.generated.resources.block_user
 import aura.feature.home.presentation.generated.resources.block_user_title
 import aura.feature.home.presentation.generated.resources.block_user_desc
 import aura.feature.home.presentation.generated.resources.cancel
+import aura.feature.home.presentation.generated.resources.delete_match
+import aura.feature.home.presentation.generated.resources.delete_match_title
+import aura.feature.home.presentation.generated.resources.delete_match_desc
+import androidx.compose.material.icons.filled.HeartBroken
 import coil3.compose.AsyncImage
 import com.dating.core.designsystem.components.dialogs.DestructiveConfirmationDialog
 import com.dating.core.designsystem.theme.extended
@@ -130,6 +134,7 @@ fun ProfileDetailScreen(
                 showMatchDialog = true
             }
             ProfileDetailEvent.OnUserBlocked -> onBack()
+            ProfileDetailEvent.OnMatchDeleted -> onBack()
         }
     }
 
@@ -151,9 +156,11 @@ fun ProfileDetailScreen(
                         onBack = onBack,
                         hideActions = isOwnProfile || isMatch,
                         showBlockButton = !isOwnProfile,
+                        showDeleteMatchButton = isMatch,
                         onSwipeLeft = { viewModel.onAction(ProfileDetailAction.OnSwipeLeft(userId)) },
                         onSwipeRight = { viewModel.onAction(ProfileDetailAction.OnSwipeRight(userId)) },
-                        onBlockClick = { viewModel.onAction(ProfileDetailAction.OnBlockClick(userId)) }
+                        onBlockClick = { viewModel.onAction(ProfileDetailAction.OnBlockClick(userId)) },
+                        onDeleteMatchClick = { viewModel.onAction(ProfileDetailAction.OnDeleteMatchClick(userId)) }
                     )
                 }
                 else -> {
@@ -195,6 +202,19 @@ fun ProfileDetailScreen(
             onConfirmClick = { viewModel.onAction(ProfileDetailAction.OnConfirmBlock) },
             onCancelClick = { viewModel.onAction(ProfileDetailAction.OnDismissBlockDialog) },
             onDismiss = { viewModel.onAction(ProfileDetailAction.OnDismissBlockDialog) }
+        )
+    }
+
+    if (state.showDeleteMatchDialog) {
+        val deleteUsername = state.user?.username ?: ""
+        DestructiveConfirmationDialog(
+            title = stringResource(Res.string.delete_match_title, deleteUsername),
+            description = stringResource(Res.string.delete_match_desc),
+            confirmButtonText = stringResource(Res.string.delete_match),
+            cancelButtonText = stringResource(Res.string.cancel),
+            onConfirmClick = { viewModel.onAction(ProfileDetailAction.OnConfirmDeleteMatch) },
+            onCancelClick = { viewModel.onAction(ProfileDetailAction.OnDismissDeleteMatchDialog) },
+            onDismiss = { viewModel.onAction(ProfileDetailAction.OnDismissDeleteMatchDialog) }
         )
     }
 
@@ -241,9 +261,11 @@ private fun ProfileDetailContent(
     onBack: () -> Unit,
     hideActions: Boolean = false,
     showBlockButton: Boolean = false,
+    showDeleteMatchButton: Boolean = false,
     onSwipeLeft: () -> Unit,
     onSwipeRight: () -> Unit,
-    onBlockClick: () -> Unit = {}
+    onBlockClick: () -> Unit = {},
+    onDeleteMatchClick: () -> Unit = {}
 ) {
     val photos = user.photos.ifEmpty { listOfNotNull(fallbackImageUrl) }
     val pagerState = rememberPagerState { photos.size.coerceAtLeast(1) }
@@ -410,21 +432,42 @@ private fun ProfileDetailContent(
                     )
                 }
 
-                // Block button
-                if (showBlockButton) {
-                    IconButton(
-                        onClick = onBlockClick,
+                // Action buttons (top-right)
+                if (showBlockButton || showDeleteMatchButton) {
+                    Row(
                         modifier = Modifier
                             .align(Alignment.TopEnd)
-                            .padding(top = 48.dp, end = 16.dp)
-                            .background(Color.Black.copy(alpha = 0.3f), CircleShape)
-                            .size(40.dp)
+                            .padding(top = 48.dp, end = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Block,
-                            contentDescription = stringResource(Res.string.block_user),
-                            tint = Color.White
-                        )
+                        if (showDeleteMatchButton) {
+                            IconButton(
+                                onClick = onDeleteMatchClick,
+                                modifier = Modifier
+                                    .background(Color.Black.copy(alpha = 0.3f), CircleShape)
+                                    .size(40.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.HeartBroken,
+                                    contentDescription = stringResource(Res.string.delete_match),
+                                    tint = Color.White
+                                )
+                            }
+                        }
+                        if (showBlockButton) {
+                            IconButton(
+                                onClick = onBlockClick,
+                                modifier = Modifier
+                                    .background(Color.Black.copy(alpha = 0.3f), CircleShape)
+                                    .size(40.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Block,
+                                    contentDescription = stringResource(Res.string.block_user),
+                                    tint = Color.White
+                                )
+                            }
+                        }
                     }
                 }
             }
