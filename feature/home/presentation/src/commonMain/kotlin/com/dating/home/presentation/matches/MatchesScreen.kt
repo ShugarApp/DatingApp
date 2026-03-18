@@ -5,7 +5,9 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -126,6 +128,7 @@ fun MatchesScreen(
                                 MatchesTab.MATCHES -> MatchCard(
                                     match = match,
                                     onClick = { onAction(MatchesAction.OnMatchClick(match.id, match.profilePictureUrl)) },
+                                    onLongClick = { onAction(MatchesAction.OnDeleteMatchClick(match)) },
                                     onStartChat = { onAction(MatchesAction.OnStartChat(match.id)) },
                                     isChatLoading = state.isCreatingChat
                                 )
@@ -217,10 +220,12 @@ private fun MatchesTabSwitcher(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun MatchCard(
     match: Match,
     onClick: () -> Unit,
+    onLongClick: () -> Unit,
     onStartChat: () -> Unit,
     isChatLoading: Boolean = false,
     modifier: Modifier = Modifier
@@ -228,7 +233,10 @@ private fun MatchCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick),
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongClick
+            ),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),

@@ -51,6 +51,9 @@ import shugar.feature.home.presentation.generated.resources.block_user
 import shugar.feature.home.presentation.generated.resources.block_user_title
 import shugar.feature.home.presentation.generated.resources.block_user_desc
 import shugar.feature.home.presentation.generated.resources.cancel
+import aura.feature.home.presentation.generated.resources.delete_match
+import aura.feature.home.presentation.generated.resources.delete_match_title
+import aura.feature.home.presentation.generated.resources.delete_match_desc
 import com.dating.core.designsystem.components.dialogs.DestructiveConfirmationDialog
 import com.dating.home.presentation.chat.chat_detail.components.ChatDetailHeader
 import com.dating.home.presentation.chat.chat_detail.components.DateChip
@@ -97,6 +100,7 @@ fun ChatDetailRoot(
         when (event) {
             ChatDetailEvent.OnChatLeft -> onBack()
             ChatDetailEvent.OnUserBlocked -> onBack()
+            ChatDetailEvent.OnMatchDeleted -> onBack()
             ChatDetailEvent.OnNewMessage -> {
                 scope.launch {
                     messageListState.animateScrollToItem(0)
@@ -155,6 +159,19 @@ fun ChatDetailRoot(
             onConfirmClick = { viewModel.onAction(ChatDetailAction.OnConfirmBlockUser) },
             onCancelClick = { viewModel.onAction(ChatDetailAction.OnDismissBlockDialog) },
             onDismiss = { viewModel.onAction(ChatDetailAction.OnDismissBlockDialog) }
+        )
+    }
+
+    if (state.showDeleteMatchDialog) {
+        val username = state.chatUi?.otherParticipants?.firstOrNull()?.username ?: ""
+        DestructiveConfirmationDialog(
+            title = stringResource(Res.string.delete_match_title, username),
+            description = stringResource(Res.string.delete_match_desc),
+            confirmButtonText = stringResource(Res.string.delete_match),
+            cancelButtonText = stringResource(Res.string.cancel),
+            onConfirmClick = { viewModel.onAction(ChatDetailAction.OnConfirmDeleteMatch) },
+            onCancelClick = { viewModel.onAction(ChatDetailAction.OnDismissDeleteMatchDialog) },
+            onDismiss = { viewModel.onAction(ChatDetailAction.OnDismissDeleteMatchDialog) }
         )
     }
 }
@@ -275,6 +292,9 @@ fun ChatDetailScreen(
                                 },
                                 onBlockUserClick = {
                                     onAction(ChatDetailAction.OnBlockUserClick)
+                                },
+                                onDeleteMatchClick = {
+                                    onAction(ChatDetailAction.OnDeleteMatchClick)
                                 },
                                 onBackClick = {
                                     onAction(ChatDetailAction.OnBackClick)

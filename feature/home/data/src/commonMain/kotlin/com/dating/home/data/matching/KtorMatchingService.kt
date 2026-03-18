@@ -2,10 +2,12 @@ package com.dating.home.data.matching
 
 import com.dating.core.data.dto.UserSerializable
 import com.dating.core.data.mappers.toDomain
+import com.dating.core.data.networking.delete
 import com.dating.core.data.networking.get
 import com.dating.core.data.networking.post
 import com.dating.core.domain.auth.User
 import com.dating.core.domain.util.DataError
+import com.dating.core.domain.util.EmptyResult
 import com.dating.core.domain.util.Result
 import com.dating.core.domain.util.map
 import com.dating.home.data.dto.request.SwipeRequest
@@ -59,5 +61,11 @@ class KtorMatchingService(private val httpClient: HttpClient) : MatchingService 
         return httpClient.get<List<UserSerializable>>(
             route = "/matching/likes"
         ).map { list -> list.map { it.toDomain() } }
+    }
+
+    override suspend fun deleteMatch(matchedUserId: String): EmptyResult<DataError.Remote> {
+        return httpClient.delete<Unit>(
+            route = "/matching/matches/$matchedUserId"
+        )
     }
 }

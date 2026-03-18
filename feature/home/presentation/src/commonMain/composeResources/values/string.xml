@@ -289,6 +289,10 @@
     <string name="blocked_users_unblock_desc">They will be able to see you in the feed again. Previous match and conversation will not be restored.</string>
     <string name="blocked_users_deleted_user">Deleted user</string>
     <string name="settings_blocked_users">Blocked Users</string>
+    <string name="delete_match">Delete Match</string>
+    <string name="delete_match_title">Delete match with %1$s?</string>
+    <string name="delete_match_desc">The match and conversation will be deleted. You will both appear in each other\'s feed again. This action cannot be undone.</string>
+    <string name="delete_match_success">Match deleted</string>
     <string name="block_user">Block</string>
     <string name="block_user_title">Block %1$s?</string>
     <string name="block_user_desc">They won't be able to see you in the feed, likes or matches. The conversation will be deleted. You can undo this from Settings.</string>

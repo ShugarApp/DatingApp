@@ -55,6 +55,13 @@ class ProfileDetailViewModel(
             ProfileDetailAction.OnDismissBlockDialog -> {
                 _state.update { it.copy(showBlockDialog = false) }
             }
+            is ProfileDetailAction.OnDeleteMatchClick -> {
+                _state.update { it.copy(showDeleteMatchDialog = true) }
+            }
+            ProfileDetailAction.OnConfirmDeleteMatch -> confirmDeleteMatch()
+            ProfileDetailAction.OnDismissDeleteMatchDialog -> {
+                _state.update { it.copy(showDeleteMatchDialog = false) }
+            }
         }
     }
 
@@ -69,6 +76,22 @@ class ProfileDetailViewModel(
                 }
                 .onFailure {
                     _state.update { it.copy(isBlocking = false, showBlockDialog = false) }
+                    _events.send(ProfileDetailEvent.NavigateBack())
+                }
+        }
+    }
+
+    private fun confirmDeleteMatch() {
+        val userId = _state.value.user?.id ?: return
+        viewModelScope.launch {
+            _state.update { it.copy(isDeletingMatch = true) }
+            matchingService.deleteMatch(userId)
+                .onSuccess {
+                    _state.update { it.copy(isDeletingMatch = false, showDeleteMatchDialog = false) }
+                    _events.send(ProfileDetailEvent.OnMatchDeleted)
+                }
+                .onFailure {
+                    _state.update { it.copy(isDeletingMatch = false, showDeleteMatchDialog = false) }
                     _events.send(ProfileDetailEvent.NavigateBack())
                 }
         }

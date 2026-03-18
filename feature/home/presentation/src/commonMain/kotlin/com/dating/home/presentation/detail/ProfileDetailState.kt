@@ -8,7 +8,9 @@ data class ProfileDetailState(
     val user: User? = null,
     val error: UiText? = null,
     val showBlockDialog: Boolean = false,
-    val isBlocking: Boolean = false
+    val isBlocking: Boolean = false,
+    val showDeleteMatchDialog: Boolean = false,
+    val isDeletingMatch: Boolean = false
 )
 
 sealed interface ProfileDetailAction {
@@ -18,10 +20,14 @@ sealed interface ProfileDetailAction {
     data class OnBlockClick(val userId: String) : ProfileDetailAction
     data object OnConfirmBlock : ProfileDetailAction
     data object OnDismissBlockDialog : ProfileDetailAction
+    data class OnDeleteMatchClick(val userId: String) : ProfileDetailAction
+    data object OnConfirmDeleteMatch : ProfileDetailAction
+    data object OnDismissDeleteMatchDialog : ProfileDetailAction
 }
 
 sealed interface ProfileDetailEvent {
     data class NavigateBack(val swipedUserId: String? = null) : ProfileDetailEvent
     data class ShowMatch(val userName: String, val swipedUserId: String) : ProfileDetailEvent
     data object OnUserBlocked : ProfileDetailEvent
+    data object OnMatchDeleted : ProfileDetailEvent
 }
