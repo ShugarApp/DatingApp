@@ -6,16 +6,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import aura.feature.home.presentation.generated.resources.Res
-import aura.feature.home.presentation.generated.resources.cancel
-import aura.feature.home.presentation.generated.resources.delete_match
-import aura.feature.home.presentation.generated.resources.delete_match_desc
-import aura.feature.home.presentation.generated.resources.delete_match_success
-import aura.feature.home.presentation.generated.resources.delete_match_title
 import com.dating.core.designsystem.components.dialogs.DestructiveConfirmationDialog
 import com.dating.core.presentation.util.ObserveAsEvents
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+import shugar.feature.home.presentation.generated.resources.Res
+import shugar.feature.home.presentation.generated.resources.cancel
+import shugar.feature.home.presentation.generated.resources.delete_match
+import shugar.feature.home.presentation.generated.resources.delete_match_desc
+import shugar.feature.home.presentation.generated.resources.delete_match_title
 
 @Composable
 fun MatchesRoot(
@@ -29,13 +28,17 @@ fun MatchesRoot(
 
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
-            is MatchesEvent.Error -> { /* Handle error */ }
+            is MatchesEvent.Error -> { /* Handle error */
+            }
+
             is MatchesEvent.NavigateToProfile -> {
                 onNavigateToProfile(event.userId, event.imageUrl)
             }
+
             is MatchesEvent.NavigateToChat -> {
                 onNavigateToChatDetail(event.chatId)
             }
+
             MatchesEvent.MatchDeleted -> {
                 snackbarState.showSnackbar(
                     message = "Match deleted"
@@ -51,7 +54,7 @@ fun MatchesRoot(
     )
 
     if (state.showDeleteMatchDialog) {
-        val username = state.matchToDelete?.username ?: ""
+        val username = state.matchToDelete?.username.orEmpty()
         DestructiveConfirmationDialog(
             title = stringResource(Res.string.delete_match_title, username),
             description = stringResource(Res.string.delete_match_desc),

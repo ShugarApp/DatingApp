@@ -51,9 +51,9 @@ import shugar.feature.home.presentation.generated.resources.block_user
 import shugar.feature.home.presentation.generated.resources.block_user_title
 import shugar.feature.home.presentation.generated.resources.block_user_desc
 import shugar.feature.home.presentation.generated.resources.cancel
-import aura.feature.home.presentation.generated.resources.delete_match
-import aura.feature.home.presentation.generated.resources.delete_match_title
-import aura.feature.home.presentation.generated.resources.delete_match_desc
+import shugar.feature.home.presentation.generated.resources.delete_match
+import shugar.feature.home.presentation.generated.resources.delete_match_title
+import shugar.feature.home.presentation.generated.resources.delete_match_desc
 import com.dating.core.designsystem.components.dialogs.DestructiveConfirmationDialog
 import com.dating.home.presentation.chat.chat_detail.components.ChatDetailHeader
 import com.dating.home.presentation.chat.chat_detail.components.DateChip
