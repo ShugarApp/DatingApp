@@ -9,6 +9,7 @@
     <string name="logout">Logout</string>
     <string name="sending">Sending...</string>
     <string name="sent">Sent</string>
+    <string name="read">Read</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="retry">Retry</string>
@@ -221,6 +222,7 @@
     <string name="feed_filter_reset">Reset</string>
     <string name="feed_swipe_like">LIKE</string>
     <string name="feed_swipe_nope">NOPE</string>
+    <string name="feed_undo_swipe">Undo</string>
     <string name="feed_match_title">It's a match with %1$s!</string>
     <string name="feed_match_dismiss">Awesome!</string>
     <string name="feed_complete_profile_title">Complete your profile!</string>
@@ -231,6 +233,12 @@
     <string name="feed_error_title">No connection</string>
     <string name="feed_error_desc">We could not connect to the server. Check your internet connection and try again.</string>
     <string name="feed_error_retry">Retry</string>
+
+    <!-- Photo Onboarding -->
+    <string name="photo_onboarding_title">Add your photos</string>
+    <string name="photo_onboarding_subtitle">Upload at least 2 photos to start discovering people near you. Show your best side!</string>
+    <string name="photo_onboarding_continue">Continue</string>
+    <string name="photo_onboarding_photos_count">%1$d / 2 required photos</string>
 
     <!-- Profile Screen -->
     <string name="profile_edit">Edit Profile</string>
@@ -299,4 +307,24 @@
     <string name="block_user_success">User blocked</string>
     <string name="block_user_already_blocked">This user is already blocked</string>
     <string name="block_user_error">Error blocking user</string>
+
+    <!-- Report User -->
+    <string name="report_user">Report</string>
+    <string name="report_user_title">Report user</string>
+    <string name="report_user_subtitle">Select a reason for reporting this user</string>
+    <string name="report_reason_harassment">Harassment</string>
+    <string name="report_reason_fake_profile">Fake profile</string>
+    <string name="report_reason_inappropriate_content">Inappropriate content</string>
+    <string name="report_reason_underage">Underage</string>
+    <string name="report_reason_spam">Spam</string>
+    <string name="report_reason_scam">Scam</string>
+    <string name="report_reason_other">Other</string>
+    <string name="report_description_placeholder">Additional details (optional)</string>
+    <string name="report_description_counter">%1$d / 1000</string>
+    <string name="report_submit">Submit report</string>
+    <string name="report_submitting">Submitting...</string>
+    <string name="report_success">Report submitted. We will review your case.</string>
+    <string name="report_duplicate">You already have a pending report for this user</string>
+    <string name="report_account_suspended">Your account has been suspended</string>
+    <string name="report_account_banned">Your account has been banned</string>
 </resources>

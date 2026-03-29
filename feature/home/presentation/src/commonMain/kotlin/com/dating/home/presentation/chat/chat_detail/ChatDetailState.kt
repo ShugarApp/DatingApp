@@ -25,7 +25,9 @@ data class ChatDetailState(
     val showBlockDialog: Boolean = false,
     val isBlocking: Boolean = false,
     val showDeleteMatchDialog: Boolean = false,
-    val isDeletingMatch: Boolean = false
+    val isDeletingMatch: Boolean = false,
+    val showReportSheet: Boolean = false,
+    val isSubmittingReport: Boolean = false
 )
 
 data class BannerState(

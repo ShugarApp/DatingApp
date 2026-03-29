@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.HeartBroken
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,6 +28,7 @@ import shugar.feature.home.presentation.generated.resources.Res
 import shugar.feature.home.presentation.generated.resources.chat_members
 import shugar.feature.home.presentation.generated.resources.go_back
 import shugar.feature.home.presentation.generated.resources.leave_chat
+import shugar.feature.home.presentation.generated.resources.report_user
 import shugar.feature.home.presentation.generated.resources.open_chat_options_menu
 import shugar.feature.home.presentation.generated.resources.users_icon
 import com.dating.home.domain.models.ChatMessage
@@ -57,6 +59,7 @@ fun ChatDetailHeader(
     onLeaveChatClick: () -> Unit,
     onBlockUserClick: () -> Unit,
     onDeleteMatchClick: () -> Unit,
+    onReportUserClick: () -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -122,6 +125,12 @@ fun ChatDetailHeader(
                         onClick = onDeleteMatchClick
                     ),
                     DropDownItem(
+                        title = stringResource(Res.string.report_user),
+                        icon = Icons.Default.Flag,
+                        contentColor = MaterialTheme.colorScheme.extended.destructiveHover,
+                        onClick = onReportUserClick
+                    ),
+                    DropDownItem(
                         title = stringResource(Res.string.block_user),
                         icon = Icons.Default.Block,
                         contentColor = MaterialTheme.colorScheme.extended.destructiveHover,
@@ -185,6 +194,7 @@ fun ChatDetailHeaderPreview() {
                     onLeaveChatClick = {},
                     onBlockUserClick = {},
                     onDeleteMatchClick = {},
+                    onReportUserClick = {},
                     onDismissChatOptions = {},
                     onBackClick = {},
                 )

@@ -8,4 +8,6 @@ sealed interface ChatDetailEvent {
     data object OnNewMessage: ChatDetailEvent
     data object OnUserBlocked: ChatDetailEvent
     data object OnMatchDeleted: ChatDetailEvent
+    data object OnReportSuccess: ChatDetailEvent
+    data object OnForceLogout: ChatDetailEvent
 }

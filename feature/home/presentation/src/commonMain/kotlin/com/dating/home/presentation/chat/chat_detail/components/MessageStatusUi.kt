@@ -15,8 +15,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import shugar.feature.home.presentation.generated.resources.Res
 import shugar.feature.home.presentation.generated.resources.check_icon
+import shugar.feature.home.presentation.generated.resources.double_check_icon
 import shugar.feature.home.presentation.generated.resources.failed
 import shugar.feature.home.presentation.generated.resources.loading_icon
+import shugar.feature.home.presentation.generated.resources.read
 import shugar.feature.home.presentation.generated.resources.sending
 import shugar.feature.home.presentation.generated.resources.sent
 import com.dating.home.domain.models.ChatMessageDeliveryStatus
@@ -40,6 +42,11 @@ fun MessageStatus(
             stringResource(Res.string.sent),
             vectorResource(Res.drawable.check_icon),
             MaterialTheme.colorScheme.extended.textTertiary
+        )
+        ChatMessageDeliveryStatus.READ -> Triple(
+            stringResource(Res.string.read),
+            vectorResource(Res.drawable.double_check_icon),
+            MaterialTheme.colorScheme.primary
         )
         ChatMessageDeliveryStatus.FAILED -> Triple(
             stringResource(Res.string.failed),

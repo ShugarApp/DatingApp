@@ -8,6 +8,7 @@ import com.dating.home.presentation.chat.manage_chat.ManageChatViewModel
 import com.dating.home.presentation.detail.ProfileDetailViewModel
 import com.dating.home.presentation.home.swipe.FeedViewModel
 import com.dating.home.presentation.matches.MatchesViewModel
+import com.dating.home.presentation.photo_onboarding.PhotoOnboardingViewModel
 import com.dating.home.presentation.profile.edit_profile.EditProfileViewModel
 import com.dating.home.presentation.profile.profile.ProfileViewModel
 import com.dating.home.presentation.profile.settings.SettingsViewModel
@@ -28,6 +29,7 @@ val homePresentationModule = module {
     viewModelOf(::MatchesViewModel)
     viewModelOf(::ChangePasswordViewModel)
     viewModelOf(::EditProfileViewModel)
+    viewModelOf(::PhotoOnboardingViewModel)
     viewModelOf(::ProfileDetailViewModel)
     viewModelOf(::BlockedUsersViewModel)
 }

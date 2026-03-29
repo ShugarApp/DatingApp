@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 enum class IncomingWebSocketType {
     NEW_MESSAGE,
     MESSAGE_DELETED,
+    MESSAGES_READ,
     PROFILE_PICTURE_UPDATED,
     CHAT_PARTICIPANTS_CHANGED,
     TYPING_INDICATOR
@@ -41,6 +42,14 @@ sealed interface IncomingWebSocketDto {
     data class ChatParticipantsChangedDto(
         val chatId: String,
         val type: IncomingWebSocketType = IncomingWebSocketType.CHAT_PARTICIPANTS_CHANGED
+    ): IncomingWebSocketDto
+
+    @Serializable
+    data class MessagesReadDto(
+        val chatId: String,
+        val readByUserId: String,
+        val messageIds: List<String>,
+        val type: IncomingWebSocketType = IncomingWebSocketType.MESSAGES_READ
     ): IncomingWebSocketDto
 
     @Serializable
