@@ -7,10 +7,12 @@ import com.dating.home.data.dto.websocket.OutgoingWebSocketDto
 import com.dating.home.data.dto.websocket.WebSocketMessageDto
 import com.dating.home.data.mappers.toDomain
 import com.dating.home.data.mappers.toEntity
+import com.dating.home.domain.models.ChatMessageDeliveryStatus
 import com.dating.home.data.network.KtorWebSocketConnector
 import com.dating.home.database.AppChatDatabase
 import com.dating.home.domain.chat.ChatConnectionClient
 import com.dating.home.domain.chat.ChatRepository
+import com.dating.home.domain.models.MessagesReadEvent
 import com.dating.home.domain.models.TypingIndicator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
@@ -62,10 +64,34 @@ class WebSocketChatConnectionClient(
             SharingStarted.WhileSubscribed(5000)
         )
 
+    override val messagesRead = parsedMessages
+        .filterIsInstance<IncomingWebSocketDto.MessagesReadDto>()
+        .mapNotNull { dto ->
+            MessagesReadEvent(
+                chatId = dto.chatId,
+                readByUserId = dto.readByUserId,
+                messageIds = dto.messageIds
+            )
+        }
+        .shareIn(
+            applicationScope,
+            SharingStarted.WhileSubscribed(5000)
+        )
+
     override val connectionState = webSocketConnector.connectionState
 
     override suspend fun sendTyping(chatId: String) {
         val dto = OutgoingWebSocketDto.Typing(chatId = chatId)
+        val webSocketMessage = WebSocketMessageDto(
+            type = dto.type.name,
+            payload = json.encodeToString(dto)
+        )
+        webSocketConnector.sendMessage(json.encodeToString(webSocketMessage))
+    }
+
+    override suspend fun sendReadReceipt(chatId: String, messageIds: List<String>) {
+        if (messageIds.isEmpty()) return
+        val dto = OutgoingWebSocketDto.ReadMessages(chatId = chatId, messageIds = messageIds)
         val webSocketMessage = WebSocketMessageDto(
             type = dto.type.name,
             payload = json.encodeToString(dto)
@@ -91,6 +117,10 @@ class WebSocketChatConnectionClient(
                 json.decodeFromString<IncomingWebSocketDto.ChatParticipantsChangedDto>(message.payload)
             }
 
+            IncomingWebSocketType.MESSAGES_READ.name -> {
+                json.decodeFromString<IncomingWebSocketDto.MessagesReadDto>(message.payload)
+            }
+
             IncomingWebSocketType.TYPING_INDICATOR.name -> {
                 json.decodeFromString<IncomingWebSocketDto.TypingIndicatorDto>(message.payload)
             }
@@ -105,6 +135,7 @@ class WebSocketChatConnectionClient(
             is IncomingWebSocketDto.MessageDeletedDto -> deleteMessage(message)
             is IncomingWebSocketDto.NewMessageDto -> handleNewMessage(message)
             is IncomingWebSocketDto.ProfilePictureUpdated -> updateProfilePicture(message)
+            is IncomingWebSocketDto.MessagesReadDto -> handleMessagesRead(message)
             is IncomingWebSocketDto.TypingIndicatorDto -> Unit
         }
     }
@@ -125,6 +156,17 @@ class WebSocketChatConnectionClient(
 
         val entity = message.toEntity()
         database.chatMessageDao.upsertMessage(entity)
+    }
+
+    private suspend fun handleMessagesRead(message: IncomingWebSocketDto.MessagesReadDto) {
+        val now = kotlin.time.Clock.System.now().toEpochMilliseconds()
+        message.messageIds.forEach { messageId ->
+            database.chatMessageDao.updateDeliveryStatus(
+                messageId = messageId,
+                status = ChatMessageDeliveryStatus.READ.name,
+                timestamp = now
+            )
+        }
     }
 
     private suspend fun updateProfilePicture(message: IncomingWebSocketDto.ProfilePictureUpdated) {

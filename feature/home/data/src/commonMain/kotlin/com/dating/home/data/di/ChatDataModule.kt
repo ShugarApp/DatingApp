@@ -13,6 +13,7 @@ import com.dating.home.data.notification.KtorDeviceTokenService
 import com.dating.home.data.participant.KtorChatParticipantService
 import com.dating.home.data.participant.OfflineFirstChatParticipantRepository
 import com.dating.home.data.block.KtorBlockService
+import com.dating.home.data.report.KtorReportService
 import com.dating.home.data.user.KtorUserService
 import com.dating.home.database.DatabaseFactory
 import com.dating.home.domain.chat.ChatConnectionClient
@@ -25,6 +26,7 @@ import com.dating.home.domain.notification.DeviceTokenService
 import com.dating.home.domain.participant.ChatParticipantRepository
 import com.dating.home.domain.participant.ChatParticipantService
 import com.dating.home.domain.block.BlockService
+import com.dating.home.domain.report.ReportService
 import com.dating.home.domain.user.UserService
 import kotlinx.serialization.json.Json
 import org.koin.core.module.Module
@@ -50,6 +52,7 @@ val homeDataModule = module {
     singleOf(::KtorMatchingService) bind MatchingService::class
     singleOf(::KtorUserService) bind UserService::class
     singleOf(::KtorBlockService) bind BlockService::class
+    singleOf(::KtorReportService) bind ReportService::class
     single {
         Json {
             ignoreUnknownKeys = true

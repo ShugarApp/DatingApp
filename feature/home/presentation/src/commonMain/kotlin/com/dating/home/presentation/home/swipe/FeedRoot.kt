@@ -14,6 +14,7 @@ fun FeedRoot(
     onNavigateToProfile: (String, String?) -> Unit,
     onNavigateToEditProfile: () -> Unit,
     swipedUserId: String? = null,
+    swipedIsDislike: Boolean = false,
     modifier: Modifier = Modifier,
     viewModel: FeedViewModel = koinViewModel()
 ) {
@@ -21,7 +22,7 @@ fun FeedRoot(
 
     LaunchedEffect(swipedUserId) {
         if (swipedUserId != null) {
-            viewModel.onAction(FeedAction.OnUserSwiped(swipedUserId))
+            viewModel.onAction(FeedAction.OnUserSwiped(swipedUserId, swipedIsDislike))
         }
     }
 

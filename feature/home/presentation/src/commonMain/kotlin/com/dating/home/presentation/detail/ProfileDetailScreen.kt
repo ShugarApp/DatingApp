@@ -33,6 +33,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Cake
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocalBar
@@ -46,6 +47,10 @@ import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -88,12 +93,16 @@ import aura.feature.home.presentation.generated.resources.cancel
 import aura.feature.home.presentation.generated.resources.delete_match
 import aura.feature.home.presentation.generated.resources.delete_match_title
 import aura.feature.home.presentation.generated.resources.delete_match_desc
+import aura.feature.home.presentation.generated.resources.report_user
+import aura.feature.home.presentation.generated.resources.report_success
+import aura.feature.home.presentation.generated.resources.report_duplicate
 import androidx.compose.material.icons.filled.HeartBroken
 import coil3.compose.AsyncImage
 import com.dating.core.designsystem.components.dialogs.DestructiveConfirmationDialog
 import com.dating.core.designsystem.theme.extended
 import com.dating.core.domain.auth.User
 import com.dating.core.presentation.util.ObserveAsEvents
+import com.dating.home.presentation.report.ReportUserBottomSheet
 import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -107,7 +116,8 @@ fun ProfileDetailScreen(
     userId: String,
     imageUrl: String?,
     onBack: () -> Unit,
-    onSwipedUser: (String) -> Unit = {},
+    onSwipedUser: (String, Boolean) -> Unit = { _, _ -> },
+    onForceLogout: () -> Unit = {},
     isOwnProfile: Boolean = false,
     isMatch: Boolean = false,
     modifier: Modifier = Modifier,
@@ -117,6 +127,8 @@ fun ProfileDetailScreen(
     var showMatchDialog by remember { mutableStateOf(false) }
     var matchName by remember { mutableStateOf("") }
     var swipedUserId by remember { mutableStateOf<String?>(null) }
+    val snackbarState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(userId) {
         viewModel.loadUser(userId)
@@ -125,7 +137,7 @@ fun ProfileDetailScreen(
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
             is ProfileDetailEvent.NavigateBack -> {
-                event.swipedUserId?.let { onSwipedUser(it) }
+                event.swipedUserId?.let { onSwipedUser(it, event.isDislike) }
                 onBack()
             }
             is ProfileDetailEvent.ShowMatch -> {
@@ -135,12 +147,24 @@ fun ProfileDetailScreen(
             }
             ProfileDetailEvent.OnUserBlocked -> onBack()
             ProfileDetailEvent.OnMatchDeleted -> onBack()
+            is ProfileDetailEvent.OnReportSuccess -> {
+                snackbarState.showSnackbar(
+                    org.jetbrains.compose.resources.getString(Res.string.report_success)
+                )
+            }
+            is ProfileDetailEvent.OnReportError -> {
+                snackbarState.showSnackbar(
+                    org.jetbrains.compose.resources.getString(Res.string.report_duplicate)
+                )
+            }
+            ProfileDetailEvent.OnForceLogout -> onForceLogout()
         }
     }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.surface,
+        snackbarHost = { SnackbarHost(snackbarState) }
     ) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize()) {
             when {
@@ -157,10 +181,12 @@ fun ProfileDetailScreen(
                         hideActions = isOwnProfile || isMatch,
                         showBlockButton = !isOwnProfile,
                         showDeleteMatchButton = isMatch,
+                        showReportButton = !isOwnProfile,
                         onSwipeLeft = { viewModel.onAction(ProfileDetailAction.OnSwipeLeft(userId)) },
                         onSwipeRight = { viewModel.onAction(ProfileDetailAction.OnSwipeRight(userId)) },
                         onBlockClick = { viewModel.onAction(ProfileDetailAction.OnBlockClick(userId)) },
-                        onDeleteMatchClick = { viewModel.onAction(ProfileDetailAction.OnDeleteMatchClick(userId)) }
+                        onDeleteMatchClick = { viewModel.onAction(ProfileDetailAction.OnDeleteMatchClick(userId)) },
+                        onReportClick = { viewModel.onAction(ProfileDetailAction.OnReportClick(userId)) }
                     )
                 }
                 else -> {
@@ -218,11 +244,25 @@ fun ProfileDetailScreen(
         )
     }
 
+    if (state.showReportSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { viewModel.onAction(ProfileDetailAction.OnDismissReportSheet) },
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+        ) {
+            ReportUserBottomSheet(
+                isSubmitting = state.isSubmittingReport,
+                onSubmit = { reason, description ->
+                    viewModel.onAction(ProfileDetailAction.OnSubmitReport(reason, description))
+                }
+            )
+        }
+    }
+
     if (showMatchDialog) {
         AlertDialog(
             onDismissRequest = {
                 showMatchDialog = false
-                swipedUserId?.let { onSwipedUser(it) }
+                swipedUserId?.let { onSwipedUser(it, false) }
                 onBack()
             },
             icon = {
@@ -243,7 +283,7 @@ fun ProfileDetailScreen(
             confirmButton = {
                 TextButton(onClick = {
                     showMatchDialog = false
-                    swipedUserId?.let { onSwipedUser(it) }
+                    swipedUserId?.let { onSwipedUser(it, false) }
                     onBack()
                 }) {
                     Text(stringResource(Res.string.feed_match_dismiss))
@@ -262,10 +302,12 @@ private fun ProfileDetailContent(
     hideActions: Boolean = false,
     showBlockButton: Boolean = false,
     showDeleteMatchButton: Boolean = false,
+    showReportButton: Boolean = false,
     onSwipeLeft: () -> Unit,
     onSwipeRight: () -> Unit,
     onBlockClick: () -> Unit = {},
-    onDeleteMatchClick: () -> Unit = {}
+    onDeleteMatchClick: () -> Unit = {},
+    onReportClick: () -> Unit = {}
 ) {
     val photos = user.photos.ifEmpty { listOfNotNull(fallbackImageUrl) }
     val pagerState = rememberPagerState { photos.size.coerceAtLeast(1) }
@@ -433,7 +475,7 @@ private fun ProfileDetailContent(
                 }
 
                 // Action buttons (top-right)
-                if (showBlockButton || showDeleteMatchButton) {
+                if (showBlockButton || showDeleteMatchButton || showReportButton) {
                     Row(
                         modifier = Modifier
                             .align(Alignment.TopEnd)
@@ -450,6 +492,20 @@ private fun ProfileDetailContent(
                                 Icon(
                                     imageVector = Icons.Default.HeartBroken,
                                     contentDescription = stringResource(Res.string.delete_match),
+                                    tint = Color.White
+                                )
+                            }
+                        }
+                        if (showReportButton) {
+                            IconButton(
+                                onClick = onReportClick,
+                                modifier = Modifier
+                                    .background(Color.Black.copy(alpha = 0.3f), CircleShape)
+                                    .size(40.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Flag,
+                                    contentDescription = stringResource(Res.string.report_user),
                                     tint = Color.White
                                 )
                             }

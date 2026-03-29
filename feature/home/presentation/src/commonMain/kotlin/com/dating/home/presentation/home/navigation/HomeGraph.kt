@@ -43,13 +43,16 @@ fun NavGraphBuilder.homeGraph(
 
         composable<HomeGraphRoutes.BottomNavContainer> { backStackEntry ->
             val swipedUserId = backStackEntry.savedStateHandle.get<String>("swiped_user_id")
+            val swipedIsDislike = backStackEntry.savedStateHandle.get<Boolean>("swiped_is_dislike") ?: false
             LaunchedEffect(swipedUserId) {
                 if (swipedUserId != null) {
                     backStackEntry.savedStateHandle.remove<String>("swiped_user_id")
+                    backStackEntry.savedStateHandle.remove<Boolean>("swiped_is_dislike")
                 }
             }
             BottomNavigationContainer(
                 swipedUserId = swipedUserId,
+                swipedIsDislike = swipedIsDislike,
                 onNavigateToProfile = { userId, imageUrl ->
                     navController.navigate(HomeGraphRoutes.ProfileDetailRoute(userId, imageUrl))
                 },
@@ -85,10 +88,13 @@ fun NavGraphBuilder.homeGraph(
                 isOwnProfile = route.isOwnProfile,
                 isMatch = route.isMatch,
                 onBack = { navController.popBackStack() },
-                onSwipedUser = { swipedUserId ->
+                onSwipedUser = { swipedUserId, isDislike ->
                     navController.previousBackStackEntry
                         ?.savedStateHandle
                         ?.set("swiped_user_id", swipedUserId)
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("swiped_is_dislike", isDislike)
                 }
             )
         }

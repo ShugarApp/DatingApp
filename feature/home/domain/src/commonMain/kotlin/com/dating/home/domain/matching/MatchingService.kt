@@ -29,4 +29,6 @@ interface MatchingService {
     suspend fun getLikes(): Result<List<User>, DataError.Remote>
 
     suspend fun deleteMatch(matchedUserId: String): EmptyResult<DataError.Remote>
+
+    suspend fun undoSwipe(swipedId: String): EmptyResult<DataError.Remote>
 }

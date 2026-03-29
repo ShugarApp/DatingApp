@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.filled.Undo
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -94,6 +95,7 @@ import aura.feature.home.presentation.generated.resources.feed_complete_profile_
 import aura.feature.home.presentation.generated.resources.feed_complete_profile_title
 import aura.feature.home.presentation.generated.resources.feed_match_dismiss
 import aura.feature.home.presentation.generated.resources.feed_match_title
+import aura.feature.home.presentation.generated.resources.feed_undo_swipe
 import coil3.compose.AsyncImage
 import com.dating.core.designsystem.components.header.MainTopAppBar
 import com.dating.core.domain.discovery.Gender
@@ -119,6 +121,25 @@ fun FeedScreen(
             MainTopAppBar(
                 title = stringResource(Res.string.app_name_feed),
                 actions = {
+                    if (state.lastDislikedItem != null) {
+                        IconButton(
+                            onClick = { onAction(FeedAction.OnUndoSwipe) },
+                            enabled = !state.isUndoing
+                        ) {
+                            if (state.isUndoing) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(20.dp),
+                                    strokeWidth = 2.dp,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            } else {
+                                Icon(
+                                    imageVector = Icons.Default.Undo,
+                                    contentDescription = stringResource(Res.string.feed_undo_swipe)
+                                )
+                            }
+                        }
+                    }
                     IconButton(onClick = { showFilterSheet = true }) {
                         Icon(
                             imageVector = Icons.Default.Tune,
@@ -156,30 +177,41 @@ fun FeedScreen(
                         onOpenFilters = { showFilterSheet = true }
                     )
                 } else if (state.feedItems.isNotEmpty()) {
-                    val visibleItems = state.feedItems.take(3).reversed()
-                    visibleItems.forEach { feedItem ->
-                        val isTopCard = feedItem == state.feedItems.first()
-                        if (isTopCard) {
-                            SwipeableCard(
-                                onSwipeLeft = { onAction(FeedAction.OnSwipeLeft(feedItem.userId)) },
-                                onSwipeRight = { onAction(FeedAction.OnSwipeRight(feedItem.userId)) },
-                                modifier = Modifier.padding(16.dp)
-                            ) {
-                                FeedCardContent(
-                                    feedItem = feedItem,
-                                    onClick = { onAction(FeedAction.OnUserClick(feedItem.userId, feedItem.profilePictureUrl)) }
-                                )
-                            }
-                        } else {
-                            Card(
-                                modifier = Modifier.padding(16.dp),
-                                colors = CardDefaults.cardColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceContainer
-                                )
-                            ) {
-                                FeedCardContent(feedItem = feedItem, onClick = {})
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Box(
+                            modifier = Modifier.weight(1f).fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            val visibleItems = state.feedItems.take(3).reversed()
+                            visibleItems.forEach { feedItem ->
+                                val isTopCard = feedItem == state.feedItems.first()
+                                if (isTopCard) {
+                                    SwipeableCard(
+                                        onSwipeLeft = { onAction(FeedAction.OnSwipeLeft(feedItem.userId)) },
+                                        onSwipeRight = { onAction(FeedAction.OnSwipeRight(feedItem.userId)) },
+                                        modifier = Modifier.padding(16.dp)
+                                    ) {
+                                        FeedCardContent(
+                                            feedItem = feedItem,
+                                            onClick = { onAction(FeedAction.OnUserClick(feedItem.userId, feedItem.profilePictureUrl)) }
+                                        )
+                                    }
+                                } else {
+                                    Card(
+                                        modifier = Modifier.padding(16.dp),
+                                        colors = CardDefaults.cardColors(
+                                            containerColor = MaterialTheme.colorScheme.surfaceContainer
+                                        )
+                                    ) {
+                                        FeedCardContent(feedItem = feedItem, onClick = {})
+                                    }
+                                }
                             }
                         }
+
                     }
                 }
             }

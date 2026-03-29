@@ -97,11 +97,16 @@ class FeedViewModel(
                 if (isInitialized) refreshPreferencesIfChanged()
             }
             is FeedAction.OnUserSwiped -> {
+                val swipedItem = _state.value.feedItems.firstOrNull { it.userId == action.userId }
                 _state.update { current ->
-                    current.copy(feedItems = current.feedItems.filter { it.userId != action.userId })
+                    current.copy(
+                        feedItems = current.feedItems.filter { it.userId != action.userId },
+                        lastDislikedItem = if (action.isDislike) swipedItem else null
+                    )
                 }
                 prefetchIfNeeded()
             }
+            FeedAction.OnUndoSwipe -> undoSwipe()
         }
     }
 
@@ -135,7 +140,8 @@ class FeedViewModel(
             it.copy(
                 feedItems = emptyList(),
                 currentPage = 0,
-                hasMore = true
+                hasMore = true,
+                lastDislikedItem = null
             )
         }
         loadFeed(page = 0, isInitialLoad = true)
@@ -201,9 +207,14 @@ class FeedViewModel(
     }
 
     private fun swipe(userId: String, action: SwipeAction) {
-        val matchedName = _state.value.feedItems.firstOrNull { it.userId == userId }?.username
+        val currentItems = _state.value.feedItems
+        val swipedItem = currentItems.firstOrNull { it.userId == userId }
+        val matchedName = swipedItem?.username
         _state.update { current ->
-            current.copy(feedItems = current.feedItems.filter { it.userId != userId })
+            current.copy(
+                feedItems = current.feedItems.filter { it.userId != userId },
+                lastDislikedItem = if (action == SwipeAction.DISLIKE) swipedItem else null
+            )
         }
         prefetchIfNeeded()
         viewModelScope.launch {
@@ -216,6 +227,26 @@ class FeedViewModel(
                     }
                 }
                 .onFailure { /* swipe errors are non-critical, feed already updated */ }
+        }
+    }
+
+    private fun undoSwipe() {
+        val lastDisliked = _state.value.lastDislikedItem ?: return
+        _state.update { it.copy(isUndoing = true) }
+        viewModelScope.launch {
+            matchingService.undoSwipe(swipedId = lastDisliked.userId)
+                .onSuccess {
+                    _state.update { current ->
+                        current.copy(
+                            feedItems = listOf(lastDisliked) + current.feedItems,
+                            lastDislikedItem = null,
+                            isUndoing = false
+                        )
+                    }
+                }
+                .onFailure {
+                    _state.update { it.copy(isUndoing = false) }
+                }
         }
     }
 

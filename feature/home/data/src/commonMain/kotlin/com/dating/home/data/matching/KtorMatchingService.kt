@@ -68,4 +68,10 @@ class KtorMatchingService(private val httpClient: HttpClient) : MatchingService 
             route = "/matching/matches/$matchedUserId"
         )
     }
+
+    override suspend fun undoSwipe(swipedId: String): EmptyResult<DataError.Remote> {
+        return httpClient.delete<Unit>(
+            route = "/matching/swipe/$swipedId"
+        )
+    }
 }

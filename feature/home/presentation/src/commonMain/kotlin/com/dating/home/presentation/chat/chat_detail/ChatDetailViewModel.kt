@@ -7,6 +7,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import aura.feature.home.presentation.generated.resources.Res
+import aura.feature.home.presentation.generated.resources.report_duplicate
 import aura.feature.home.presentation.generated.resources.today
 import com.dating.core.domain.auth.SessionStorage
 import com.dating.core.domain.util.DataErrorException
@@ -15,12 +16,16 @@ import com.dating.core.domain.util.onFailure
 import com.dating.core.domain.util.onSuccess
 import com.dating.core.presentation.util.UiText
 import com.dating.core.presentation.util.toUiText
+import com.dating.core.domain.util.DataError
 import com.dating.home.domain.block.BlockService
 import com.dating.home.domain.chat.ChatConnectionClient
 import com.dating.home.domain.chat.ChatRepository
 import com.dating.home.domain.matching.MatchingService
 import com.dating.home.domain.message.MessageRepository
+import com.dating.home.domain.report.ReportReason
+import com.dating.home.domain.report.ReportService
 import com.dating.home.domain.models.ChatMessage
+import com.dating.home.domain.models.ChatMessageDeliveryStatus
 import com.dating.home.domain.models.ConnectionState
 import com.dating.home.domain.models.OutgoingNewMessage
 import com.dating.home.presentation.chat.mappers.toUi
@@ -37,6 +42,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -53,7 +59,8 @@ class ChatDetailViewModel(
     private val messageRepository: MessageRepository,
     private val connectionClient: ChatConnectionClient,
     private val blockService: BlockService,
-    private val matchingService: MatchingService
+    private val matchingService: MatchingService,
+    private val reportService: ReportService
 ) : ViewModel() {
 
     private val eventChannel = Channel<ChatDetailEvent>()
@@ -124,6 +131,7 @@ class ChatDetailViewModel(
                 observeChatMessages()
                 observeCanSendMessage()
                 observeTypingIndicators()
+                observeMessagesRead()
                 hasLoadedInitialData = true
             }
         }
@@ -156,6 +164,9 @@ class ChatDetailViewModel(
             ChatDetailAction.OnDeleteMatchClick -> onDeleteMatchClick()
             ChatDetailAction.OnConfirmDeleteMatch -> confirmDeleteMatch()
             ChatDetailAction.OnDismissDeleteMatchDialog -> _state.update { it.copy(showDeleteMatchDialog = false) }
+            ChatDetailAction.OnReportUserClick -> onReportUserClick()
+            is ChatDetailAction.OnSubmitReport -> submitReport(action.reason, action.description)
+            ChatDetailAction.OnDismissReportSheet -> _state.update { it.copy(showReportSheet = false) }
             else -> Unit
         }
     }
@@ -325,6 +336,7 @@ class ChatDetailViewModel(
 
             if (newestMessageId != null && newestMessageId != currentNewestId && isNearBottom) {
                 eventChannel.send(ChatDetailEvent.OnNewMessage)
+                markMessagesAsRead()
             }
         }.launchIn(viewModelScope)
     }
@@ -361,6 +373,48 @@ class ChatDetailViewModel(
                 typingTimeoutJobs.remove(message.senderId)
             }
             .launchIn(viewModelScope)
+    }
+
+    private fun observeMessagesRead() {
+        connectionClient
+            .messagesRead
+            .onEach { event ->
+                val currentChatId = _chatId.value ?: return@onEach
+                if (event.chatId != currentChatId) return@onEach
+
+                event.messageIds.forEach { messageId ->
+                    messageRepository.updateMessageDeliveryStatus(
+                        messageId = messageId,
+                        status = ChatMessageDeliveryStatus.READ
+                    )
+                }
+            }
+            .launchIn(viewModelScope)
+    }
+
+    private fun markMessagesAsRead() {
+        val chatId = _chatId.value ?: return
+        viewModelScope.launch {
+            val authInfo = sessionStorage.observeAuthInfo().firstOrNull() ?: return@launch
+            val localUserId = authInfo.user.id
+
+            val unreadMessageIds = messageRepository.getMessagesForChat(chatId)
+                .firstOrNull()
+                ?.filter { it.sender.userId != localUserId && it.message.deliveryStatus == ChatMessageDeliveryStatus.SENT }
+                ?.map { it.message.id }
+                ?: return@launch
+
+            if (unreadMessageIds.isEmpty()) return@launch
+
+            connectionClient.sendReadReceipt(chatId, unreadMessageIds)
+
+            unreadMessageIds.forEach { messageId ->
+                messageRepository.updateMessageDeliveryStatus(
+                    messageId = messageId,
+                    status = ChatMessageDeliveryStatus.READ
+                )
+            }
+        }
     }
 
     private fun onTextChanged(text: String) {
@@ -554,7 +608,34 @@ class ChatDetailViewModel(
         viewModelScope.launch {
             chatId?.let {
                 chatRepository.fetchChatById(chatId)
+                markMessagesAsRead()
             }
+        }
+    }
+
+    private fun onReportUserClick() {
+        _state.update { it.copy(isChatOptionsOpen = false, showReportSheet = true) }
+    }
+
+    private fun submitReport(reason: ReportReason, description: String?) {
+        val otherUserId = state.value.chatUi?.otherParticipants?.firstOrNull()?.id ?: return
+        viewModelScope.launch {
+            _state.update { it.copy(isSubmittingReport = true) }
+            reportService.reportUser(otherUserId, reason, description)
+                .onSuccess {
+                    _state.update { it.copy(isSubmittingReport = false, showReportSheet = false) }
+                    eventChannel.send(ChatDetailEvent.OnReportSuccess)
+                }
+                .onFailure { error ->
+                    _state.update { it.copy(isSubmittingReport = false, showReportSheet = false) }
+                    when (error) {
+                        DataError.Remote.CONFLICT -> eventChannel.send(
+                            ChatDetailEvent.OnError(UiText.Resource(Res.string.report_duplicate))
+                        )
+                        DataError.Remote.FORBIDDEN -> eventChannel.send(ChatDetailEvent.OnForceLogout)
+                        else -> eventChannel.send(ChatDetailEvent.OnError(error.toUiText()))
+                    }
+                }
         }
     }
 

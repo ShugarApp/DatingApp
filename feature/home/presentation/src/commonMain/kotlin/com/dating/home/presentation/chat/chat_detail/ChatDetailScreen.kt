@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalUuidApi::class, ExperimentalComposeUiApi::class)
+@file:OptIn(ExperimentalUuidApi::class, ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 
 package com.dating.home.presentation.chat.chat_detail
 
@@ -54,7 +54,12 @@ import aura.feature.home.presentation.generated.resources.cancel
 import aura.feature.home.presentation.generated.resources.delete_match
 import aura.feature.home.presentation.generated.resources.delete_match_title
 import aura.feature.home.presentation.generated.resources.delete_match_desc
+import aura.feature.home.presentation.generated.resources.report_success
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
 import com.dating.core.designsystem.components.dialogs.DestructiveConfirmationDialog
+import com.dating.home.presentation.report.ReportUserBottomSheet
 import com.dating.home.presentation.chat.chat_detail.components.ChatDetailHeader
 import com.dating.home.presentation.chat.chat_detail.components.DateChip
 import com.dating.home.presentation.chat.chat_detail.components.MessageBannerListener
@@ -88,6 +93,7 @@ fun ChatDetailRoot(
     chatId: String?,
     onBack: () -> Unit,
     onChatMembersClick: () -> Unit,
+    onForceLogout: () -> Unit = {},
     viewModel: ChatDetailViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -110,6 +116,12 @@ fun ChatDetailRoot(
             is ChatDetailEvent.OnError -> {
                 snackbarState.showSnackbar(event.error.asStringAsync())
             }
+            ChatDetailEvent.OnReportSuccess -> {
+                snackbarState.showSnackbar(
+                    org.jetbrains.compose.resources.getString(Res.string.report_success)
+                )
+            }
+            ChatDetailEvent.OnForceLogout -> onForceLogout()
         }
     }
 
@@ -173,6 +185,20 @@ fun ChatDetailRoot(
             onCancelClick = { viewModel.onAction(ChatDetailAction.OnDismissDeleteMatchDialog) },
             onDismiss = { viewModel.onAction(ChatDetailAction.OnDismissDeleteMatchDialog) }
         )
+    }
+
+    if (state.showReportSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { viewModel.onAction(ChatDetailAction.OnDismissReportSheet) },
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+        ) {
+            ReportUserBottomSheet(
+                isSubmitting = state.isSubmittingReport,
+                onSubmit = { reason, description ->
+                    viewModel.onAction(ChatDetailAction.OnSubmitReport(reason, description))
+                }
+            )
+        }
     }
 }
 
@@ -295,6 +321,9 @@ fun ChatDetailScreen(
                                 },
                                 onDeleteMatchClick = {
                                     onAction(ChatDetailAction.OnDeleteMatchClick)
+                                },
+                                onReportUserClick = {
+                                    onAction(ChatDetailAction.OnReportUserClick)
                                 },
                                 onBackClick = {
                                     onAction(ChatDetailAction.OnBackClick)

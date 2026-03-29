@@ -26,4 +26,7 @@ sealed interface ChatDetailAction {
     data object OnDeleteMatchClick: ChatDetailAction
     data object OnConfirmDeleteMatch: ChatDetailAction
     data object OnDismissDeleteMatchDialog: ChatDetailAction
+    data object OnReportUserClick: ChatDetailAction
+    data class OnSubmitReport(val reason: com.dating.home.domain.report.ReportReason, val description: String?): ChatDetailAction
+    data object OnDismissReportSheet: ChatDetailAction
 }

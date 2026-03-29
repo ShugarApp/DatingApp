@@ -4,7 +4,8 @@ import kotlinx.serialization.Serializable
 
 enum class OutgoingWebSocketType {
     NEW_MESSAGE,
-    TYPING
+    TYPING,
+    READ_MESSAGES
 }
 
 @Serializable
@@ -23,4 +24,10 @@ sealed class OutgoingWebSocketDto(
     data class Typing(
         val chatId: String
     ) : OutgoingWebSocketDto(OutgoingWebSocketType.TYPING)
+
+    @Serializable
+    data class ReadMessages(
+        val chatId: String,
+        val messageIds: List<String>
+    ) : OutgoingWebSocketDto(OutgoingWebSocketType.READ_MESSAGES)
 }

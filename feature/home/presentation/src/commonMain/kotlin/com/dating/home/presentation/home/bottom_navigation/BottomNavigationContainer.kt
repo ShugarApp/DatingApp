@@ -10,10 +10,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.dating.core.domain.auth.SessionStorage
 import com.dating.home.presentation.chat.chat_list_detail.ChatListDetailAdaptiveLayout
 import com.dating.home.presentation.home.swipe.FeedRoot
 import com.dating.home.presentation.matches.MatchesRoot
+import com.dating.home.presentation.photo_onboarding.PhotoOnboardingScreen
 import com.dating.home.presentation.profile.profile.ProfileScreen
+import org.koin.compose.koinInject
 
 @Composable
 fun BottomNavigationContainer(
@@ -26,9 +30,28 @@ fun BottomNavigationContainer(
     onVerification: () -> Unit,
     onSubscriptions: () -> Unit,
     swipedUserId: String? = null,
+    swipedIsDislike: Boolean = false,
     modifier: Modifier = Modifier
 ) {
+    val sessionStorage: SessionStorage = koinInject()
+    val authInfo by sessionStorage.observeAuthInfo().collectAsStateWithLifecycle(null)
+    val hasMinimumPhotos = authInfo?.let { it.user.photos.size >= 2 }
     var selectedSection by rememberSaveable { mutableStateOf(BottomNavSection.FEED) }
+
+    // Show full-screen photo onboarding if user has fewer than 2 photos
+    if (hasMinimumPhotos == false) {
+        PhotoOnboardingScreen(
+            onComplete = {
+                // No-op: the screen will automatically dismiss when session updates
+                // with >= 2 photos, causing hasMinimumPhotos to become true
+            },
+            modifier = modifier
+        )
+        return
+    }
+
+    // Still loading session — avoid showing content briefly
+    if (hasMinimumPhotos == null) return
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -51,7 +74,8 @@ fun BottomNavigationContainer(
                     FeedRoot(
                         onNavigateToProfile = onNavigateToProfile,
                         onNavigateToEditProfile = onEditProfile,
-                        swipedUserId = swipedUserId
+                        swipedUserId = swipedUserId,
+                        swipedIsDislike = swipedIsDislike
                     )
                 }
 
