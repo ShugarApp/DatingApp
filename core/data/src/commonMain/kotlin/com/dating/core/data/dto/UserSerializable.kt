@@ -8,6 +8,8 @@ data class UserSerializable(
     val email: String,
     val username: String,
     val hasVerifiedEmail: Boolean,
+    val status: String = "PENDING",
+    val isPaused: Boolean = false,
     val photos: List<String> = emptyList(),
     val city: String? = null,
     val country: String? = null,
@@ -21,6 +23,5 @@ data class UserSerializable(
     val zodiac: String? = null,
     val smoking: String? = null,
     val drinking: String? = null,
-    val interests: List<String> = emptyList(),
-    val isPaused: Boolean = false
+    val interests: List<String> = emptyList()
 )

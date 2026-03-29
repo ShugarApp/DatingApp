@@ -241,6 +241,9 @@
     <string name="feed_error_title">No connection</string>
     <string name="feed_error_desc">We could not connect to the server. Check your internet connection and try again.</string>
     <string name="feed_error_retry">Retry</string>
+    <string name="feed_paused_title">Your account is paused</string>
+    <string name="feed_paused_desc">Your profile is currently hidden from other users. Activate your account to start discovering people again.</string>
+    <string name="feed_paused_activate">Activate Account</string>
 
     <!-- Photo Onboarding -->
     <string name="photo_onboarding_title">Add your photos</string>

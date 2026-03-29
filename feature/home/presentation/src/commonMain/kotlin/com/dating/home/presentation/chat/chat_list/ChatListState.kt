@@ -11,6 +11,7 @@ data class ChatListState(
     val localParticipant: ChatParticipantUi? = null,
     val selectedChatId: String? = null,
     val isLoading: Boolean = false,
+    val isSearchVisible: Boolean = false,
     val searchQuery: String = "",
     val searchTextFieldState: TextFieldState = TextFieldState(),
     val showDeleteConfirmationForChatId: String? = null

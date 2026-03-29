@@ -12,6 +12,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dating.core.domain.auth.SessionStorage
+import com.dating.core.domain.auth.UserStatus
 import com.dating.home.presentation.chat.chat_list_detail.ChatListDetailAdaptiveLayout
 import com.dating.home.presentation.home.swipe.FeedRoot
 import com.dating.home.presentation.matches.MatchesRoot
@@ -35,15 +36,15 @@ fun BottomNavigationContainer(
 ) {
     val sessionStorage: SessionStorage = koinInject()
     val authInfo by sessionStorage.observeAuthInfo().collectAsStateWithLifecycle(null)
-    val hasMinimumPhotos = authInfo?.let { it.user.photos.size >= 2 }
+    val userStatus = authInfo?.user?.status
     var selectedSection by rememberSaveable { mutableStateOf(BottomNavSection.FEED) }
 
-    // Show full-screen photo onboarding if user has fewer than 2 photos
-    if (hasMinimumPhotos == false) {
+    // Show full-screen photo onboarding if user status is PENDING
+    if (userStatus == UserStatus.PENDING) {
         PhotoOnboardingScreen(
             onComplete = {
                 // No-op: the screen will automatically dismiss when session updates
-                // with >= 2 photos, causing hasMinimumPhotos to become true
+                // with status ACTIVE, causing the check to pass
             },
             modifier = modifier
         )
@@ -51,7 +52,7 @@ fun BottomNavigationContainer(
     }
 
     // Still loading session — avoid showing content briefly
-    if (hasMinimumPhotos == null) return
+    if (userStatus == null) return
 
     Scaffold(
         modifier = modifier.fillMaxSize(),

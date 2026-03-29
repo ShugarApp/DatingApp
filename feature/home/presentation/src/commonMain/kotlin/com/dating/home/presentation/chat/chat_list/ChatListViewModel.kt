@@ -67,6 +67,8 @@ class ChatListViewModel(
 
             ChatListAction.OnRefresh -> refresh()
 
+            ChatListAction.OnToggleSearch -> toggleSearch()
+
             is ChatListAction.OnSearchQueryChanged -> {
                 _state.update { it.copy(searchQuery = action.query) }
             }
@@ -82,6 +84,16 @@ class ChatListViewModel(
             }
 
             else -> Unit
+        }
+    }
+
+    private fun toggleSearch() {
+        _state.update {
+            if (it.isSearchVisible) {
+                it.copy(isSearchVisible = false, searchQuery = "")
+            } else {
+                it.copy(isSearchVisible = true)
+            }
         }
     }
 

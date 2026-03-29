@@ -7,13 +7,15 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import com.dating.auth.presentation.navigation.AuthGraphRoutes
-import com.dating.home.presentation.home.navigation.HomeGraphRoutes
+import com.dating.aura.navigation.BlockedScreen
 import com.dating.aura.navigation.DeepLinkListener
 import com.dating.aura.navigation.NavigationRoot
 import com.dating.core.designsystem.theme.AppTheme
+import com.dating.core.domain.auth.UserStatus
 import com.dating.core.domain.preferences.ThemePreference
 import com.dating.core.domain.preferences.ThemePreferences
 import com.dating.core.presentation.util.ObserveAsEvents
+import com.dating.home.presentation.home.navigation.HomeGraphRoutes
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
@@ -59,15 +61,24 @@ fun App(
         darkTheme = resolvedDarkTheme
     ) {
         if(!state.isCheckingAuth) {
-            NavigationRoot(
-                navController = navController,
-                startDestination = if(state.isLoggedIn) {
-                    HomeGraphRoutes.Home
-                } else {
-                    AuthGraphRoutes.Graph
-                }
-            )
-            DeepLinkListener(navController, onDeepLinkListenerSetup)
+            val isBlocked = state.userStatus == UserStatus.SUSPENDED ||
+                    state.userStatus == UserStatus.BANNED
+
+            if (isBlocked) {
+                BlockedScreen(
+                    isBanned = state.userStatus == UserStatus.BANNED
+                )
+            } else {
+                NavigationRoot(
+                    navController = navController,
+                    startDestination = if(state.isLoggedIn) {
+                        HomeGraphRoutes.Home
+                    } else {
+                        AuthGraphRoutes.Graph
+                    }
+                )
+                DeepLinkListener(navController, onDeepLinkListenerSetup)
+            }
         }
     }
 }

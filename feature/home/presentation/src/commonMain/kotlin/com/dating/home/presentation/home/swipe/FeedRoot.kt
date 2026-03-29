@@ -42,9 +42,17 @@ fun FeedRoot(
         }
     }
 
-    FeedScreen(
-        state = state,
-        onAction = viewModel::onAction,
-        modifier = modifier
-    )
+    if (state.isAccountPaused) {
+        PausedFeedScreen(
+            isResuming = state.isResumingAccount,
+            onActivateClick = { viewModel.onAction(FeedAction.OnResumeAccount) },
+            modifier = modifier
+        )
+    } else {
+        FeedScreen(
+            state = state,
+            onAction = viewModel::onAction,
+            modifier = modifier
+        )
+    }
 }
