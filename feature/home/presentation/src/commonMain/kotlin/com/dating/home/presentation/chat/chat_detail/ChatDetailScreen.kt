@@ -58,6 +58,10 @@ import shugar.feature.home.presentation.generated.resources.cancel
 import shugar.feature.home.presentation.generated.resources.delete_match
 import shugar.feature.home.presentation.generated.resources.delete_match_title
 import shugar.feature.home.presentation.generated.resources.delete_match_desc
+import shugar.feature.home.presentation.generated.resources.block_after_report_confirm
+import shugar.feature.home.presentation.generated.resources.block_after_report_desc
+import shugar.feature.home.presentation.generated.resources.block_after_report_dismiss
+import shugar.feature.home.presentation.generated.resources.block_after_report_title
 import shugar.feature.home.presentation.generated.resources.report_success
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
@@ -201,6 +205,18 @@ fun ChatDetailRoot(
             onConfirmClick = { viewModel.onAction(ChatDetailAction.OnConfirmDeleteMatch) },
             onCancelClick = { viewModel.onAction(ChatDetailAction.OnDismissDeleteMatchDialog) },
             onDismiss = { viewModel.onAction(ChatDetailAction.OnDismissDeleteMatchDialog) }
+        )
+    }
+
+    if (state.showBlockAfterReportDialog) {
+        DestructiveConfirmationDialog(
+            title = stringResource(Res.string.block_after_report_title),
+            description = stringResource(Res.string.block_after_report_desc),
+            confirmButtonText = stringResource(Res.string.block_after_report_confirm),
+            cancelButtonText = stringResource(Res.string.block_after_report_dismiss),
+            onConfirmClick = { viewModel.onAction(ChatDetailAction.OnConfirmBlockAfterReport) },
+            onCancelClick = { viewModel.onAction(ChatDetailAction.OnDismissBlockAfterReportDialog) },
+            onDismiss = { viewModel.onAction(ChatDetailAction.OnDismissBlockAfterReportDialog) }
         )
     }
 

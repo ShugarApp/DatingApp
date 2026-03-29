@@ -3,6 +3,7 @@ package com.dating.home.presentation.photo_onboarding
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dating.core.domain.auth.SessionStorage
+import com.dating.core.domain.auth.UserStatus
 import com.dating.core.domain.util.onFailure
 import com.dating.core.domain.util.onSuccess
 import com.dating.core.presentation.util.UiText
@@ -40,15 +41,14 @@ class PhotoOnboardingViewModel(
             _state.update {
                 it.copy(photos = List(4) { i -> cachedPhotos.getOrNull(i) })
             }
-            // Sync with server to get the latest photos
+            // Sync with server to get the latest photos and status
             userService.getMyProfile()
                 .onSuccess { user ->
                     _state.update {
                         it.copy(photos = List(4) { i -> user.photos.getOrNull(i) })
                     }
-                    // Update local session so BottomNavigationContainer re-evaluates
                     if (authInfo != null) {
-                        sessionStorage.set(authInfo.copy(user = authInfo.user.copy(photos = user.photos)))
+                        sessionStorage.set(authInfo.copy(user = user))
                     }
                 }
         }
@@ -101,6 +101,10 @@ class PhotoOnboardingViewModel(
                 .onSuccess { user ->
                     sessionStorage.observeAuthInfo().firstOrNull()?.let { info ->
                         sessionStorage.set(info.copy(user = user))
+                    }
+                    // If backend hasn't changed status yet, reset loading
+                    if (user.status == UserStatus.PENDING) {
+                        _state.update { it.copy(isCompleting = false) }
                     }
                 }
                 .onFailure {

@@ -32,6 +32,7 @@ class FeedViewModel(
     val events = _events.receiveAsFlow()
 
     private var isInitialized = false
+    private val blockedUserIds = mutableSetOf<String>()
 
     init {
         observeAccountPaused()
@@ -45,7 +46,11 @@ class FeedViewModel(
                     showMe = prefs.showMe
                 )
             }
-            loadFeed(page = 0, isInitialLoad = true)
+            val authInfo = sessionStorage.observeAuthInfo().first()
+            val isPaused = authInfo?.user?.isPaused == true
+            if (!isPaused) {
+                loadFeed(page = 0, isInitialLoad = true)
+            }
             isInitialized = true
             checkCompleteProfilePrompt()
         }
@@ -53,10 +58,17 @@ class FeedViewModel(
 
     private fun observeAccountPaused() {
         viewModelScope.launch {
+            var wasPaused: Boolean? = null
             sessionStorage.observeAuthInfo().collect { authInfo ->
+                val isPaused = authInfo?.user?.isPaused == true
+                val justResumed = wasPaused == true && !isPaused
                 _state.update {
-                    it.copy(isAccountPaused = authInfo?.user?.isPaused == true)
+                    it.copy(isAccountPaused = isPaused)
                 }
+                if (justResumed) {
+                    resetAndLoadFeed()
+                }
+                wasPaused = isPaused
             }
         }
     }
@@ -124,7 +136,13 @@ class FeedViewModel(
             }
             FeedAction.OnUndoSwipe -> undoSwipe()
             FeedAction.OnResumeAccount -> resumeAccount()
+            is FeedAction.OnUserBlocked -> removeUser(action.userId)
         }
+    }
+
+    private fun removeUser(userId: String) {
+        blockedUserIds.add(userId)
+        resetAndLoadFeed()
     }
 
     private fun resumeAccount() {
@@ -202,15 +220,17 @@ class FeedViewModel(
                 size = PAGE_SIZE
             )
                 .onSuccess { users ->
-                    val newItems = users.map { user ->
-                        FeedItem(
-                            userId = user.id,
-                            username = user.username,
-                            profilePictureUrl = user.profilePictureUrl,
-                            city = user.city,
-                            country = user.country
-                        )
-                    }
+                    val newItems = users
+                        .filter { it.id !in blockedUserIds }
+                        .map { user ->
+                            FeedItem(
+                                userId = user.id,
+                                username = user.username,
+                                profilePictureUrl = user.profilePictureUrl,
+                                city = user.city,
+                                country = user.country
+                            )
+                        }
                     _state.update {
                         it.copy(
                             isLoading = false,

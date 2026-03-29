@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,14 +27,37 @@ import shugar.composeapp.generated.resources.Res
 import shugar.composeapp.generated.resources.blocked_banned_desc
 import shugar.composeapp.generated.resources.blocked_banned_title
 import shugar.composeapp.generated.resources.blocked_contact_support
+import shugar.composeapp.generated.resources.blocked_deleted_desc
+import shugar.composeapp.generated.resources.blocked_deleted_title
+import shugar.composeapp.generated.resources.blocked_logout
 import shugar.composeapp.generated.resources.blocked_suspended_desc
 import shugar.composeapp.generated.resources.blocked_suspended_title
+import com.dating.core.domain.auth.UserStatus
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun BlockedScreen(
-    isBanned: Boolean
+    userStatus: UserStatus,
+    onLogout: () -> Unit
 ) {
+    val (title, description, icon) = when (userStatus) {
+        UserStatus.BANNED -> Triple(
+            Res.string.blocked_banned_title,
+            Res.string.blocked_banned_desc,
+            "\u26D4"
+        )
+        UserStatus.DELETED -> Triple(
+            Res.string.blocked_deleted_title,
+            Res.string.blocked_deleted_desc,
+            "\uD83D\uDDD1\uFE0F"
+        )
+        else -> Triple(
+            Res.string.blocked_suspended_title,
+            Res.string.blocked_suspended_desc,
+            "\u26A0\uFE0F"
+        )
+    }
+
     Scaffold { paddingValues ->
         Column(
             modifier = Modifier
@@ -51,16 +75,13 @@ fun BlockedScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = if (isBanned) "\u26D4" else "\u26A0\uFE0F",
+                    text = icon,
                     fontSize = 36.sp
                 )
             }
             Spacer(modifier = Modifier.height(24.dp))
             Text(
-                text = stringResource(
-                    if (isBanned) Res.string.blocked_banned_title
-                    else Res.string.blocked_suspended_title
-                ),
+                text = stringResource(title),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -68,10 +89,7 @@ fun BlockedScreen(
             )
             Spacer(modifier = Modifier.height(12.dp))
             Text(
-                text = stringResource(
-                    if (isBanned) Res.string.blocked_banned_desc
-                    else Res.string.blocked_suspended_desc
-                ),
+                text = stringResource(description),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -84,6 +102,14 @@ fun BlockedScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
             )
+            Spacer(modifier = Modifier.height(32.dp))
+            TextButton(onClick = onLogout) {
+                Text(
+                    text = stringResource(Res.string.blocked_logout),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
         }
     }
 }

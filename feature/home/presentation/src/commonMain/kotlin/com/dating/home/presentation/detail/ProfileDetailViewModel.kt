@@ -73,6 +73,13 @@ class ProfileDetailViewModel(
             ProfileDetailAction.OnDismissReportSheet -> {
                 _state.update { it.copy(showReportSheet = false) }
             }
+            ProfileDetailAction.OnConfirmBlockAfterReport -> {
+                _state.update { it.copy(showBlockAfterReportDialog = false) }
+                confirmBlock()
+            }
+            ProfileDetailAction.OnDismissBlockAfterReportDialog -> {
+                _state.update { it.copy(showBlockAfterReportDialog = false) }
+            }
         }
     }
 
@@ -114,8 +121,7 @@ class ProfileDetailViewModel(
             _state.update { it.copy(isSubmittingReport = true) }
             reportService.reportUser(userId, reason, description)
                 .onSuccess { result ->
-                    _state.update { it.copy(isSubmittingReport = false, showReportSheet = false) }
-                    _events.send(ProfileDetailEvent.OnReportSuccess(result.message))
+                    _state.update { it.copy(isSubmittingReport = false, showReportSheet = false, showBlockAfterReportDialog = true) }
                 }
                 .onFailure { error ->
                     _state.update { it.copy(isSubmittingReport = false, showReportSheet = false) }

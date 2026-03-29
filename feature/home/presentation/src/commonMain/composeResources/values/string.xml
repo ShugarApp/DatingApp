@@ -338,4 +338,10 @@
     <string name="report_duplicate">You already have a pending report for this user</string>
     <string name="report_account_suspended">Your account has been suspended</string>
     <string name="report_account_banned">Your account has been banned</string>
+
+    <!-- Block after report -->
+    <string name="block_after_report_title">Block this user too?</string>
+    <string name="block_after_report_desc">Your report has been submitted. Would you also like to block this user so they can\'t contact you anymore?</string>
+    <string name="block_after_report_confirm">Block</string>
+    <string name="block_after_report_dismiss">No thanks</string>
 </resources>

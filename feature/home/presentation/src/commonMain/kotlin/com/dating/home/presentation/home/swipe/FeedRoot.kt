@@ -15,6 +15,7 @@ fun FeedRoot(
     onNavigateToEditProfile: () -> Unit,
     swipedUserId: String? = null,
     swipedIsDislike: Boolean = false,
+    blockedUserId: String? = null,
     modifier: Modifier = Modifier,
     viewModel: FeedViewModel = koinViewModel()
 ) {
@@ -23,6 +24,12 @@ fun FeedRoot(
     LaunchedEffect(swipedUserId) {
         if (swipedUserId != null) {
             viewModel.onAction(FeedAction.OnUserSwiped(swipedUserId, swipedIsDislike))
+        }
+    }
+
+    LaunchedEffect(blockedUserId) {
+        if (blockedUserId != null) {
+            viewModel.onAction(FeedAction.OnUserBlocked(blockedUserId))
         }
     }
 

@@ -28,6 +28,7 @@ data class ChatDetailState(
     val isDeletingMatch: Boolean = false,
     val showReportSheet: Boolean = false,
     val isSubmittingReport: Boolean = false,
+    val showBlockAfterReportDialog: Boolean = false,
     val isSearchMode: Boolean = false,
     val messageSearchQuery: String = "",
     val messageSearchResults: List<Int> = emptyList(),

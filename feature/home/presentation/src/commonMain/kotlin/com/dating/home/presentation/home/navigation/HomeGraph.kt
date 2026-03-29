@@ -44,15 +44,22 @@ fun NavGraphBuilder.homeGraph(
         composable<HomeGraphRoutes.BottomNavContainer> { backStackEntry ->
             val swipedUserId = backStackEntry.savedStateHandle.get<String>("swiped_user_id")
             val swipedIsDislike = backStackEntry.savedStateHandle.get<Boolean>("swiped_is_dislike") ?: false
+            val blockedUserId = backStackEntry.savedStateHandle.get<String>("blocked_user_id")
             LaunchedEffect(swipedUserId) {
                 if (swipedUserId != null) {
                     backStackEntry.savedStateHandle.remove<String>("swiped_user_id")
                     backStackEntry.savedStateHandle.remove<Boolean>("swiped_is_dislike")
                 }
             }
+            LaunchedEffect(blockedUserId) {
+                if (blockedUserId != null) {
+                    backStackEntry.savedStateHandle.remove<String>("blocked_user_id")
+                }
+            }
             BottomNavigationContainer(
                 swipedUserId = swipedUserId,
                 swipedIsDislike = swipedIsDislike,
+                blockedUserId = blockedUserId,
                 onNavigateToProfile = { userId, imageUrl ->
                     navController.navigate(HomeGraphRoutes.ProfileDetailRoute(userId, imageUrl))
                 },
@@ -95,6 +102,11 @@ fun NavGraphBuilder.homeGraph(
                     navController.previousBackStackEntry
                         ?.savedStateHandle
                         ?.set("swiped_is_dislike", isDislike)
+                },
+                onUserBlocked = { blockedId ->
+                    navController.getBackStackEntry<HomeGraphRoutes.BottomNavContainer>()
+                        .savedStateHandle
+                        .set("blocked_user_id", blockedId)
                 }
             )
         }
@@ -126,7 +138,12 @@ fun NavGraphBuilder.homeGraph(
 
         composable<HomeGraphRoutes.PauseAccountRoute> {
             PauseAccountScreen(
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                onNavigateToFeed = {
+                    navController.navigate(HomeGraphRoutes.BottomNavContainer(null)) {
+                        popUpTo(HomeGraphRoutes.BottomNavContainer(null)) { inclusive = true }
+                    }
+                }
             )
         }
 
