@@ -9,5 +9,6 @@ sealed interface ChatDetailEvent {
     data object OnUserBlocked: ChatDetailEvent
     data object OnMatchDeleted: ChatDetailEvent
     data object OnReportSuccess: ChatDetailEvent
+    data class OnNavigateToProfile(val userId: String): ChatDetailEvent
     data object OnForceLogout: ChatDetailEvent
 }

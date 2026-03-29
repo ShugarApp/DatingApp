@@ -1,5 +1,7 @@
 package com.dating.home.presentation.chat.chat_detail.components
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,14 +36,16 @@ fun MessageList(
     messages: List<MessageUi>,
     paginationError: String?,
     isPaginationLoading: Boolean,
-    messageWithOpenMenu: MessageUi.LocalUserMessage?,
+    messageWithOpenMenu: MessageUi?,
     listState: LazyListState,
-    onMessageLongClick: (MessageUi.LocalUserMessage) -> Unit,
+    onMessageLongClick: (MessageUi) -> Unit,
     onMessageRetryClick: (MessageUi.LocalUserMessage) -> Unit,
     onRetryPaginationClick: () -> Unit,
     onDismissMessageMenu: () -> Unit,
     onDeleteMessageClick: (MessageUi.LocalUserMessage) -> Unit,
-    modifier: Modifier = Modifier
+    onCopyClick: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    highlightText: String? = null
 ) {
     if(messages.isEmpty()) {
         Box(
@@ -73,9 +77,13 @@ fun MessageList(
                     onDismissMessageMenu = onDismissMessageMenu,
                     onDeleteClick = onDeleteMessageClick,
                     onRetryClick = onMessageRetryClick,
+                    onCopyClick = onCopyClick,
+                    highlightText = highlightText,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .animateItem()
+                        .animateItem(
+                            placementSpec = spring(stiffness = Spring.StiffnessMediumLow)
+                        )
                 )
             }
 

@@ -35,8 +35,8 @@ fun NavGraphBuilder.homeGraph(
             ChatDetailRoot(
                 chatId = route.chatId,
                 onBack = { navController.popBackStack() },
-                onChatMembersClick = {
-                    // TODO: Handle this navigation if needed, or pass a callback
+                onProfileClick = { userId ->
+                    navController.navigate(HomeGraphRoutes.ProfileDetailRoute(userId, isMatch = true))
                 }
             )
         }

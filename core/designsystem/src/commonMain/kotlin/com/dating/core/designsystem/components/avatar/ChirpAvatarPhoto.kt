@@ -32,7 +32,8 @@ fun ChirpAvatarPhoto(
     size: AvatarSize = AvatarSize.SMALL,
     imageUrl: String? = null,
     onClick: (() -> Unit)? = null,
-    textColor: Color = MaterialTheme.colorScheme.extended.textPlaceholder
+    textColor: Color = MaterialTheme.colorScheme.extended.textPlaceholder,
+    contentDescription: String? = null
 ) {
     Box(
         modifier = modifier
@@ -58,7 +59,7 @@ fun ChirpAvatarPhoto(
         AsyncImage(
             model = imageUrl,
             contentScale = ContentScale.Crop,
-            contentDescription = null,
+            contentDescription = contentDescription,
             modifier = Modifier
                 .clip(CircleShape)
                 .matchParentSize()

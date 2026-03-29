@@ -150,6 +150,7 @@ class ChatDetailViewModel(
             ChatDetailAction.OnDismissMessageMenu -> onDismissMessageMenu()
             ChatDetailAction.OnLeaveChatClick -> onLeaveChatClick()
             is ChatDetailAction.OnMessageLongClick -> onMessageLongClick(action.message)
+            is ChatDetailAction.OnCopyMessage -> onDismissMessageMenu()
             is ChatDetailAction.OnRetryClick -> retryMessage(action.message)
             ChatDetailAction.OnScrollToTop -> onScrollToTop()
             ChatDetailAction.OnSendMessageClick -> sendMessage()
@@ -167,6 +168,11 @@ class ChatDetailViewModel(
             ChatDetailAction.OnReportUserClick -> onReportUserClick()
             is ChatDetailAction.OnSubmitReport -> submitReport(action.reason, action.description)
             ChatDetailAction.OnDismissReportSheet -> _state.update { it.copy(showReportSheet = false) }
+            is ChatDetailAction.OnProfileClick -> onProfileClick(action.userId)
+            ChatDetailAction.OnToggleMessageSearch -> toggleMessageSearch()
+            is ChatDetailAction.OnMessageSearchQueryChanged -> updateMessageSearch(action.query)
+            ChatDetailAction.OnNextSearchResult -> navigateSearchResult(forward = true)
+            ChatDetailAction.OnPreviousSearchResult -> navigateSearchResult(forward = false)
             else -> Unit
         }
     }
@@ -248,7 +254,7 @@ class ChatDetailViewModel(
         }
     }
 
-    private fun onMessageLongClick(message: MessageUi.LocalUserMessage) {
+    private fun onMessageLongClick(message: MessageUi) {
         _state.update {
             it.copy(
                 messageWithOpenMenu = message
@@ -613,6 +619,12 @@ class ChatDetailViewModel(
         }
     }
 
+    private fun onProfileClick(userId: String) {
+        viewModelScope.launch {
+            eventChannel.send(ChatDetailEvent.OnNavigateToProfile(userId))
+        }
+    }
+
     private fun onReportUserClick() {
         _state.update { it.copy(isChatOptionsOpen = false, showReportSheet = true) }
     }
@@ -636,6 +648,55 @@ class ChatDetailViewModel(
                         else -> eventChannel.send(ChatDetailEvent.OnError(error.toUiText()))
                     }
                 }
+        }
+    }
+
+    private fun toggleMessageSearch() {
+        _state.update {
+            if (it.isSearchMode) {
+                it.copy(
+                    isSearchMode = false,
+                    messageSearchQuery = "",
+                    messageSearchResults = emptyList(),
+                    currentSearchResultIndex = -1
+                )
+            } else {
+                it.copy(isSearchMode = true)
+            }
+        }
+    }
+
+    private fun updateMessageSearch(query: String) {
+        _state.update { currentState ->
+            val results = if (query.isBlank()) {
+                emptyList()
+            } else {
+                currentState.messages.mapIndexedNotNull { index, message ->
+                    val content = when (message) {
+                        is MessageUi.LocalUserMessage -> message.content
+                        is MessageUi.OtherUserMessage -> message.content
+                        else -> null
+                    }
+                    if (content != null && content.contains(query, ignoreCase = true)) index else null
+                }
+            }
+            currentState.copy(
+                messageSearchQuery = query,
+                messageSearchResults = results,
+                currentSearchResultIndex = if (results.isNotEmpty()) 0 else -1
+            )
+        }
+    }
+
+    private fun navigateSearchResult(forward: Boolean) {
+        _state.update { currentState ->
+            if (currentState.messageSearchResults.isEmpty()) return@update currentState
+            val newIndex = if (forward) {
+                (currentState.currentSearchResultIndex + 1) % currentState.messageSearchResults.size
+            } else {
+                (currentState.currentSearchResultIndex - 1 + currentState.messageSearchResults.size) % currentState.messageSearchResults.size
+            }
+            currentState.copy(currentSearchResultIndex = newIndex)
         }
     }
 

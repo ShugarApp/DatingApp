@@ -31,6 +31,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun ChatListDetailAdaptiveLayout(
     initialChatId: String?,
     onNavigateToChatDetail: (String) -> Unit,
+    onNavigateToProfile: (userId: String) -> Unit,
     chatListDetailViewModel: ChatListDetailViewModel = koinViewModel()
 ) {
     val sharedState by chatListDetailViewModel.state.collectAsStateWithLifecycle()
@@ -84,8 +85,8 @@ fun ChatListDetailAdaptiveLayout(
             AnimatedPane {
                 ChatDetailRoot(
                     chatId = sharedState.selectedChatId,
-                    onChatMembersClick = {
-                        chatListDetailViewModel.onAction(ChatListDetailAction.OnManageChatClick)
+                    onProfileClick = { userId ->
+                        onNavigateToProfile(userId)
                     },
                     onBack = {
                         scope.launch {

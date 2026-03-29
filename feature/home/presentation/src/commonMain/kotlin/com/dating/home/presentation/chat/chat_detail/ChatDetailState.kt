@@ -16,7 +16,7 @@ data class ChatDetailState(
     val isPaginationLoading: Boolean = false,
     val paginationError: UiText? = null,
     val endReached: Boolean = false,
-    val messageWithOpenMenu: MessageUi.LocalUserMessage? = null,
+    val messageWithOpenMenu: MessageUi? = null,
     val bannerState: BannerState = BannerState(),
     val isChatOptionsOpen: Boolean = false,
     val isNearBottom: Boolean = false,
@@ -27,7 +27,11 @@ data class ChatDetailState(
     val showDeleteMatchDialog: Boolean = false,
     val isDeletingMatch: Boolean = false,
     val showReportSheet: Boolean = false,
-    val isSubmittingReport: Boolean = false
+    val isSubmittingReport: Boolean = false,
+    val isSearchMode: Boolean = false,
+    val messageSearchQuery: String = "",
+    val messageSearchResults: List<Int> = emptyList(),
+    val currentSearchResultIndex: Int = -1
 )
 
 data class BannerState(

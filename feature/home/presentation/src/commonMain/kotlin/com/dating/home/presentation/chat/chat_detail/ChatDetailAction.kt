@@ -7,12 +7,18 @@ sealed interface ChatDetailAction {
     data object OnScrollToTop: ChatDetailAction
     data class OnSelectChat(val chatId: String?): ChatDetailAction
     data class OnDeleteMessageClick(val message: MessageUi.LocalUserMessage): ChatDetailAction
-    data class OnMessageLongClick(val message: MessageUi.LocalUserMessage): ChatDetailAction
+    data class OnMessageLongClick(val message: MessageUi): ChatDetailAction
     data object OnDismissMessageMenu: ChatDetailAction
+    data class OnCopyMessage(val content: String): ChatDetailAction
     data class OnRetryClick(val message: MessageUi.LocalUserMessage): ChatDetailAction
     data object OnBackClick: ChatDetailAction
+    data object OnToggleMessageSearch: ChatDetailAction
+    data class OnMessageSearchQueryChanged(val query: String): ChatDetailAction
+    data object OnNextSearchResult: ChatDetailAction
+    data object OnPreviousSearchResult: ChatDetailAction
     data object OnChatOptionsClick: ChatDetailAction
-    data object OnChatMembersClick: ChatDetailAction
+    // TODO: Re-enable OnChatMembersClick when group chat members feature is needed
+    data class OnProfileClick(val userId: String): ChatDetailAction
     data object OnLeaveChatClick: ChatDetailAction
     data object OnDismissChatOptions: ChatDetailAction
     data object OnRetryPaginationClick: ChatDetailAction

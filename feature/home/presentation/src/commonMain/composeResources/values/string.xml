@@ -34,7 +34,15 @@
     <string name="send_a_message">Send a message</string>
     <string name="select_a_profile_picture">Select a profile picture</string>
     <string name="send">Send</string>
+    <string name="copy">Copy</string>
     <string name="delete_for_everyone">Delete for everyone</string>
+    <string name="search_messages">Search messages</string>
+    <string name="search_conversations">Search conversations</string>
+    <string name="message_copied">Message copied</string>
+    <string name="delete_chat">Delete chat</string>
+    <string name="delete_chat_title">Delete this conversation?</string>
+    <string name="delete_chat_desc">This conversation will be removed from your chat list. This action cannot be undone.</string>
+    <string name="no_results">No results</string>
     <string name="no_chats">No conversations yet</string>
     <string name="no_chats_subtitle">Match with someone and send them the first message. The best stories start with a hello!</string>
     <string name="no_messages">No messages</string>

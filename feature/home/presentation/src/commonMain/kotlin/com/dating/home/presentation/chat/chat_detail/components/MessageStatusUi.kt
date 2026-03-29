@@ -12,6 +12,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import shugar.feature.home.presentation.generated.resources.Res
 import shugar.feature.home.presentation.generated.resources.check_icon
@@ -55,7 +58,10 @@ fun MessageStatus(
         )
     }
     Row(
-        modifier = modifier,
+        modifier = modifier
+            .semantics {
+                liveRegion = LiveRegionMode.Polite
+            },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(

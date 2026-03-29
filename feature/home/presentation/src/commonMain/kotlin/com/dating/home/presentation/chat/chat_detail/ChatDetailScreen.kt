@@ -10,11 +10,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -39,7 +41,9 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import shugar.feature.home.presentation.generated.resources.Res
@@ -67,6 +71,7 @@ import com.dating.home.presentation.chat.chat_detail.components.MessageBox
 import com.dating.home.presentation.chat.chat_detail.components.MessageList
 import com.dating.home.presentation.chat.chat_detail.components.PaginationScrollListener
 import com.dating.home.presentation.chat.chat_detail.components.TypingIndicator
+import com.dating.core.designsystem.components.brand.ChirpHorizontalDivider
 import com.dating.core.designsystem.components.header.TopAppBarGeneric
 import com.dating.home.presentation.chat.components.EmptySection
 import com.dating.home.presentation.chat.model.ChatUi
@@ -92,7 +97,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun ChatDetailRoot(
     chatId: String?,
     onBack: () -> Unit,
-    onChatMembersClick: () -> Unit,
+    onProfileClick: (userId: String) -> Unit,
     onForceLogout: () -> Unit = {},
     viewModel: ChatDetailViewModel = koinViewModel()
 ) {
@@ -101,6 +106,7 @@ fun ChatDetailRoot(
     val snackbarState = remember { SnackbarHostState() }
     val messageListState = rememberLazyListState()
     val scope = rememberCoroutineScope()
+    val clipboardManager = LocalClipboardManager.current
 
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
@@ -121,6 +127,7 @@ fun ChatDetailRoot(
                     org.jetbrains.compose.resources.getString(Res.string.report_success)
                 )
             }
+            is ChatDetailEvent.OnNavigateToProfile -> onProfileClick(event.userId)
             ChatDetailEvent.OnForceLogout -> onForceLogout()
         }
     }
@@ -147,13 +154,23 @@ fun ChatDetailRoot(
         onBack()
     }
 
+    // Navigate to search result when index changes
+    LaunchedEffect(state.currentSearchResultIndex, state.messageSearchResults) {
+        if (state.currentSearchResultIndex >= 0 && state.messageSearchResults.isNotEmpty()) {
+            val messageIndex = state.messageSearchResults[state.currentSearchResultIndex]
+            messageListState.animateScrollToItem(messageIndex)
+        }
+    }
+
     ChatDetailScreen(
         state = state,
         messageListState = messageListState,
         onAction = { action ->
             when (action) {
-                is ChatDetailAction.OnChatMembersClick -> onChatMembersClick()
                 is ChatDetailAction.OnBackClick -> onBack()
+                is ChatDetailAction.OnCopyMessage -> {
+                    clipboardManager.setText(AnnotatedString(action.content))
+                }
                 else -> Unit
             }
             viewModel.onAction(action)
@@ -257,6 +274,7 @@ fun ChatDetailScreen(
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
+        contentWindowInsets = WindowInsets.safeDrawing,
         containerColor = if (!configuration.isWideScreen) {
             MaterialTheme.colorScheme.surface
         } else {
@@ -268,6 +286,8 @@ fun ChatDetailScreen(
     ) { innerPadding ->
         Box(
             modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
                 .clearFocusOnTap()
                 .then(
                     if (configuration.isWideScreen) {
@@ -276,6 +296,7 @@ fun ChatDetailScreen(
                 )
         ) {
             Column(
+                modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 DynamicRoundedCornerColumn(
@@ -294,7 +315,7 @@ fun ChatDetailScreen(
                     } else {
                         TopAppBarGeneric(
                             divider = true,
-                            modifier = Modifier.padding(top = 32.dp)
+                            modifier = Modifier
                                 .onSizeChanged {
                                     headerHeight = with(density) {
                                         it.height.toDp()
@@ -304,14 +325,18 @@ fun ChatDetailScreen(
                             ChatDetailHeader(
                                 chatUi = state.chatUi,
                                 isChatOptionsDropDownOpen = state.isChatOptionsOpen,
+                                isSearchMode = state.isSearchMode,
+                                messageSearchQuery = state.messageSearchQuery,
+                                searchResultCount = state.messageSearchResults.size,
+                                currentSearchResultIndex = state.currentSearchResultIndex,
                                 onChatOptionsClick = {
                                     onAction(ChatDetailAction.OnChatOptionsClick)
                                 },
                                 onDismissChatOptions = {
                                     onAction(ChatDetailAction.OnDismissChatOptions)
                                 },
-                                onManageChatClick = {
-                                    onAction(ChatDetailAction.OnChatMembersClick)
+                                onProfileClick = { userId ->
+                                    onAction(ChatDetailAction.OnProfileClick(userId))
                                 },
                                 onLeaveChatClick = {
                                     onAction(ChatDetailAction.OnLeaveChatClick)
@@ -328,6 +353,18 @@ fun ChatDetailScreen(
                                 onBackClick = {
                                     onAction(ChatDetailAction.OnBackClick)
                                 },
+                                onToggleSearch = {
+                                    onAction(ChatDetailAction.OnToggleMessageSearch)
+                                },
+                                onSearchQueryChanged = { query ->
+                                    onAction(ChatDetailAction.OnMessageSearchQueryChanged(query))
+                                },
+                                onNextSearchResult = {
+                                    onAction(ChatDetailAction.OnNextSearchResult)
+                                },
+                                onPreviousSearchResult = {
+                                    onAction(ChatDetailAction.OnPreviousSearchResult)
+                                },
                                 modifier = Modifier.fillMaxWidth()
                             )
                         }
@@ -337,6 +374,7 @@ fun ChatDetailScreen(
                             listState = messageListState,
                             isPaginationLoading = state.isPaginationLoading,
                             paginationError = state.paginationError?.asString(),
+                            highlightText = if (state.isSearchMode) state.messageSearchQuery else null,
                             onMessageLongClick = { message ->
                                 onAction(ChatDetailAction.OnMessageLongClick(message))
                             },
@@ -352,6 +390,9 @@ fun ChatDetailScreen(
                             onRetryPaginationClick = {
                                 onAction(ChatDetailAction.OnRetryPaginationClick)
                             },
+                            onCopyClick = { content ->
+                                onAction(ChatDetailAction.OnCopyMessage(content))
+                            },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .weight(1f)
@@ -365,24 +406,27 @@ fun ChatDetailScreen(
                         AnimatedVisibility(
                             visible = !configuration.isWideScreen
                         ) {
-                            MessageBox(
-                                messageTextFieldState = state.messageTextFieldState,
-                                isSendButtonEnabled = state.canSendMessage,
-                                connectionState = state.connectionState,
-                                onSendClick = {
-                                    onAction(ChatDetailAction.OnSendMessageClick)
-                                },
-                                onTextChanged = { text ->
-                                    onAction(ChatDetailAction.OnTextChanged(text))
-                                },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .imePadding()
-                                    .padding(
-                                        vertical = 8.dp,
-                                        horizontal = 16.dp
-                                    )
-                            )
+                            Column {
+                                ChirpHorizontalDivider()
+                                MessageBox(
+                                    messageTextFieldState = state.messageTextFieldState,
+                                    isSendButtonEnabled = state.canSendMessage,
+                                    connectionState = state.connectionState,
+                                    onSendClick = {
+                                        onAction(ChatDetailAction.OnSendMessageClick)
+                                    },
+                                    onTextChanged = { text ->
+                                        onAction(ChatDetailAction.OnTextChanged(text))
+                                    },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .imePadding()
+                                        .padding(
+                                            vertical = 8.dp,
+                                            horizontal = 16.dp
+                                        )
+                                )
+                            }
                         }
                     }
                 }
@@ -401,6 +445,7 @@ fun ChatDetailScreen(
                             typingUsernames = state.typingUsernames,
                             modifier = Modifier.fillMaxWidth()
                         )
+                        ChirpHorizontalDivider()
                         MessageBox(
                             messageTextFieldState = state.messageTextFieldState,
                             isSendButtonEnabled = state.canSendMessage,

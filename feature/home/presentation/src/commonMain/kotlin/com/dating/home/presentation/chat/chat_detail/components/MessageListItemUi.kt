@@ -18,12 +18,14 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun MessageListItemUi(
     messageUi: MessageUi,
-    messageWithOpenMenu: MessageUi.LocalUserMessage?,
-    onMessageLongClick: (MessageUi.LocalUserMessage) -> Unit,
+    messageWithOpenMenu: MessageUi?,
+    onMessageLongClick: (MessageUi) -> Unit,
     onDismissMessageMenu: () -> Unit,
     onDeleteClick: (MessageUi.LocalUserMessage) -> Unit,
     onRetryClick: (MessageUi.LocalUserMessage) -> Unit,
-    modifier: Modifier = Modifier
+    onCopyClick: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    highlightText: String? = null
 ) {
     Box(
         modifier = modifier
@@ -42,13 +44,20 @@ fun MessageListItemUi(
                     onMessageLongClick = { onMessageLongClick(messageUi) },
                     onDismissMessageMenu = onDismissMessageMenu,
                     onDeleteClick = { onDeleteClick(messageUi) },
-                    onRetryClick = { onRetryClick(messageUi) }
+                    onRetryClick = { onRetryClick(messageUi) },
+                    onCopyClick = { onCopyClick(messageUi.content) },
+                    highlightText = highlightText
                 )
             }
             is MessageUi.OtherUserMessage -> {
                 OtherUserMessage(
                     message = messageUi,
-                    color = getChatBubbleColorForUser(messageUi.sender.id)
+                    color = getChatBubbleColorForUser(messageUi.sender.id),
+                    messageWithOpenMenu = messageWithOpenMenu,
+                    onMessageLongClick = { onMessageLongClick(messageUi) },
+                    onDismissMessageMenu = onDismissMessageMenu,
+                    onCopyClick = { onCopyClick(messageUi.content) },
+                    highlightText = highlightText
                 )
             }
         }
@@ -85,6 +94,7 @@ fun MessageListItemLocalMessageUiPreview() {
             onMessageLongClick = {},
             onDismissMessageMenu = {},
             onDeleteClick = {},
+            onCopyClick = {},
             modifier = Modifier
                 .fillMaxWidth()
                 .height(200.dp)
@@ -108,6 +118,7 @@ fun MessageListItemLocalMessageRetryUiPreview() {
             onMessageLongClick = {},
             onDismissMessageMenu = {},
             onDeleteClick = {},
+            onCopyClick = {},
             modifier = Modifier
                 .fillMaxWidth()
         )
@@ -134,6 +145,7 @@ fun MessageListItemOtherMessageUiPreview() {
             onMessageLongClick = {},
             onDismissMessageMenu = {},
             onDeleteClick = {},
+            onCopyClick = {},
             modifier = Modifier
                 .fillMaxWidth()
         )

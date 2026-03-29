@@ -89,7 +89,10 @@ fun BottomNavigationContainer(
                 BottomNavSection.MESSAGES -> {
                     ChatListDetailAdaptiveLayout(
                         initialChatId = null,
-                        onNavigateToChatDetail = onNavigateToChatDetail
+                        onNavigateToChatDetail = onNavigateToChatDetail,
+                        onNavigateToProfile = { userId ->
+                            onNavigateToMatchProfile(userId, null)
+                        }
                     )
                 }
 
