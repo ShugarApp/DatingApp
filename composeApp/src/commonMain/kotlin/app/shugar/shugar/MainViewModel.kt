@@ -53,7 +53,8 @@ class MainViewModel(
             val authInfo = sessionStorage.observeAuthInfo().firstOrNull()
             _state.update { it.copy(
                 isCheckingAuth = false,
-                isLoggedIn = authInfo != null
+                isLoggedIn = authInfo != null,
+                userStatus = authInfo?.user?.status
             ) }
         }
     }
@@ -67,13 +68,18 @@ class MainViewModel(
                 if(isSessionExpired) {
                     sessionStorage.set(null)
                     _state.update { it.copy(
-                        isLoggedIn = false
+                        isLoggedIn = false,
+                        userStatus = null
                     ) }
                     currentDeviceToken?.let {
                         deviceTokenService.unregisterToken(it)
                     }
                     isTokenRegistered = false
                     eventChannel.send(MainEvent.OnSessionExpired)
+                } else {
+                    _state.update { it.copy(
+                        userStatus = authInfo?.user?.status
+                    ) }
                 }
 
                 previousRefreshToken = currentRefreshToken

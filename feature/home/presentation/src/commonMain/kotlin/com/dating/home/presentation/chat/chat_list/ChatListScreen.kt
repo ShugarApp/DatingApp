@@ -2,7 +2,10 @@
 
 package com.dating.home.presentation.chat.chat_list
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,8 +23,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -113,15 +118,34 @@ fun ChatListScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            MainTopAppBar(title = "Chats")
-
-            ChirpMultiLineTextField(
-                state = state.searchTextFieldState,
-                placeholder = stringResource(Res.string.search_conversations),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 4.dp)
+            MainTopAppBar(
+                title = "Chats",
+                actions = {
+                    IconButton(
+                        onClick = { onAction(ChatListAction.OnToggleSearch) }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = stringResource(Res.string.search_conversations),
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
             )
+
+            AnimatedVisibility(
+                visible = state.isSearchVisible,
+                enter = expandVertically(),
+                exit = shrinkVertically()
+            ) {
+                ChirpMultiLineTextField(
+                    state = state.searchTextFieldState,
+                    placeholder = stringResource(Res.string.search_conversations),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp, vertical = 4.dp)
+                )
+            }
 
             PullToRefreshBox(
                 isRefreshing = state.isLoading,

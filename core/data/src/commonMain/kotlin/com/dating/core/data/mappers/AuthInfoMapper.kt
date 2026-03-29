@@ -4,6 +4,7 @@ import com.dating.core.data.dto.AuthInfoSerializable
 import com.dating.core.data.dto.UserSerializable
 import com.dating.core.domain.auth.AuthInfo
 import com.dating.core.domain.auth.User
+import com.dating.core.domain.auth.UserStatus
 
 fun AuthInfoSerializable.toDomain(): AuthInfo {
     return AuthInfo(
@@ -19,6 +20,8 @@ fun UserSerializable.toDomain(): User {
         email = email,
         username = username,
         hasVerifiedEmail = hasVerifiedEmail,
+        status = try { UserStatus.valueOf(status) } catch (_: Exception) { UserStatus.PENDING },
+        isPaused = isPaused,
         photos = photos,
         city = city,
         country = country,
@@ -32,8 +35,7 @@ fun UserSerializable.toDomain(): User {
         zodiac = zodiac,
         smoking = smoking,
         drinking = drinking,
-        interests = interests,
-        isPaused = isPaused
+        interests = interests
     )
 }
 
@@ -43,6 +45,8 @@ fun User.toSerializable(): UserSerializable {
         email = email,
         username = username,
         hasVerifiedEmail = hasVerifiedEmail,
+        status = status.name,
+        isPaused = isPaused,
         photos = photos,
         city = city,
         country = country,
@@ -56,8 +60,7 @@ fun User.toSerializable(): UserSerializable {
         zodiac = zodiac,
         smoking = smoking,
         drinking = drinking,
-        interests = interests,
-        isPaused = isPaused
+        interests = interests
     )
 }
 

@@ -2,22 +2,27 @@ package com.dating.home.presentation.home.swipe
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dating.core.domain.auth.SessionStorage
 import com.dating.core.domain.discovery.DiscoveryPreferencesStorage
 import com.dating.core.domain.discovery.Gender
 import com.dating.core.domain.util.onFailure
 import com.dating.core.domain.util.onSuccess
 import com.dating.home.domain.matching.MatchingService
 import com.dating.home.domain.matching.SwipeAction
+import com.dating.home.domain.user.UserService
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class FeedViewModel(
     private val matchingService: MatchingService,
-    private val discoveryPreferences: DiscoveryPreferencesStorage
+    private val discoveryPreferences: DiscoveryPreferencesStorage,
+    private val sessionStorage: SessionStorage,
+    private val userService: UserService
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FeedState())
@@ -29,6 +34,7 @@ class FeedViewModel(
     private var isInitialized = false
 
     init {
+        observeAccountPaused()
         viewModelScope.launch {
             val prefs = discoveryPreferences.get()
             _state.update {
@@ -42,6 +48,16 @@ class FeedViewModel(
             loadFeed(page = 0, isInitialLoad = true)
             isInitialized = true
             checkCompleteProfilePrompt()
+        }
+    }
+
+    private fun observeAccountPaused() {
+        viewModelScope.launch {
+            sessionStorage.observeAuthInfo().collect { authInfo ->
+                _state.update {
+                    it.copy(isAccountPaused = authInfo?.user?.isPaused == true)
+                }
+            }
         }
     }
 
@@ -107,6 +123,24 @@ class FeedViewModel(
                 prefetchIfNeeded()
             }
             FeedAction.OnUndoSwipe -> undoSwipe()
+            FeedAction.OnResumeAccount -> resumeAccount()
+        }
+    }
+
+    private fun resumeAccount() {
+        _state.update { it.copy(isResumingAccount = true) }
+        viewModelScope.launch {
+            userService.pauseAccount(false)
+                .onSuccess { updatedUser ->
+                    val authInfo = sessionStorage.observeAuthInfo().first()
+                    if (authInfo != null) {
+                        sessionStorage.set(authInfo.copy(user = updatedUser))
+                    }
+                    _state.update { it.copy(isResumingAccount = false) }
+                }
+                .onFailure {
+                    _state.update { it.copy(isResumingAccount = false) }
+                }
         }
     }
 

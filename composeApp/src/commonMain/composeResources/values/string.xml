@@ -3,4 +3,10 @@
     <string name="file">File</string>
     <string name="new_window">New window</string>
     <string name="app_theme">App theme</string>
+
+    <string name="blocked_suspended_title">Account Suspended</string>
+    <string name="blocked_suspended_desc">Your account has been temporarily suspended for violating our community guidelines. If you believe this is a mistake, please contact our support team.</string>
+    <string name="blocked_banned_title">Account Banned</string>
+    <string name="blocked_banned_desc">Your account has been permanently banned for serious violations of our community guidelines. This decision is final.</string>
+    <string name="blocked_contact_support">If you need help, contact support@aura.com</string>
 </resources>

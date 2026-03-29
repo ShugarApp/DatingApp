@@ -17,7 +17,9 @@ data class FeedState(
     val hasMore: Boolean = true,
     val isFetchingMore: Boolean = false,
     val lastDislikedItem: FeedItem? = null,
-    val isUndoing: Boolean = false
+    val isUndoing: Boolean = false,
+    val isAccountPaused: Boolean = false,
+    val isResumingAccount: Boolean = false
 )
 
 data class FeedItem(
@@ -45,6 +47,7 @@ sealed interface FeedAction {
     data object OnScreenResumed : FeedAction
     data class OnUserSwiped(val userId: String, val isDislike: Boolean = false) : FeedAction
     data object OnUndoSwipe : FeedAction
+    data object OnResumeAccount : FeedAction
 }
 
 sealed interface FeedEvent {

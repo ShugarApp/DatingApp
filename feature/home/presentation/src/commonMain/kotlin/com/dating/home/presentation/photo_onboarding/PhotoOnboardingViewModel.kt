@@ -94,6 +94,21 @@ class PhotoOnboardingViewModel(
         _state.update { it.copy(imageError = null) }
     }
 
+    fun onComplete() {
+        _state.update { it.copy(isCompleting = true) }
+        viewModelScope.launch {
+            userService.getMyProfile()
+                .onSuccess { user ->
+                    sessionStorage.observeAuthInfo().firstOrNull()?.let { info ->
+                        sessionStorage.set(info.copy(user = user))
+                    }
+                }
+                .onFailure {
+                    _state.update { it.copy(isCompleting = false) }
+                }
+        }
+    }
+
     private fun updateSessionPhotos(photos: List<String>) {
         viewModelScope.launch {
             sessionStorage.observeAuthInfo().firstOrNull()?.let { info ->
