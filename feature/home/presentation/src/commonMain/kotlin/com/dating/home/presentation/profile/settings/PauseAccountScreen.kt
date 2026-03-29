@@ -74,6 +74,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun PauseAccountScreen(
     onBack: () -> Unit,
+    onNavigateToFeed: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SettingsViewModel = koinViewModel()
 ) {
@@ -83,7 +84,7 @@ fun PauseAccountScreen(
 
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
-            SettingsEvent.OnPauseAccountToggled -> onBack()
+            SettingsEvent.OnPauseAccountToggled -> onNavigateToFeed()
             else -> Unit
         }
     }

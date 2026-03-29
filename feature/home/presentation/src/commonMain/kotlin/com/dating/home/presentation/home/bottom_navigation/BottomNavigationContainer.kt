@@ -32,6 +32,7 @@ fun BottomNavigationContainer(
     onSubscriptions: () -> Unit,
     swipedUserId: String? = null,
     swipedIsDislike: Boolean = false,
+    blockedUserId: String? = null,
     modifier: Modifier = Modifier
 ) {
     val sessionStorage: SessionStorage = koinInject()
@@ -76,7 +77,8 @@ fun BottomNavigationContainer(
                         onNavigateToProfile = onNavigateToProfile,
                         onNavigateToEditProfile = onEditProfile,
                         swipedUserId = swipedUserId,
-                        swipedIsDislike = swipedIsDislike
+                        swipedIsDislike = swipedIsDislike,
+                        blockedUserId = blockedUserId
                     )
                 }
 

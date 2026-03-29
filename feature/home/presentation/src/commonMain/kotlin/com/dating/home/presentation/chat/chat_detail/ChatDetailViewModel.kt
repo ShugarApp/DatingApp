@@ -168,6 +168,13 @@ class ChatDetailViewModel(
             ChatDetailAction.OnReportUserClick -> onReportUserClick()
             is ChatDetailAction.OnSubmitReport -> submitReport(action.reason, action.description)
             ChatDetailAction.OnDismissReportSheet -> _state.update { it.copy(showReportSheet = false) }
+            ChatDetailAction.OnConfirmBlockAfterReport -> {
+                _state.update { it.copy(showBlockAfterReportDialog = false) }
+                confirmBlockUser()
+            }
+            ChatDetailAction.OnDismissBlockAfterReportDialog -> {
+                _state.update { it.copy(showBlockAfterReportDialog = false) }
+            }
             is ChatDetailAction.OnProfileClick -> onProfileClick(action.userId)
             ChatDetailAction.OnToggleMessageSearch -> toggleMessageSearch()
             is ChatDetailAction.OnMessageSearchQueryChanged -> updateMessageSearch(action.query)
@@ -635,8 +642,7 @@ class ChatDetailViewModel(
             _state.update { it.copy(isSubmittingReport = true) }
             reportService.reportUser(otherUserId, reason, description)
                 .onSuccess {
-                    _state.update { it.copy(isSubmittingReport = false, showReportSheet = false) }
-                    eventChannel.send(ChatDetailEvent.OnReportSuccess)
+                    _state.update { it.copy(isSubmittingReport = false, showReportSheet = false, showBlockAfterReportDialog = true) }
                 }
                 .onFailure { error ->
                     _state.update { it.copy(isSubmittingReport = false, showReportSheet = false) }

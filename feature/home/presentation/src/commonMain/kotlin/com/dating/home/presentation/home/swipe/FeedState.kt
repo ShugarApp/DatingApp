@@ -48,6 +48,7 @@ sealed interface FeedAction {
     data class OnUserSwiped(val userId: String, val isDislike: Boolean = false) : FeedAction
     data object OnUndoSwipe : FeedAction
     data object OnResumeAccount : FeedAction
+    data class OnUserBlocked(val userId: String) : FeedAction
 }
 
 sealed interface FeedEvent {

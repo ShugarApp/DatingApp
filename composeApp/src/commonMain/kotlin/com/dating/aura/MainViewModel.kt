@@ -96,6 +96,15 @@ class MainViewModel(
             .launchIn(viewModelScope)
     }
 
+    fun onLogout() {
+        viewModelScope.launch {
+            sessionStorage.set(null)
+            _state.update { it.copy(isLoggedIn = false, userStatus = null) }
+            currentDeviceToken?.let { deviceTokenService.unregisterToken(it) }
+            isTokenRegistered = false
+        }
+    }
+
     private fun registerDeviceToken(token: String, platform: String) {
         viewModelScope.launch {
             deviceTokenService.registerToken(token, platform)

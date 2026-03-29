@@ -62,11 +62,15 @@ fun App(
     ) {
         if(!state.isCheckingAuth) {
             val isBlocked = state.userStatus == UserStatus.SUSPENDED ||
-                    state.userStatus == UserStatus.BANNED
+                    state.userStatus == UserStatus.BANNED ||
+                    state.userStatus == UserStatus.DELETED
 
             if (isBlocked) {
                 BlockedScreen(
-                    isBanned = state.userStatus == UserStatus.BANNED
+                    userStatus = state.userStatus!!,
+                    onLogout = {
+                        viewModel.onLogout()
+                    }
                 )
             } else {
                 NavigationRoot(

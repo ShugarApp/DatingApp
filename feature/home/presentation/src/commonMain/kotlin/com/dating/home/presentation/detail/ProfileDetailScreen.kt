@@ -95,6 +95,10 @@ import aura.feature.home.presentation.generated.resources.delete_match_title
 import aura.feature.home.presentation.generated.resources.delete_match_desc
 import aura.feature.home.presentation.generated.resources.report_user
 import aura.feature.home.presentation.generated.resources.report_success
+import aura.feature.home.presentation.generated.resources.block_after_report_confirm
+import aura.feature.home.presentation.generated.resources.block_after_report_desc
+import aura.feature.home.presentation.generated.resources.block_after_report_dismiss
+import aura.feature.home.presentation.generated.resources.block_after_report_title
 import aura.feature.home.presentation.generated.resources.report_duplicate
 import androidx.compose.material.icons.filled.HeartBroken
 import coil3.compose.AsyncImage
@@ -117,6 +121,7 @@ fun ProfileDetailScreen(
     imageUrl: String?,
     onBack: () -> Unit,
     onSwipedUser: (String, Boolean) -> Unit = { _, _ -> },
+    onUserBlocked: (String) -> Unit = {},
     onForceLogout: () -> Unit = {},
     isOwnProfile: Boolean = false,
     isMatch: Boolean = false,
@@ -145,7 +150,10 @@ fun ProfileDetailScreen(
                 matchName = event.userName
                 showMatchDialog = true
             }
-            ProfileDetailEvent.OnUserBlocked -> onBack()
+            ProfileDetailEvent.OnUserBlocked -> {
+                onUserBlocked(userId)
+                onBack()
+            }
             ProfileDetailEvent.OnMatchDeleted -> onBack()
             is ProfileDetailEvent.OnReportSuccess -> {
                 snackbarState.showSnackbar(
@@ -241,6 +249,18 @@ fun ProfileDetailScreen(
             onConfirmClick = { viewModel.onAction(ProfileDetailAction.OnConfirmDeleteMatch) },
             onCancelClick = { viewModel.onAction(ProfileDetailAction.OnDismissDeleteMatchDialog) },
             onDismiss = { viewModel.onAction(ProfileDetailAction.OnDismissDeleteMatchDialog) }
+        )
+    }
+
+    if (state.showBlockAfterReportDialog) {
+        DestructiveConfirmationDialog(
+            title = stringResource(Res.string.block_after_report_title),
+            description = stringResource(Res.string.block_after_report_desc),
+            confirmButtonText = stringResource(Res.string.block_after_report_confirm),
+            cancelButtonText = stringResource(Res.string.block_after_report_dismiss),
+            onConfirmClick = { viewModel.onAction(ProfileDetailAction.OnConfirmBlockAfterReport) },
+            onCancelClick = { viewModel.onAction(ProfileDetailAction.OnDismissBlockAfterReportDialog) },
+            onDismiss = { viewModel.onAction(ProfileDetailAction.OnDismissBlockAfterReportDialog) }
         )
     }
 

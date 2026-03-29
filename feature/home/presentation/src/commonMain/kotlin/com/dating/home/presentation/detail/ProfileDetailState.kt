@@ -12,7 +12,8 @@ data class ProfileDetailState(
     val showDeleteMatchDialog: Boolean = false,
     val isDeletingMatch: Boolean = false,
     val showReportSheet: Boolean = false,
-    val isSubmittingReport: Boolean = false
+    val isSubmittingReport: Boolean = false,
+    val showBlockAfterReportDialog: Boolean = false
 )
 
 sealed interface ProfileDetailAction {
@@ -28,6 +29,8 @@ sealed interface ProfileDetailAction {
     data class OnReportClick(val userId: String) : ProfileDetailAction
     data class OnSubmitReport(val reason: com.dating.home.domain.report.ReportReason, val description: String?) : ProfileDetailAction
     data object OnDismissReportSheet : ProfileDetailAction
+    data object OnConfirmBlockAfterReport : ProfileDetailAction
+    data object OnDismissBlockAfterReportDialog : ProfileDetailAction
 }
 
 sealed interface ProfileDetailEvent {

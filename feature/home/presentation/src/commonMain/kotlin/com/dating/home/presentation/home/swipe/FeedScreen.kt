@@ -50,6 +50,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -190,26 +191,28 @@ fun FeedScreen(
                         ) {
                             val visibleItems = state.feedItems.take(3).reversed()
                             visibleItems.forEach { feedItem ->
-                                val isTopCard = feedItem == state.feedItems.first()
-                                if (isTopCard) {
-                                    SwipeableCard(
-                                        onSwipeLeft = { onAction(FeedAction.OnSwipeLeft(feedItem.userId)) },
-                                        onSwipeRight = { onAction(FeedAction.OnSwipeRight(feedItem.userId)) },
-                                        modifier = Modifier.padding(16.dp)
-                                    ) {
-                                        FeedCardContent(
-                                            feedItem = feedItem,
-                                            onClick = { onAction(FeedAction.OnUserClick(feedItem.userId, feedItem.profilePictureUrl)) }
-                                        )
-                                    }
-                                } else {
-                                    Card(
-                                        modifier = Modifier.padding(16.dp),
-                                        colors = CardDefaults.cardColors(
-                                            containerColor = MaterialTheme.colorScheme.surfaceContainer
-                                        )
-                                    ) {
-                                        FeedCardContent(feedItem = feedItem, onClick = {})
+                                key(feedItem.userId) {
+                                    val isTopCard = feedItem == state.feedItems.first()
+                                    if (isTopCard) {
+                                        SwipeableCard(
+                                            onSwipeLeft = { onAction(FeedAction.OnSwipeLeft(feedItem.userId)) },
+                                            onSwipeRight = { onAction(FeedAction.OnSwipeRight(feedItem.userId)) },
+                                            modifier = Modifier.padding(16.dp)
+                                        ) {
+                                            FeedCardContent(
+                                                feedItem = feedItem,
+                                                onClick = { onAction(FeedAction.OnUserClick(feedItem.userId, feedItem.profilePictureUrl)) }
+                                            )
+                                        }
+                                    } else {
+                                        Card(
+                                            modifier = Modifier.padding(16.dp),
+                                            colors = CardDefaults.cardColors(
+                                                containerColor = MaterialTheme.colorScheme.surfaceContainer
+                                            )
+                                        ) {
+                                            FeedCardContent(feedItem = feedItem, onClick = {})
+                                        }
                                     }
                                 }
                             }
