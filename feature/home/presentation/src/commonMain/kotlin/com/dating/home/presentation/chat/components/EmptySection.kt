@@ -43,7 +43,7 @@ fun EmptySection(
     ) {
         Image(
             painter = painterResource(illustration),
-            contentDescription = null,
+            contentDescription = title,
             modifier = Modifier.size(
                 if (configuration == DeviceConfiguration.MOBILE_LANDSCAPE) {
                     125.dp

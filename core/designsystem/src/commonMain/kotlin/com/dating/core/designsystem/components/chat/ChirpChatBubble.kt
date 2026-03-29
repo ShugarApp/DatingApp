@@ -20,6 +20,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.dating.core.designsystem.theme.AppTheme
@@ -36,6 +38,7 @@ fun ChirpChatBubble(
     color: Color = MaterialTheme.colorScheme.extended.surfaceHigher,
     messageStatus: @Composable (() -> Unit)? = null,
     triangleSize: Dp = 10.dp,
+    highlightText: String? = null,
     onLongClick: (() -> Unit)? = null
 ) {
     val padding = 12.dp
@@ -73,13 +76,42 @@ fun ChirpChatBubble(
             .width(IntrinsicSize.Max),
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
-        Text(
-            text = messageContent,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.extended.textPrimary,
-            modifier = Modifier
-                .fillMaxWidth()
-        )
+        if (!highlightText.isNullOrBlank()) {
+            val annotatedText = buildAnnotatedString {
+                val lowerContent = messageContent.lowercase()
+                val lowerQuery = highlightText.lowercase()
+                var startIndex = 0
+                while (true) {
+                    val matchIndex = lowerContent.indexOf(lowerQuery, startIndex)
+                    if (matchIndex == -1) {
+                        append(messageContent.substring(startIndex))
+                        break
+                    }
+                    append(messageContent.substring(startIndex, matchIndex))
+                    pushStyle(
+                        SpanStyle(
+                            background = Color(0xFFFFEB3B).copy(alpha = 0.5f)
+                        )
+                    )
+                    append(messageContent.substring(matchIndex, matchIndex + highlightText.length))
+                    pop()
+                    startIndex = matchIndex + highlightText.length
+                }
+            }
+            Text(
+                text = annotatedText,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.extended.textPrimary,
+                modifier = Modifier.fillMaxWidth()
+            )
+        } else {
+            Text(
+                text = messageContent,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.extended.textPrimary,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
         Row(
             modifier = Modifier
                 .fillMaxWidth(),

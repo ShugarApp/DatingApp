@@ -1,14 +1,18 @@
 package com.dating.home.presentation.chat.chat_list
 
+import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dating.core.domain.auth.SessionStorage
+import com.dating.core.domain.util.onFailure
 import com.dating.home.domain.chat.ChatRepository
 import com.dating.home.domain.participant.ChatParticipantRepository
 import com.dating.home.presentation.chat.mappers.toUi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -39,6 +43,7 @@ class ChatListViewModel(
     }
         .onStart {
             if (!hasLoadedInitialData) {
+                observeSearchTextField()
                 loadChats()
                 fetchLocalUserProfile()
                 hasLoadedInitialData = true
@@ -62,7 +67,37 @@ class ChatListViewModel(
 
             ChatListAction.OnRefresh -> refresh()
 
+            is ChatListAction.OnSearchQueryChanged -> {
+                _state.update { it.copy(searchQuery = action.query) }
+            }
+
+            is ChatListAction.OnSwipeToDeleteChat -> {
+                _state.update { it.copy(showDeleteConfirmationForChatId = action.chatId) }
+            }
+
+            ChatListAction.OnConfirmDeleteChat -> confirmDeleteChat()
+
+            ChatListAction.OnDismissDeleteChatDialog -> {
+                _state.update { it.copy(showDeleteConfirmationForChatId = null) }
+            }
+
             else -> Unit
+        }
+    }
+
+    private fun observeSearchTextField() {
+        snapshotFlow { _state.value.searchTextFieldState.text.toString() }
+            .onEach { text ->
+                _state.update { it.copy(searchQuery = text) }
+            }
+            .launchIn(viewModelScope)
+    }
+
+    private fun confirmDeleteChat() {
+        val chatId = _state.value.showDeleteConfirmationForChatId ?: return
+        viewModelScope.launch {
+            _state.update { it.copy(showDeleteConfirmationForChatId = null) }
+            repository.leaveChat(chatId)
         }
     }
 

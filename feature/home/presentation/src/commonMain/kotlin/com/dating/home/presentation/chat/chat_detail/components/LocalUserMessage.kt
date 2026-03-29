@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -13,8 +14,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import aura.feature.home.presentation.generated.resources.Res
+import aura.feature.home.presentation.generated.resources.copy
 import aura.feature.home.presentation.generated.resources.delete_for_everyone
 import aura.feature.home.presentation.generated.resources.reload_icon
 import aura.feature.home.presentation.generated.resources.retry
@@ -32,17 +38,33 @@ import org.jetbrains.compose.resources.vectorResource
 @Composable
 fun LocalUserMessage(
     message: MessageUi.LocalUserMessage,
-    messageWithOpenMenu: MessageUi.LocalUserMessage?,
+    messageWithOpenMenu: MessageUi?,
     onMessageLongClick: () -> Unit,
     onDismissMessageMenu: () -> Unit,
     onDeleteClick: () -> Unit,
     onRetryClick: () -> Unit,
-    modifier: Modifier = Modifier
+    onCopyClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    highlightText: String? = null
 ) {
+    val statusText = when (message.deliveryStatus) {
+        ChatMessageDeliveryStatus.SENDING -> "sending"
+        ChatMessageDeliveryStatus.SENT -> "sent"
+        ChatMessageDeliveryStatus.READ -> "read"
+        ChatMessageDeliveryStatus.FAILED -> "failed"
+    }
+
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(start = 48.dp),
+            .padding(start = 48.dp)
+            .semantics {
+                contentDescription = "Your message: ${message.content}, status: $statusText"
+                if (message.deliveryStatus == ChatMessageDeliveryStatus.FAILED) {
+                    liveRegion = androidx.compose.ui.semantics.LiveRegionMode.Polite
+                    stateDescription = "Message failed to send"
+                }
+            },
         verticalAlignment = Alignment.Bottom,
         horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)
     ) {
@@ -65,6 +87,7 @@ fun LocalUserMessage(
                 formattedDateTime = message.formattedSentTime.asString(),
                 trianglePosition = TrianglePosition.RIGHT,
                 color = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+                highlightText = highlightText,
                 messageStatus = {
                     MessageStatus(
                         status = message.deliveryStatus
@@ -79,6 +102,12 @@ fun LocalUserMessage(
                 isOpen = message.id == messageWithOpenMenu?.id,
                 onDismiss = onDismissMessageMenu,
                 items = listOf(
+                    DropDownItem(
+                        title = stringResource(Res.string.copy),
+                        icon = Icons.Default.ContentCopy,
+                        contentColor = MaterialTheme.colorScheme.onSurface,
+                        onClick = onCopyClick
+                    ),
                     DropDownItem(
                         title = stringResource(Res.string.delete_for_everyone),
                         icon = Icons.Default.Delete,

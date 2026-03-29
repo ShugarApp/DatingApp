@@ -110,7 +110,7 @@ fun MessageBox(
                     disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
                     disabledContentColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f)
                 ),
-                modifier = Modifier.size(40.dp)
+                modifier = Modifier.size(48.dp)
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Send,
