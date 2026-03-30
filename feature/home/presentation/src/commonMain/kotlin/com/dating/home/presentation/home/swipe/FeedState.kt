@@ -19,7 +19,8 @@ data class FeedState(
     val lastDislikedItem: FeedItem? = null,
     val isUndoing: Boolean = false,
     val isAccountPaused: Boolean = false,
-    val isResumingAccount: Boolean = false
+    val isResumingAccount: Boolean = false,
+    val isIncognitoActive: Boolean = false
 )
 
 data class FeedItem(

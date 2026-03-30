@@ -34,6 +34,7 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.PauseCircle
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.filled.PersonOff
 import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material.icons.filled.PlayCircle
@@ -92,6 +93,8 @@ import shugar.feature.home.presentation.generated.resources.settings_location
 import shugar.feature.home.presentation.generated.resources.settings_manage_subscription
 import shugar.feature.home.presentation.generated.resources.settings_max_distance
 import shugar.feature.home.presentation.generated.resources.settings_notifications
+import shugar.feature.home.presentation.generated.resources.settings_blocked_users
+import shugar.feature.home.presentation.generated.resources.settings_incognito_mode
 import shugar.feature.home.presentation.generated.resources.settings_pause_account
 import shugar.feature.home.presentation.generated.resources.settings_privacy
 import shugar.feature.home.presentation.generated.resources.settings_pro_plan_active
@@ -140,6 +143,7 @@ fun SettingsScreen(
     onChangePassword: () -> Unit,
     onDeleteAccount: () -> Unit,
     onPauseAccount: () -> Unit,
+    onIncognitoMode: () -> Unit,
     onBlockedUsers: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SettingsViewModel = koinViewModel()
@@ -230,6 +234,11 @@ fun SettingsScreen(
                         stringResource(Res.string.settings_pause_account)
                     },
                     onClick = onPauseAccount
+                )
+                AccessCardItem(
+                    icon = Icons.Default.VisibilityOff,
+                    title = stringResource(Res.string.settings_incognito_mode),
+                    onClick = onIncognitoMode
                 )
                 AccessCardItem(
                     icon = Icons.Default.Block,

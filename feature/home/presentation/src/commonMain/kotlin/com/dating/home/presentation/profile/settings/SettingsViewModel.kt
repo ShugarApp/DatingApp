@@ -44,6 +44,7 @@ class SettingsViewModel(
         currentState.copy(
             username = authInfo?.user?.username ?: currentState.username,
             isAccountPaused = authInfo?.user?.isPaused ?: currentState.isAccountPaused,
+            isIncognito = authInfo?.user?.isIncognito ?: currentState.isIncognito,
             maxDistance = discovery.maxDistance,
             showMe = discovery.showMe,
             minAge = discovery.minAge,
@@ -62,6 +63,7 @@ class SettingsViewModel(
             SettingsAction.OnConfirmLogoutClick -> logout()
             SettingsAction.OnDismissLogoutConfirmationDialogClick -> dismissLogoutConfirmation()
             SettingsAction.OnConfirmPauseAccountClick -> togglePauseAccount()
+            SettingsAction.OnToggleIncognitoClick -> toggleIncognitoMode()
             SettingsAction.OnConfirmDeleteAccountClick -> deleteAccount()
 
             SettingsAction.OnLocationClick -> updateLocation()
@@ -151,6 +153,25 @@ class SettingsViewModel(
                         sessionStorage.set(authInfo.copy(user = user))
                     }
                     _events.send(SettingsEvent.OnPauseAccountToggled)
+                }
+                .onFailure { error ->
+                    _state.update { it.copy(isLoading = false, errorMessage = error.toUiText()) }
+                }
+        }
+    }
+
+    private fun toggleIncognitoMode() {
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
+            val currentIsIncognito = state.value.isIncognito
+            userService.toggleIncognitoMode(!currentIsIncognito)
+                .onSuccess { user ->
+                    _state.update { it.copy(isLoading = false) }
+                    val authInfo = sessionStorage.observeAuthInfo().first()
+                    if (authInfo != null) {
+                        sessionStorage.set(authInfo.copy(user = user))
+                    }
+                    _events.send(SettingsEvent.OnIncognitoToggled)
                 }
                 .onFailure { error ->
                     _state.update { it.copy(isLoading = false, errorMessage = error.toUiText()) }

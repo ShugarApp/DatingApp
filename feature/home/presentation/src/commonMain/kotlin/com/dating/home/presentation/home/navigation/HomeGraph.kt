@@ -10,6 +10,7 @@ import androidx.navigation.toRoute
 import com.dating.home.presentation.home.bottom_navigation.BottomNavigationContainer
 import com.dating.home.presentation.profile.edit_profile.EditProfileScreen
 import com.dating.home.presentation.profile.settings.DeleteAccountScreen
+import com.dating.home.presentation.profile.settings.IncognitoModeScreen
 import com.dating.home.presentation.profile.settings.PauseAccountScreen
 import com.dating.home.presentation.profile.settings.SettingsScreen
 import com.dating.home.presentation.profile.settings.blocked.BlockedUsersScreen
@@ -132,12 +133,26 @@ fun NavGraphBuilder.homeGraph(
                 },
                 onBlockedUsers = {
                     navController.navigate(HomeGraphRoutes.BlockedUsersRoute)
+                },
+                onIncognitoMode = {
+                    navController.navigate(HomeGraphRoutes.IncognitoModeRoute)
                 }
             )
         }
 
         composable<HomeGraphRoutes.PauseAccountRoute> {
             PauseAccountScreen(
+                onBack = { navController.popBackStack() },
+                onNavigateToFeed = {
+                    navController.navigate(HomeGraphRoutes.BottomNavContainer(null)) {
+                        popUpTo(HomeGraphRoutes.BottomNavContainer(null)) { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        composable<HomeGraphRoutes.IncognitoModeRoute> {
+            IncognitoModeScreen(
                 onBack = { navController.popBackStack() },
                 onNavigateToFeed = {
                     navController.navigate(HomeGraphRoutes.BottomNavContainer(null)) {

@@ -28,4 +28,5 @@ interface UserService {
     suspend fun getUserById(id: String): Result<User, DataError.Remote>
     suspend fun deleteAccount(): EmptyResult<DataError.Remote>
     suspend fun pauseAccount(pause: Boolean): Result<User, DataError.Remote>
+    suspend fun toggleIncognitoMode(incognito: Boolean): Result<User, DataError.Remote>
 }
