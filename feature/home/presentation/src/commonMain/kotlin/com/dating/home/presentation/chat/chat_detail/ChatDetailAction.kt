@@ -1,9 +1,17 @@
 package com.dating.home.presentation.chat.chat_detail
 
+import com.dating.home.domain.models.MessageType
 import com.dating.home.presentation.chat.model.MessageUi
 
 sealed interface ChatDetailAction {
     data object OnSendMessageClick: ChatDetailAction
+    data class OnSendMediaMessage(
+        val mediaBytes: ByteArray,
+        val mimeType: String,
+        val messageType: MessageType
+    ): ChatDetailAction
+    data class OnSendGifUrl(val url: String): ChatDetailAction
+    data object OnToggleMediaPicker: ChatDetailAction
     data object OnScrollToTop: ChatDetailAction
     data class OnSelectChat(val chatId: String?): ChatDetailAction
     data class OnDeleteMessageClick(val message: MessageUi.LocalUserMessage): ChatDetailAction

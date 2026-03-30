@@ -11,6 +11,7 @@ import com.dating.core.designsystem.components.avatar.ChatParticipantUi
 import com.dating.core.designsystem.theme.AppTheme
 import com.dating.core.presentation.util.UiText
 import com.dating.home.domain.models.ChatMessageDeliveryStatus
+import com.dating.home.domain.models.MessageType
 import com.dating.home.presentation.chat.model.MessageUi
 import com.dating.home.presentation.chat.util.getChatBubbleColorForUser
 import org.jetbrains.compose.ui.tooling.preview.Preview

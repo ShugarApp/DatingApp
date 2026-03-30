@@ -1,5 +1,6 @@
 package com.dating.home.database.entities
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
@@ -27,5 +28,8 @@ data class ChatMessageEntity(
     val content: String,
     val timestamp: Long,
     val deliveryStatus: String,
-    val deliveryStatusTimestamp: Long = timestamp
+    @ColumnInfo(defaultValue = "0")
+    val deliveryStatusTimestamp: Long = timestamp,
+    @ColumnInfo(defaultValue = "TEXT")
+    val messageType: String = "TEXT"
 )

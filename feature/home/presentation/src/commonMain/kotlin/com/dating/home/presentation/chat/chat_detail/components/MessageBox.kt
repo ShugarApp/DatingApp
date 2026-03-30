@@ -13,8 +13,11 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.AttachFile
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -52,7 +55,9 @@ fun MessageBox(
     connectionState: ConnectionState,
     onSendClick: () -> Unit,
     modifier: Modifier = Modifier,
-    onTextChanged: (String) -> Unit = {}
+    onTextChanged: (String) -> Unit = {},
+    onAttachClick: (() -> Unit)? = null,
+    isUploadingMedia: Boolean = false
 ) {
     val isConnected = connectionState == ConnectionState.CONNECTED
 
@@ -97,6 +102,31 @@ fun MessageBox(
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.extended.textDisabled
                     )
+                }
+            }
+            if (onAttachClick != null) {
+                IconButton(
+                    onClick = onAttachClick,
+                    enabled = isConnected && !isUploadingMedia,
+                    modifier = Modifier.size(40.dp)
+                ) {
+                    if (isUploadingMedia) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.AttachFile,
+                            contentDescription = "Attach media",
+                            modifier = Modifier.size(20.dp),
+                            tint = if (isConnected) {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            } else {
+                                MaterialTheme.colorScheme.extended.textDisabled
+                            }
+                        )
+                    }
                 }
             }
             Spacer(modifier = Modifier.weight(1f))

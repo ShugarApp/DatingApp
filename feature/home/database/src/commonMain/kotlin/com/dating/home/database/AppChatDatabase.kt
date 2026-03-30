@@ -1,5 +1,6 @@
 package com.dating.home.database
 
+import androidx.room.AutoMigration
 import androidx.room.ConstructedBy
 import androidx.room.Database
 import androidx.room.RoomDatabase
@@ -23,7 +24,10 @@ import com.dating.home.database.view.LastMessageView
     views = [
         LastMessageView::class
     ],
-    version = 1,
+    version = 2,
+    autoMigrations = [
+        AutoMigration(from = 1, to = 2)
+    ]
 )
 @ConstructedBy(ChirpChatDatabaseConstructor::class)
 abstract class AppChatDatabase : RoomDatabase() {

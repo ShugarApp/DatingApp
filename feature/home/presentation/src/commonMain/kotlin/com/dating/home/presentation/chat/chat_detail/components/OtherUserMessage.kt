@@ -9,6 +9,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -17,6 +21,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import aura.feature.home.presentation.generated.resources.Res
 import aura.feature.home.presentation.generated.resources.copy
+import com.dating.home.domain.models.MessageType
 import com.dating.home.presentation.chat.model.MessageUi
 import com.dating.core.designsystem.components.avatar.ChirpAvatarPhoto
 import com.dating.core.designsystem.components.chat.ChirpChatBubble
@@ -36,6 +41,15 @@ fun OtherUserMessage(
     modifier: Modifier = Modifier,
     highlightText: String? = null
 ) {
+    var fullScreenImageUrl by remember { mutableStateOf<String?>(null) }
+
+    fullScreenImageUrl?.let { url ->
+        FullScreenImageViewer(
+            imageUrl = url,
+            onDismiss = { fullScreenImageUrl = null }
+        )
+    }
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -59,7 +73,18 @@ fun OtherUserMessage(
                 color = color,
                 formattedDateTime = message.formattedSentTime.asString(),
                 highlightText = highlightText,
-                onLongClick = onMessageLongClick
+                onLongClick = onMessageLongClick,
+                mediaContent = if (message.messageType != MessageType.TEXT) {
+                    {
+                        MediaMessageContent(
+                            content = message.content,
+                            messageType = message.messageType,
+                            onImageClick = if (message.messageType == MessageType.IMAGE) {
+                                { fullScreenImageUrl = message.content }
+                            } else null
+                        )
+                    }
+                } else null
             )
 
             ChirpDropDownMenu(

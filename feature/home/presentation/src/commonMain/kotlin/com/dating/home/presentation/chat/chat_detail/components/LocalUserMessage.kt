@@ -12,6 +12,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.contentDescription
@@ -26,6 +30,7 @@ import shugar.feature.home.presentation.generated.resources.reload_icon
 import shugar.feature.home.presentation.generated.resources.retry
 import shugar.feature.home.presentation.generated.resources.you
 import com.dating.home.domain.models.ChatMessageDeliveryStatus
+import com.dating.home.domain.models.MessageType
 import com.dating.home.presentation.chat.model.MessageUi
 import com.dating.core.designsystem.components.chat.ChirpChatBubble
 import com.dating.core.designsystem.components.chat.TrianglePosition
@@ -47,6 +52,15 @@ fun LocalUserMessage(
     modifier: Modifier = Modifier,
     highlightText: String? = null
 ) {
+    var fullScreenImageUrl by remember { mutableStateOf<String?>(null) }
+
+    fullScreenImageUrl?.let { url ->
+        FullScreenImageViewer(
+            imageUrl = url,
+            onDismiss = { fullScreenImageUrl = null }
+        )
+    }
+
     val statusText = when (message.deliveryStatus) {
         ChatMessageDeliveryStatus.SENDING -> "sending"
         ChatMessageDeliveryStatus.SENT -> "sent"
@@ -95,7 +109,18 @@ fun LocalUserMessage(
                 },
                 onLongClick = {
                     onMessageLongClick()
-                }
+                },
+                mediaContent = if (message.messageType != MessageType.TEXT) {
+                    {
+                        MediaMessageContent(
+                            content = message.content,
+                            messageType = message.messageType,
+                            onImageClick = if (message.messageType == MessageType.IMAGE) {
+                                { fullScreenImageUrl = message.content }
+                            } else null
+                        )
+                    }
+                } else null
             )
 
             ChirpDropDownMenu(

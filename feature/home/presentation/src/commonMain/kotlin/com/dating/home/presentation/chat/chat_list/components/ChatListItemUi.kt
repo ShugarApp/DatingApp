@@ -20,6 +20,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.dating.home.domain.models.ChatMessage
 import com.dating.home.domain.models.ChatMessageDeliveryStatus
+import com.dating.home.domain.models.MessageType
 import com.dating.home.presentation.chat.components.ChatItemHeaderRow
 import com.dating.home.presentation.chat.model.ChatUi
 import com.dating.core.designsystem.components.avatar.ChatParticipantUi
@@ -36,7 +37,12 @@ fun ChatListItemUi(
 ) {
     val isGroupChat = chat.otherParticipants.size > 1
     val chatName = chat.otherParticipants.joinToString(", ") { it.username }
-    val lastMessagePreview = chat.lastMessage?.content ?: ""
+    val lastMessagePreview = when (chat.lastMessage?.messageType) {
+        MessageType.IMAGE -> "\uD83D\uDCF7 Photo"
+        MessageType.GIF -> "GIF"
+        MessageType.AUDIO -> "\uD83C\uDFB5 Audio"
+        else -> chat.lastMessage?.content ?: ""
+    }
     Card(
         modifier = modifier.semantics {
             contentDescription = "Chat with $chatName. $lastMessagePreview"
@@ -77,7 +83,7 @@ fun ChatListItemUi(
                             append(chat.lastMessageSenderUsername + ": ")
                         }
                     }
-                    append(chat.lastMessage.content)
+                    append(lastMessagePreview)
                 }
                 Text(
                     text = previewMessage,

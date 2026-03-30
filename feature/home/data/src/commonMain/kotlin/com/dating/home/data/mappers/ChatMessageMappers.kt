@@ -1,12 +1,15 @@
 package com.dating.home.data.mappers
 
 import com.dating.home.data.dto.ChatMessageDto
+import com.dating.home.data.dto.MediaUploadUrlDto
 import com.dating.home.data.dto.websocket.IncomingWebSocketDto
 import com.dating.home.data.dto.websocket.OutgoingWebSocketDto
 import com.dating.home.database.entities.ChatMessageEntity
 import com.dating.home.database.view.LastMessageView
 import com.dating.home.domain.models.ChatMessage
 import com.dating.home.domain.models.ChatMessageDeliveryStatus
+import com.dating.home.domain.models.MediaUploadInfo
+import com.dating.home.domain.models.MessageType
 import com.dating.home.domain.models.OutgoingNewMessage
 import kotlin.time.Clock
 import kotlin.time.Instant
@@ -18,7 +21,8 @@ fun ChatMessageDto.toDomain(): ChatMessage {
         content = content,
         createdAt = Instant.parse(createdAt),
         senderId = senderId,
-        deliveryStatus = ChatMessageDeliveryStatus.SENT
+        deliveryStatus = ChatMessageDeliveryStatus.SENT,
+        messageType = parseMessageType(messageType)
     )
 }
 
@@ -29,7 +33,8 @@ fun ChatMessageEntity.toDomain(): ChatMessage {
         content = content,
         createdAt = Instant.fromEpochMilliseconds(timestamp),
         senderId = senderId,
-        deliveryStatus = ChatMessageDeliveryStatus.valueOf(deliveryStatus)
+        deliveryStatus = ChatMessageDeliveryStatus.valueOf(deliveryStatus),
+        messageType = parseMessageType(messageType)
     )
 }
 
@@ -41,6 +46,7 @@ fun LastMessageView.toDomain(): ChatMessage {
         createdAt = Instant.fromEpochMilliseconds(timestamp),
         senderId = senderId,
         deliveryStatus = ChatMessageDeliveryStatus.valueOf(this.deliveryStatus),
+        messageType = parseMessageType(messageType)
     )
 }
 
@@ -51,7 +57,8 @@ fun ChatMessage.toEntity(): ChatMessageEntity {
         senderId = senderId,
         content = content,
         timestamp = createdAt.toEpochMilliseconds(),
-        deliveryStatus = deliveryStatus.name
+        deliveryStatus = deliveryStatus.name,
+        messageType = messageType.name
     )
 }
 
@@ -63,6 +70,7 @@ fun ChatMessage.toLastMessageView(): LastMessageView {
         content = content,
         timestamp = createdAt.toEpochMilliseconds(),
         deliveryStatus = deliveryStatus.name,
+        messageType = messageType.name,
         senderUsername = null
     )
 }
@@ -72,6 +80,7 @@ fun ChatMessage.toNewMessage(): OutgoingWebSocketDto.NewMessage {
         messageId = id,
         chatId = chatId,
         content = content,
+        messageType = messageType.name
     )
 }
 
@@ -82,7 +91,8 @@ fun IncomingWebSocketDto.NewMessageDto.toEntity(): ChatMessageEntity {
         senderId = senderId,
         content = content,
         timestamp = Instant.parse(createdAt).toEpochMilliseconds(),
-        deliveryStatus = ChatMessageDeliveryStatus.SENT.name
+        deliveryStatus = ChatMessageDeliveryStatus.SENT.name,
+        messageType = messageType
     )
 }
 
@@ -90,7 +100,8 @@ fun OutgoingNewMessage.toWebSocketDto(): OutgoingWebSocketDto.NewMessage {
     return OutgoingWebSocketDto.NewMessage(
         chatId = chatId,
         messageId = messageId,
-        content = content
+        content = content,
+        messageType = messageType.name
     )
 }
 
@@ -104,6 +115,24 @@ fun OutgoingWebSocketDto.NewMessage.toEntity(
         content = content,
         senderId = senderId,
         deliveryStatus = deliveryStatus.name,
-        timestamp = Clock.System.now().toEpochMilliseconds()
+        timestamp = Clock.System.now().toEpochMilliseconds(),
+        messageType = messageType
     )
+}
+
+fun MediaUploadUrlDto.toDomain(): MediaUploadInfo {
+    return MediaUploadInfo(
+        uploadUrl = uploadUrl,
+        publicUrl = publicUrl,
+        headers = headers,
+        expiresAt = expiresAt
+    )
+}
+
+private fun parseMessageType(value: String): MessageType {
+    return try {
+        MessageType.valueOf(value)
+    } catch (_: IllegalArgumentException) {
+        MessageType.TEXT
+    }
 }

@@ -1,6 +1,7 @@
 package com.dating.home.presentation.chat.model
 
 import com.dating.home.domain.models.ChatMessageDeliveryStatus
+import com.dating.home.domain.models.MessageType
 import com.dating.core.designsystem.components.avatar.ChatParticipantUi
 import com.dating.core.presentation.util.UiText
 
@@ -9,14 +10,16 @@ sealed class MessageUi(open val id: String) {
         override val id: String,
         val content: String,
         val deliveryStatus: ChatMessageDeliveryStatus,
-        val formattedSentTime: UiText
+        val formattedSentTime: UiText,
+        val messageType: MessageType = MessageType.TEXT
     ): MessageUi(id)
 
     data class OtherUserMessage(
         override val id: String,
         val content: String,
         val formattedSentTime: UiText,
-        val sender: ChatParticipantUi
+        val sender: ChatParticipantUi,
+        val messageType: MessageType = MessageType.TEXT
     ): MessageUi(id)
 
     data class DateSeparator(

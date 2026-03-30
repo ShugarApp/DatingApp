@@ -5,6 +5,7 @@ import com.dating.home.data.chat.KtorChatService
 import com.dating.home.data.chat.OfflineFirstChatRepository
 import com.dating.home.data.chat.WebSocketChatConnectionClient
 import com.dating.home.data.matching.KtorMatchingService
+import com.dating.home.data.message.KtorChatMediaService
 import com.dating.home.data.message.KtorChatMessageService
 import com.dating.home.data.message.OfflineFirstMessageRepository
 import com.dating.home.data.network.ConnectionRetryHandler
@@ -13,6 +14,7 @@ import com.dating.home.data.notification.KtorDeviceTokenService
 import com.dating.home.data.participant.KtorChatParticipantService
 import com.dating.home.data.participant.OfflineFirstChatParticipantRepository
 import com.dating.home.data.block.KtorBlockService
+import com.dating.home.data.giphy.KtorGiphyService
 import com.dating.home.data.report.KtorReportService
 import com.dating.home.data.user.KtorUserService
 import com.dating.home.database.DatabaseFactory
@@ -20,12 +22,14 @@ import com.dating.home.domain.chat.ChatConnectionClient
 import com.dating.home.domain.chat.ChatRepository
 import com.dating.home.domain.chat.ChatService
 import com.dating.home.domain.matching.MatchingService
+import com.dating.home.domain.message.ChatMediaService
 import com.dating.home.domain.message.ChatMessageService
 import com.dating.home.domain.message.MessageRepository
 import com.dating.home.domain.notification.DeviceTokenService
 import com.dating.home.domain.participant.ChatParticipantRepository
 import com.dating.home.domain.participant.ChatParticipantService
 import com.dating.home.domain.block.BlockService
+import com.dating.home.domain.giphy.GiphyService
 import com.dating.home.domain.report.ReportService
 import com.dating.home.domain.user.UserService
 import kotlinx.serialization.json.Json
@@ -47,12 +51,14 @@ val homeDataModule = module {
     singleOf(::ConnectionRetryHandler)
     singleOf(::KtorWebSocketConnector)
     singleOf(::KtorChatMessageService) bind ChatMessageService::class
+    singleOf(::KtorChatMediaService) bind ChatMediaService::class
     singleOf(::KtorDeviceTokenService) bind DeviceTokenService::class
     singleOf(::OfflineFirstChatParticipantRepository) bind ChatParticipantRepository::class
     singleOf(::KtorMatchingService) bind MatchingService::class
     singleOf(::KtorUserService) bind UserService::class
     singleOf(::KtorBlockService) bind BlockService::class
     singleOf(::KtorReportService) bind ReportService::class
+    singleOf(::KtorGiphyService) bind GiphyService::class
     single {
         Json {
             ignoreUnknownKeys = true

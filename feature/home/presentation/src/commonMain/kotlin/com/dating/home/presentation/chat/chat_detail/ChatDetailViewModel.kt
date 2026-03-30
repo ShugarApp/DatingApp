@@ -27,6 +27,7 @@ import com.dating.home.domain.report.ReportService
 import com.dating.home.domain.models.ChatMessage
 import com.dating.home.domain.models.ChatMessageDeliveryStatus
 import com.dating.home.domain.models.ConnectionState
+import com.dating.home.domain.models.MessageType
 import com.dating.home.domain.models.OutgoingNewMessage
 import com.dating.home.presentation.chat.mappers.toUi
 import com.dating.home.presentation.chat.mappers.toUiList
@@ -154,6 +155,11 @@ class ChatDetailViewModel(
             is ChatDetailAction.OnRetryClick -> retryMessage(action.message)
             ChatDetailAction.OnScrollToTop -> onScrollToTop()
             ChatDetailAction.OnSendMessageClick -> sendMessage()
+            is ChatDetailAction.OnSendMediaMessage -> sendMediaMessage(
+                action.mediaBytes, action.mimeType, action.messageType
+            )
+            is ChatDetailAction.OnSendGifUrl -> sendGifMessage(action.url)
+            ChatDetailAction.OnToggleMediaPicker -> toggleMediaPicker()
             ChatDetailAction.OnRetryPaginationClick -> retryPagination()
             ChatDetailAction.OnHideBanner -> hideBanner()
             is ChatDetailAction.OnTopVisibleIndexChanged -> updateBanner(action.topVisibleIndex)
@@ -704,6 +710,57 @@ class ChatDetailViewModel(
             }
             currentState.copy(currentSearchResultIndex = newIndex)
         }
+    }
+
+    private fun sendMediaMessage(
+        mediaBytes: ByteArray,
+        mimeType: String,
+        messageType: MessageType
+    ) {
+        val currentChatId = _chatId.value ?: return
+
+        _state.update { it.copy(isUploadingMedia = true) }
+
+        viewModelScope.launch {
+            val messageId = Uuid.random().toString()
+
+            messageRepository
+                .sendMediaMessage(
+                    chatId = currentChatId,
+                    messageId = messageId,
+                    mediaBytes = mediaBytes,
+                    mimeType = mimeType,
+                    messageType = messageType
+                )
+                .onFailure { error ->
+                    eventChannel.send(ChatDetailEvent.OnError(error.toUiText()))
+                }
+
+            _state.update { it.copy(isUploadingMedia = false) }
+        }
+    }
+
+    private fun sendGifMessage(url: String) {
+        val currentChatId = _chatId.value ?: return
+
+        viewModelScope.launch {
+            val message = OutgoingNewMessage(
+                chatId = currentChatId,
+                messageId = Uuid.random().toString(),
+                content = url,
+                messageType = MessageType.GIF
+            )
+
+            messageRepository
+                .sendMessage(message)
+                .onFailure { error ->
+                    eventChannel.send(ChatDetailEvent.OnError(error.toUiText()))
+                }
+        }
+    }
+
+    private fun toggleMediaPicker() {
+        _state.update { it.copy(isMediaPickerOpen = !it.isMediaPickerOpen) }
     }
 
     companion object {

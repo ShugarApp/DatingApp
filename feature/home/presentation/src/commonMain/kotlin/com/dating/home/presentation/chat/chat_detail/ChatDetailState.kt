@@ -32,7 +32,9 @@ data class ChatDetailState(
     val isSearchMode: Boolean = false,
     val messageSearchQuery: String = "",
     val messageSearchResults: List<Int> = emptyList(),
-    val currentSearchResultIndex: Int = -1
+    val currentSearchResultIndex: Int = -1,
+    val isMediaPickerOpen: Boolean = false,
+    val isUploadingMedia: Boolean = false
 )
 
 data class BannerState(

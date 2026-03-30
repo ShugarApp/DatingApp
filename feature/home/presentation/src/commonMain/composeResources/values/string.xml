@@ -344,4 +344,14 @@
     <string name="block_after_report_desc">Your report has been submitted. Would you also like to block this user so they can\'t contact you anymore?</string>
     <string name="block_after_report_confirm">Block</string>
     <string name="block_after_report_dismiss">No thanks</string>
+
+    <!-- Media Messages -->
+    <string name="photo_message">Photo</string>
+    <string name="audio_message">Audio</string>
+    <string name="gif_message">GIF</string>
+    <string name="attach_media">Attach media</string>
+    <string name="pick_from_gallery">Gallery</string>
+    <string name="take_photo">Camera</string>
+    <string name="record_audio">Audio</string>
+    <string name="uploading_media">Uploading…</string>
 </resources>

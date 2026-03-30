@@ -2,6 +2,7 @@ package com.dating.home.domain.message
 
 import com.dating.home.domain.models.ChatMessage
 import com.dating.home.domain.models.ChatMessageDeliveryStatus
+import com.dating.home.domain.models.MessageType
 import com.dating.home.domain.models.MessageWithSender
 import com.dating.home.domain.models.OutgoingNewMessage
 import com.dating.core.domain.util.DataError
@@ -21,6 +22,14 @@ interface MessageRepository {
     ): Result<List<ChatMessage>, DataError>
 
     suspend fun sendMessage(message: OutgoingNewMessage): EmptyResult<DataError>
+
+    suspend fun sendMediaMessage(
+        chatId: String,
+        messageId: String,
+        mediaBytes: ByteArray,
+        mimeType: String,
+        messageType: MessageType
+    ): EmptyResult<DataError>
 
     suspend fun retryMessage(messageId: String): EmptyResult<DataError>
 
