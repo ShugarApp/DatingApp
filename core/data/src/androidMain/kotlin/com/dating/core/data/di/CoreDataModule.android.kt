@@ -3,7 +3,9 @@ package com.dating.core.data.di
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import com.dating.core.data.auth.createDataStore
+import com.dating.core.data.image.AndroidImageCompressor
 import com.dating.core.data.location.AndroidLocationProvider
+import com.dating.core.domain.image.ImageCompressor
 import com.dating.core.domain.location.LocationProvider
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.okhttp.OkHttp
@@ -16,4 +18,5 @@ actual val platformCoreDataModule = module {
         createDataStore(androidContext())
     }
     single<LocationProvider> { AndroidLocationProvider(androidContext()) }
+    single<ImageCompressor> { AndroidImageCompressor() }
 }

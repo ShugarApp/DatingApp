@@ -20,6 +20,8 @@ import com.dating.home.domain.models.ReactionSummary
 import com.dating.home.database.entities.MessageReactionEntity
 import com.dating.core.data.database.safeDatabaseUpdate
 import com.dating.core.domain.auth.SessionStorage
+import com.dating.core.domain.image.ImageCompressor
+import com.dating.core.domain.logging.AppLogger
 import com.dating.core.domain.util.DataError
 import com.dating.core.domain.util.EmptyResult
 import com.dating.core.domain.util.Result
@@ -40,7 +42,9 @@ class OfflineFirstMessageRepository(
     private val sessionStorage: SessionStorage,
     private val json: Json,
     private val webSocketConnector: KtorWebSocketConnector,
-    private val applicationScope: CoroutineScope
+    private val applicationScope: CoroutineScope,
+    private val imageCompressor: ImageCompressor,
+    private val logger: AppLogger
 ): MessageRepository {
 
     override suspend fun sendMessage(message: OutgoingNewMessage): EmptyResult<DataError> {
@@ -93,8 +97,35 @@ class OfflineFirstMessageRepository(
             )
             database.chatMessageDao.upsertMessage(entity)
 
+            // Compress image before upload (skip GIFs and non-image types)
+            val (uploadBytes, uploadMimeType) = if (mimeType.startsWith("image/") && mimeType != "image/gif") {
+                try {
+                    val compressed = imageCompressor.compressImage(
+                        bytes = mediaBytes,
+                        mimeType = mimeType,
+                        maxWidthPx = 1280,
+                        maxHeightPx = 1280,
+                        quality = 80
+                    )
+                    val ratio = if (compressed.originalSizeBytes > 0)
+                        100 - (compressed.compressedSizeBytes * 100 / compressed.originalSizeBytes)
+                    else 0
+                    logger.info(
+                        "Image compressed: ${compressed.originalSizeBytes / 1024}KB → " +
+                            "${compressed.compressedSizeBytes / 1024}KB ($ratio%) | " +
+                            "${compressed.widthPx}x${compressed.heightPx}px"
+                    )
+                    compressed.bytes to compressed.mimeType
+                } catch (e: Exception) {
+                    logger.error("Image compression failed, uploading original", e)
+                    mediaBytes to mimeType
+                }
+            } else {
+                mediaBytes to mimeType
+            }
+
             // Step 1: Get upload URL
-            val uploadInfo = when (val result = chatMediaService.getUploadUrl(chatId, mimeType)) {
+            val uploadInfo = when (val result = chatMediaService.getUploadUrl(chatId, uploadMimeType)) {
                 is Result.Success -> result.data
                 is Result.Failure -> {
                     markAsFailed(messageId)
@@ -103,7 +134,7 @@ class OfflineFirstMessageRepository(
             }
 
             // Step 2: Upload to Supabase
-            when (val result = chatMediaService.uploadMedia(uploadInfo.uploadUrl, uploadInfo.headers, mediaBytes)) {
+            when (val result = chatMediaService.uploadMedia(uploadInfo.uploadUrl, uploadInfo.headers, uploadBytes)) {
                 is Result.Success -> Unit
                 is Result.Failure -> {
                     markAsFailed(messageId)
