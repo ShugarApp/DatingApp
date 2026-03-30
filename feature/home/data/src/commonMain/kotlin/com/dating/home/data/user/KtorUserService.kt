@@ -16,6 +16,7 @@ import com.dating.core.domain.util.Result
 import com.dating.core.domain.util.map
 import com.dating.home.data.dto.request.ConfirmPhotoRequest
 import com.dating.home.data.dto.request.LocationRequest
+import com.dating.home.data.dto.request.IncognitoModeRequest
 import com.dating.home.data.dto.request.PauseAccountRequest
 import com.dating.home.data.dto.request.ReorderPhotosRequest
 import com.dating.home.data.dto.request.UpdateProfileRequest
@@ -160,6 +161,13 @@ class KtorUserService(
         return httpClient.put<PauseAccountRequest, UserSerializable>(
             route = "/users/profile/pause",
             body = PauseAccountRequest(pause = pause)
+        ).map { it.toDomain() }
+    }
+
+    override suspend fun toggleIncognitoMode(incognito: Boolean): Result<User, DataError.Remote> {
+        return httpClient.put<IncognitoModeRequest, UserSerializable>(
+            route = "/users/profile/incognito",
+            body = IncognitoModeRequest(incognito = incognito)
         ).map { it.toDomain() }
     }
 }

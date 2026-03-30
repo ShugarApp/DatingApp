@@ -34,6 +34,9 @@ sealed interface HomeGraphRoutes {
     data object PauseAccountRoute : HomeGraphRoutes
 
     @Serializable
+    data object IncognitoModeRoute : HomeGraphRoutes
+
+    @Serializable
     data object DeleteAccountRoute : HomeGraphRoutes
 
     @Serializable

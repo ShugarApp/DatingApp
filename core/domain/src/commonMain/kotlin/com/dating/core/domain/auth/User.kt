@@ -15,6 +15,7 @@ data class User(
     val hasVerifiedEmail: Boolean,
     val status: UserStatus = UserStatus.PENDING,
     val isPaused: Boolean = false,
+    val isIncognito: Boolean = false,
     val photos: List<String> = emptyList(),
     val city: String? = null,
     val country: String? = null,

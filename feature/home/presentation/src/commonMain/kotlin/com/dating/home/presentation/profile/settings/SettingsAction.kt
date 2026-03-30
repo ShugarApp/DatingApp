@@ -9,6 +9,7 @@ sealed interface SettingsAction {
     data object OnDismissLogoutConfirmationDialogClick : SettingsAction
 
     data object OnConfirmPauseAccountClick : SettingsAction
+    data object OnToggleIncognitoClick : SettingsAction
     data object OnConfirmDeleteAccountClick : SettingsAction
 
     // Discovery

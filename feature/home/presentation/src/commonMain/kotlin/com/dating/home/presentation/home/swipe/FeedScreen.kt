@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.Undo
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -65,6 +66,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import aura.feature.home.presentation.generated.resources.Res
+import aura.feature.home.presentation.generated.resources.feed_incognito_banner
 import aura.feature.home.presentation.generated.resources.feed_paused_activate
 import aura.feature.home.presentation.generated.resources.feed_paused_desc
 import aura.feature.home.presentation.generated.resources.feed_paused_title
@@ -154,12 +156,41 @@ fun FeedScreen(
             )
         }
     ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = paddingValues.calculateTopPadding())
+        ) {
+            if (state.isIncognitoActive) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.tertiary.copy(alpha = 0.15f))
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.VisibilityOff,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = MaterialTheme.colorScheme.tertiary
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = stringResource(Res.string.feed_incognito_banner),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.tertiary,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
         PullToRefreshBox(
             isRefreshing = state.isLoading && state.feedItems.isNotEmpty(),
             onRefresh = { onAction(FeedAction.OnRefresh) },
             modifier = Modifier
-                .fillMaxSize()
-                .padding(top = paddingValues.calculateTopPadding())
+                .weight(1f)
+                .fillMaxWidth()
         ) {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -221,6 +252,7 @@ fun FeedScreen(
                     }
                 }
             }
+        }
         }
     }
 

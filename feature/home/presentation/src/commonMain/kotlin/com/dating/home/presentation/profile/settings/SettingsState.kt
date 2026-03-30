@@ -7,6 +7,7 @@ import com.dating.core.presentation.util.UiText
 data class SettingsState(
     val username: String = "",
     val isAccountPaused: Boolean = false,
+    val isIncognito: Boolean = false,
     val isLoading: Boolean = false,
     val showLogoutConfirmationDialog: Boolean = false,
     val maxDistance: Double? = null,

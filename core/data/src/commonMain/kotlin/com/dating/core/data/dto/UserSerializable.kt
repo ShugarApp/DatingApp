@@ -10,6 +10,7 @@ data class UserSerializable(
     val hasVerifiedEmail: Boolean,
     val status: String = "PENDING",
     val isPaused: Boolean = false,
+    val isIncognito: Boolean = false,
     val photos: List<String> = emptyList(),
     val city: String? = null,
     val country: String? = null,

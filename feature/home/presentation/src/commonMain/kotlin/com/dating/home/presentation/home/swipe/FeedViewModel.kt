@@ -36,6 +36,7 @@ class FeedViewModel(
 
     init {
         observeAccountPaused()
+        observeIncognitoMode()
         viewModelScope.launch {
             val prefs = discoveryPreferences.get()
             _state.update {
@@ -69,6 +70,15 @@ class FeedViewModel(
                     resetAndLoadFeed()
                 }
                 wasPaused = isPaused
+            }
+        }
+    }
+
+    private fun observeIncognitoMode() {
+        viewModelScope.launch {
+            sessionStorage.observeAuthInfo().collect { authInfo ->
+                val isIncognito = authInfo?.user?.isIncognito == true
+                _state.update { it.copy(isIncognitoActive = isIncognito) }
             }
         }
     }

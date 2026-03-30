@@ -484,7 +484,7 @@ private fun WaveformBars(isAnimating: Boolean) {
         barHeights.forEachIndexed { index, baseHeight ->
             val height = if (isAnimating) {
                 val phase = (index.toFloat() / barCount + animationOffset) % 1f
-                val wave = kotlin.math.sin(phase * Math.PI * 2).toFloat() * 0.3f + 0.5f
+                val wave = kotlin.math.sin(phase * kotlin.math.PI * 2).toFloat() * 0.3f + 0.5f
                 (baseHeight * 0.5f + wave * 0.5f).coerceIn(0.15f, 1f)
             } else {
                 baseHeight * 0.5f

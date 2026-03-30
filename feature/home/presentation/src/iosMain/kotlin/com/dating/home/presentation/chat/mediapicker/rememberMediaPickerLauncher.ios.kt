@@ -100,11 +100,7 @@ actual fun rememberMediaPickerLauncher(
     return remember(mediaFilter) {
         val filter = when (mediaFilter) {
             MediaFilter.IMAGES_AND_GIFS -> PHPickerFilter.imagesFilter
-            MediaFilter.AUDIO -> PHPickerFilter.anyFilterMatchingSubfilters(
-                listOf(
-                    PHPickerFilter.filter(UTType.audio)
-                )
-            )
+            MediaFilter.AUDIO -> null // PHPicker has no audio filter; null = allow all types
         }
 
         val pickerViewController = PHPickerViewController(

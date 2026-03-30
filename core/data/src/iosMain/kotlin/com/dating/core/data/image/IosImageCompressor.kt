@@ -4,6 +4,7 @@ import com.dating.core.domain.image.CompressedImage
 import com.dating.core.domain.image.ImageCompressor
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
+import kotlinx.cinterop.useContents
 import kotlinx.cinterop.usePinned
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -53,8 +54,12 @@ class IosImageCompressor : ImageCompressor {
                 heightPx = 0
             )
 
-        val originalWidth = originalImage.size.useContents { width }.toInt()
-        val originalHeight = originalImage.size.useContents { height }.toInt()
+        val originalWidth: Int
+        val originalHeight: Int
+        originalImage.size.useContents {
+            originalWidth = width.toInt()
+            originalHeight = height.toInt()
+        }
 
         val (newWidth, newHeight) = calculateScaledSize(
             originalWidth, originalHeight, maxWidthPx, maxHeightPx
