@@ -19,8 +19,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import aura.feature.home.presentation.generated.resources.Res
-import aura.feature.home.presentation.generated.resources.copy
+import shugar.feature.home.presentation.generated.resources.Res
+import shugar.feature.home.presentation.generated.resources.copy
 import com.dating.home.domain.models.MessageType
 import com.dating.home.presentation.chat.model.MessageUi
 import com.dating.core.designsystem.components.avatar.ChirpAvatarPhoto

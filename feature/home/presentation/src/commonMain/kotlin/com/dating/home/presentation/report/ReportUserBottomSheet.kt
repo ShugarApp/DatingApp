@@ -28,24 +28,23 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import aura.feature.home.presentation.generated.resources.Res
-import aura.feature.home.presentation.generated.resources.report_description_counter
-import aura.feature.home.presentation.generated.resources.report_description_placeholder
-import aura.feature.home.presentation.generated.resources.report_reason_fake_profile
-import aura.feature.home.presentation.generated.resources.report_reason_harassment
-import aura.feature.home.presentation.generated.resources.report_reason_inappropriate_content
-import aura.feature.home.presentation.generated.resources.report_reason_other
-import aura.feature.home.presentation.generated.resources.report_reason_scam
-import aura.feature.home.presentation.generated.resources.report_reason_spam
-import aura.feature.home.presentation.generated.resources.report_reason_underage
-import aura.feature.home.presentation.generated.resources.report_submit
-import aura.feature.home.presentation.generated.resources.report_submitting
-import aura.feature.home.presentation.generated.resources.report_user_subtitle
-import aura.feature.home.presentation.generated.resources.report_user_title
 import com.dating.core.designsystem.theme.extended
 import com.dating.home.domain.report.ReportReason
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
+import shugar.feature.home.presentation.generated.resources.Res
+import shugar.feature.home.presentation.generated.resources.report_description_counter
+import shugar.feature.home.presentation.generated.resources.report_description_placeholder
+import shugar.feature.home.presentation.generated.resources.report_reason_fake_profile
+import shugar.feature.home.presentation.generated.resources.report_reason_harassment
+import shugar.feature.home.presentation.generated.resources.report_reason_inappropriate_content
+import shugar.feature.home.presentation.generated.resources.report_reason_other
+import shugar.feature.home.presentation.generated.resources.report_reason_scam
+import shugar.feature.home.presentation.generated.resources.report_reason_spam
+import shugar.feature.home.presentation.generated.resources.report_reason_underage
+import shugar.feature.home.presentation.generated.resources.report_submit
+import shugar.feature.home.presentation.generated.resources.report_user_subtitle
+import shugar.feature.home.presentation.generated.resources.report_user_title
 
 private data class ReportReasonOption(
     val reason: ReportReason,

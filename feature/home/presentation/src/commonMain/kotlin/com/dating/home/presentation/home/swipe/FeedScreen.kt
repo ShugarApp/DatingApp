@@ -101,13 +101,12 @@ import shugar.feature.home.presentation.generated.resources.feed_filter_show_me
 import shugar.feature.home.presentation.generated.resources.feed_filter_title
 import shugar.feature.home.presentation.generated.resources.feed_match_dismiss
 import shugar.feature.home.presentation.generated.resources.feed_match_title
-import shugar.feature.home.presentation.generated.resources.feed_searching_desc
-import shugar.feature.home.presentation.generated.resources.feed_searching_title
-import shugar.feature.home.presentation.generated.resources.feed_undo_swipe
-import shugar.feature.home.presentation.generated.resources.app_name_feed
 import shugar.feature.home.presentation.generated.resources.feed_paused_activate
 import shugar.feature.home.presentation.generated.resources.feed_paused_desc
 import shugar.feature.home.presentation.generated.resources.feed_paused_title
+import shugar.feature.home.presentation.generated.resources.feed_searching_desc
+import shugar.feature.home.presentation.generated.resources.feed_searching_title
+import shugar.feature.home.presentation.generated.resources.feed_undo_swipe
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -705,7 +704,7 @@ fun PausedFeedScreen(
     Scaffold(
         modifier = modifier,
         topBar = {
-            MainTopAppBar(title = stringResource(Res.string.app_name_feed))
+            MainTopAppBar()
         }
     ) { paddingValues ->
         Column(

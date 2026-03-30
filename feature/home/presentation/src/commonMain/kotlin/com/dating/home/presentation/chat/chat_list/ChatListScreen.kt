@@ -44,17 +44,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import shugar.feature.home.presentation.generated.resources.Res
-import shugar.feature.home.presentation.generated.resources.cancel
-import shugar.feature.home.presentation.generated.resources.create_chat
-import shugar.feature.home.presentation.generated.resources.delete_chat
-import shugar.feature.home.presentation.generated.resources.delete_chat_desc
-import shugar.feature.home.presentation.generated.resources.delete_chat_title
-import shugar.feature.home.presentation.generated.resources.no_chats
-import shugar.feature.home.presentation.generated.resources.no_chats_subtitle
-import shugar.feature.home.presentation.generated.resources.search_conversations
-import com.dating.core.designsystem.components.brand.ChirpHorizontalDivider
-import com.dating.core.designsystem.components.buttons.ChirpFloatingActionButton
 import com.dating.core.designsystem.components.dialogs.DestructiveConfirmationDialog
 import com.dating.core.designsystem.components.header.MainTopAppBar
 import com.dating.core.designsystem.components.textfields.ChirpMultiLineTextField
@@ -67,6 +56,14 @@ import com.dating.home.presentation.chat.components.EmptySection
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
+import shugar.feature.home.presentation.generated.resources.Res
+import shugar.feature.home.presentation.generated.resources.cancel
+import shugar.feature.home.presentation.generated.resources.delete_chat
+import shugar.feature.home.presentation.generated.resources.delete_chat_desc
+import shugar.feature.home.presentation.generated.resources.delete_chat_title
+import shugar.feature.home.presentation.generated.resources.no_chats
+import shugar.feature.home.presentation.generated.resources.no_chats_subtitle
+import shugar.feature.home.presentation.generated.resources.search_conversations
 
 @Composable
 fun ChatListRoot(
@@ -119,7 +116,6 @@ fun ChatListScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             MainTopAppBar(
-                title = "Chats",
                 actions = {
                     IconButton(
                         onClick = { onAction(ChatListAction.OnToggleSearch) }

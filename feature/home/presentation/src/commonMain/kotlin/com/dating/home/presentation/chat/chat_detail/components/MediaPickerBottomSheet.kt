@@ -21,10 +21,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import aura.feature.home.presentation.generated.resources.Res
-import aura.feature.home.presentation.generated.resources.attach_media
-import aura.feature.home.presentation.generated.resources.pick_from_gallery
-import aura.feature.home.presentation.generated.resources.record_audio
+import shugar.feature.home.presentation.generated.resources.Res
+import shugar.feature.home.presentation.generated.resources.attach_media
+import shugar.feature.home.presentation.generated.resources.pick_from_gallery
+import shugar.feature.home.presentation.generated.resources.record_audio
 import org.jetbrains.compose.resources.stringResource
 
 enum class MediaPickerOption {

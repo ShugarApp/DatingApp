@@ -16,8 +16,8 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import aura.feature.home.presentation.generated.resources.Res
-import aura.feature.home.presentation.generated.resources.error_invalid_file_type
+import shugar.feature.home.presentation.generated.resources.Res
+import shugar.feature.home.presentation.generated.resources.error_invalid_file_type
 
 class PhotoOnboardingViewModel(
     private val sessionStorage: SessionStorage,

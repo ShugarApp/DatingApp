@@ -30,11 +30,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import aura.feature.home.presentation.generated.resources.Res
-import aura.feature.home.presentation.generated.resources.photo_onboarding_continue
-import aura.feature.home.presentation.generated.resources.photo_onboarding_photos_count
-import aura.feature.home.presentation.generated.resources.photo_onboarding_subtitle
-import aura.feature.home.presentation.generated.resources.photo_onboarding_title
+import shugar.feature.home.presentation.generated.resources.Res
+import shugar.feature.home.presentation.generated.resources.photo_onboarding_continue
+import shugar.feature.home.presentation.generated.resources.photo_onboarding_photos_count
+import shugar.feature.home.presentation.generated.resources.photo_onboarding_subtitle
+import shugar.feature.home.presentation.generated.resources.photo_onboarding_title
 import com.dating.home.presentation.profile.edit_profile.PhotoGrid
 import com.dating.home.presentation.profile.mediapicker.rememberImagePickerLauncher
 import org.jetbrains.compose.resources.stringResource
