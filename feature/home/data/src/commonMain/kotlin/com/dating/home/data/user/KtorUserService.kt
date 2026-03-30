@@ -8,6 +8,8 @@ import com.dating.core.data.networking.post
 import com.dating.core.data.networking.put
 import com.dating.core.data.networking.safeCall
 import com.dating.core.domain.auth.User
+import com.dating.core.domain.image.ImageCompressor
+import com.dating.core.domain.logging.AppLogger
 import com.dating.core.domain.util.DataError
 import com.dating.core.domain.util.EmptyResult
 import com.dating.core.domain.util.Result
@@ -24,7 +26,11 @@ import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.client.request.url
 
-class KtorUserService(private val httpClient: HttpClient) : UserService {
+class KtorUserService(
+    private val httpClient: HttpClient,
+    private val imageCompressor: ImageCompressor,
+    private val logger: AppLogger
+) : UserService {
 
     override suspend fun getMyProfile(): Result<User, DataError.Remote> {
         return httpClient.get<UserSerializable>(
@@ -63,16 +69,39 @@ class KtorUserService(private val httpClient: HttpClient) : UserService {
         ).map { it.toDomain() }
     }
 
-    // Step 1: get signed upload URL. Step 2: upload bytes. Step 3: confirm (204).
+    // Step 1: get signed upload URL. Step 2: compress + upload bytes. Step 3: confirm (204).
     // Returns the confirmed publicUrl so the ViewModel can update state locally.
     override suspend fun uploadPhoto(
         imageBytes: ByteArray,
         mimeType: String,
         index: Int
     ): Result<String, DataError.Remote> {
+        // Compress image before upload (fail open: use original bytes on error)
+        val (uploadBytes, uploadMimeType) = try {
+            val compressed = imageCompressor.compressImage(
+                bytes = imageBytes,
+                mimeType = mimeType,
+                maxWidthPx = 1080,
+                maxHeightPx = 1080,
+                quality = 82
+            )
+            val ratio = if (compressed.originalSizeBytes > 0)
+                100 - (compressed.compressedSizeBytes * 100 / compressed.originalSizeBytes)
+            else 0
+            logger.info(
+                "Image compressed: ${compressed.originalSizeBytes / 1024}KB → " +
+                    "${compressed.compressedSizeBytes / 1024}KB ($ratio%) | " +
+                    "${compressed.widthPx}x${compressed.heightPx}px"
+            )
+            compressed.bytes to compressed.mimeType
+        } catch (e: Exception) {
+            logger.error("Image compression failed, uploading original", e)
+            imageBytes to mimeType
+        }
+
         val urlResult = httpClient.post<Unit, ProfilePictureUploadUrlsResponse>(
             route = "/users/profile/photos/upload-url",
-            queryParams = mapOf("mimeType" to mimeType),
+            queryParams = mapOf("mimeType" to uploadMimeType),
             body = Unit
         )
         if (urlResult is Result.Failure) return urlResult
@@ -82,7 +111,7 @@ class KtorUserService(private val httpClient: HttpClient) : UserService {
             httpClient.put {
                 url(urls.uploadUrl)
                 urls.headers.forEach { (key, value) -> headers[key] = value }
-                setBody(imageBytes)
+                setBody(uploadBytes)
             }
         }
         if (uploadResult is Result.Failure) return uploadResult
