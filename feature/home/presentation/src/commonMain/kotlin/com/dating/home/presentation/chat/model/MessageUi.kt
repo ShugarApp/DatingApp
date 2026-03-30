@@ -2,6 +2,7 @@ package com.dating.home.presentation.chat.model
 
 import com.dating.home.domain.models.ChatMessageDeliveryStatus
 import com.dating.home.domain.models.MessageType
+import com.dating.home.domain.models.ReactionSummary
 import com.dating.core.designsystem.components.avatar.ChatParticipantUi
 import com.dating.core.presentation.util.UiText
 
@@ -11,7 +12,8 @@ sealed class MessageUi(open val id: String) {
         val content: String,
         val deliveryStatus: ChatMessageDeliveryStatus,
         val formattedSentTime: UiText,
-        val messageType: MessageType = MessageType.TEXT
+        val messageType: MessageType = MessageType.TEXT,
+        val reactions: List<ReactionSummary> = emptyList()
     ): MessageUi(id)
 
     data class OtherUserMessage(
@@ -19,7 +21,8 @@ sealed class MessageUi(open val id: String) {
         val content: String,
         val formattedSentTime: UiText,
         val sender: ChatParticipantUi,
-        val messageType: MessageType = MessageType.TEXT
+        val messageType: MessageType = MessageType.TEXT,
+        val reactions: List<ReactionSummary> = emptyList()
     ): MessageUi(id)
 
     data class DateSeparator(

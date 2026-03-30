@@ -49,6 +49,8 @@ fun LocalUserMessage(
     onDeleteClick: () -> Unit,
     onRetryClick: () -> Unit,
     onCopyClick: () -> Unit,
+    onReactionTapped: (String) -> Unit = {},
+    onDoubleTapReact: () -> Unit = {},
     modifier: Modifier = Modifier,
     highlightText: String? = null
 ) {
@@ -110,6 +112,7 @@ fun LocalUserMessage(
                 onLongClick = {
                     onMessageLongClick()
                 },
+                onDoubleClick = onDoubleTapReact,
                 mediaContent = if (message.messageType != MessageType.TEXT) {
                     {
                         MediaMessageContent(
@@ -118,6 +121,14 @@ fun LocalUserMessage(
                             onImageClick = if (message.messageType == MessageType.IMAGE) {
                                 { fullScreenImageUrl = message.content }
                             } else null
+                        )
+                    }
+                } else null,
+                reactionContent = if (message.reactions.isNotEmpty()) {
+                    {
+                        ReactionRow(
+                            reactions = message.reactions,
+                            onReactionTapped = onReactionTapped
                         )
                     }
                 } else null

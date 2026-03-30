@@ -13,7 +13,10 @@ import com.dating.home.database.AppChatDatabase
 import com.dating.home.domain.chat.ChatConnectionClient
 import com.dating.home.domain.chat.ChatRepository
 import com.dating.home.domain.models.MessagesReadEvent
+import com.dating.home.domain.models.ReactionSummary
 import com.dating.home.domain.models.TypingIndicator
+import com.dating.home.data.dto.websocket.ReactionSummaryDto
+import com.dating.home.database.entities.MessageReactionEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.filterIsInstance
@@ -99,6 +102,19 @@ class WebSocketChatConnectionClient(
         webSocketConnector.sendMessage(json.encodeToString(webSocketMessage))
     }
 
+    override suspend fun sendReaction(messageId: String, chatId: String, emoji: String) {
+        val dto = OutgoingWebSocketDto.ReactMessage(
+            messageId = messageId,
+            chatId = chatId,
+            emoji = emoji
+        )
+        val webSocketMessage = WebSocketMessageDto(
+            type = dto.type.name,
+            payload = json.encodeToString(dto)
+        )
+        webSocketConnector.sendMessage(json.encodeToString(webSocketMessage))
+    }
+
     private fun parseIncomingMessage(message: WebSocketMessageDto): IncomingWebSocketDto? {
         return when (message.type) {
             IncomingWebSocketType.NEW_MESSAGE.name -> {
@@ -125,6 +141,10 @@ class WebSocketChatConnectionClient(
                 json.decodeFromString<IncomingWebSocketDto.TypingIndicatorDto>(message.payload)
             }
 
+            IncomingWebSocketType.MESSAGE_REACTION_UPDATED.name -> {
+                json.decodeFromString<IncomingWebSocketDto.MessageReactionUpdatedDto>(message.payload)
+            }
+
             else -> null
         }
     }
@@ -137,6 +157,7 @@ class WebSocketChatConnectionClient(
             is IncomingWebSocketDto.ProfilePictureUpdated -> updateProfilePicture(message)
             is IncomingWebSocketDto.MessagesReadDto -> handleMessagesRead(message)
             is IncomingWebSocketDto.TypingIndicatorDto -> Unit
+            is IncomingWebSocketDto.MessageReactionUpdatedDto -> handleReactionUpdated(message)
         }
     }
 
@@ -166,6 +187,24 @@ class WebSocketChatConnectionClient(
                 status = ChatMessageDeliveryStatus.READ.name,
                 timestamp = now
             )
+        }
+    }
+
+    private suspend fun handleReactionUpdated(message: IncomingWebSocketDto.MessageReactionUpdatedDto) {
+        val entities = message.reactions.map { reaction ->
+            MessageReactionEntity(
+                id = "${message.messageId}_${reaction.emoji}",
+                messageId = message.messageId,
+                emoji = reaction.emoji,
+                count = reaction.count,
+                reactedByMe = reaction.reactedByMe
+            )
+        }
+
+        // Delete existing reactions for this message and replace with server state
+        database.messageReactionDao.deleteReactionsForMessage(message.messageId)
+        if (entities.isNotEmpty()) {
+            database.messageReactionDao.upsertReactions(entities)
         }
     }
 

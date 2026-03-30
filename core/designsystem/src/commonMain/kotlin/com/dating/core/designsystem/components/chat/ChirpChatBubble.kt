@@ -41,19 +41,22 @@ fun ChirpChatBubble(
     triangleSize: Dp = 10.dp,
     highlightText: String? = null,
     onLongClick: (() -> Unit)? = null,
-    mediaContent: @Composable (() -> Unit)? = null
+    onDoubleClick: (() -> Unit)? = null,
+    mediaContent: @Composable (() -> Unit)? = null,
+    reactionContent: @Composable (() -> Unit)? = null
 ) {
     val padding = 12.dp
     Column(
         modifier = modifier
             .then(
-                if(onLongClick != null) {
+                if(onLongClick != null || onDoubleClick != null) {
                     Modifier.combinedClickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = ripple(
                             color = MaterialTheme.colorScheme.extended.surfaceOutline
                         ),
                         onLongClick = onLongClick,
+                        onDoubleClick = onDoubleClick,
                         onClick = {}
                     )
                 } else Modifier
@@ -143,6 +146,7 @@ fun ChirpChatBubble(
                 messageStatus?.invoke()
             }
         }
+        reactionContent?.invoke()
     }
 }
 

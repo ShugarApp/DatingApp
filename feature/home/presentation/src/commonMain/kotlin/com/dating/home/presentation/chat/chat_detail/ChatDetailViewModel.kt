@@ -29,6 +29,7 @@ import com.dating.home.domain.models.ChatMessageDeliveryStatus
 import com.dating.home.domain.models.ConnectionState
 import com.dating.home.domain.models.MessageType
 import com.dating.home.domain.models.OutgoingNewMessage
+import com.dating.home.domain.models.ReactionSummary
 import com.dating.home.presentation.chat.mappers.toUi
 import com.dating.home.presentation.chat.mappers.toUiList
 import com.dating.home.presentation.chat.model.MessageUi
@@ -94,6 +95,20 @@ class ChatDetailViewModel(
 
     private val _state = MutableStateFlow(ChatDetailState())
 
+    private val reactionsMap = _chatId
+        .flatMapLatest { chatId ->
+            if (chatId != null) {
+                messageRepository.getReactionsMapForChat(chatId)
+            } else {
+                emptyFlow()
+            }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000L),
+            initialValue = emptyMap()
+        )
+
     private val canSendMessage = snapshotFlow { _state.value.messageTextFieldState.text.toString() }
         .map { it.isBlank() }
         .combine(connectionClient.connectionState) { isMessageBlank, connectionState ->
@@ -105,15 +120,16 @@ class ChatDetailViewModel(
         _state,
         chatInfoFlow,
         sessionStorage.observeAuthInfo(),
-        typingUsers
-    ) { currentState, chatInfo, authInfo, typing ->
+        typingUsers,
+        reactionsMap
+    ) { currentState, chatInfo, authInfo, typing, reactions ->
         if (authInfo == null) {
             return@combine ChatDetailState()
         }
 
         currentState.copy(
             chatUi = chatInfo.chat.toUi(authInfo.user.id),
-            messages = chatInfo.messages.toUiList(authInfo.user.id),
+            messages = chatInfo.messages.toUiList(authInfo.user.id, reactions),
             typingUsernames = typing.values.toList()
         )
     }
@@ -182,6 +198,7 @@ class ChatDetailViewModel(
                 _state.update { it.copy(showBlockAfterReportDialog = false) }
             }
             is ChatDetailAction.OnProfileClick -> onProfileClick(action.userId)
+            is ChatDetailAction.OnReactToMessage -> reactToMessage(action.messageId, action.emoji)
             ChatDetailAction.OnToggleMessageSearch -> toggleMessageSearch()
             is ChatDetailAction.OnMessageSearchQueryChanged -> updateMessageSearch(action.query)
             ChatDetailAction.OnNextSearchResult -> navigateSearchResult(forward = true)
@@ -629,6 +646,13 @@ class ChatDetailViewModel(
                 chatRepository.fetchChatById(chatId)
                 markMessagesAsRead()
             }
+        }
+    }
+
+    private fun reactToMessage(messageId: String, emoji: String) {
+        val chatId = _chatId.value ?: return
+        viewModelScope.launch {
+            messageRepository.reactToMessage(messageId, chatId, emoji)
         }
     }
 

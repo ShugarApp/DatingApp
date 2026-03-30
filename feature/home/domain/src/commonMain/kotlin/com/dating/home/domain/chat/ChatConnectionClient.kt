@@ -14,4 +14,5 @@ interface ChatConnectionClient {
     val messagesRead: Flow<MessagesReadEvent>
     suspend fun sendTyping(chatId: String)
     suspend fun sendReadReceipt(chatId: String, messageIds: List<String>)
+    suspend fun sendReaction(messageId: String, chatId: String, emoji: String)
 }
