@@ -25,6 +25,8 @@ fun MessageListItemUi(
     onDeleteClick: (MessageUi.LocalUserMessage) -> Unit,
     onRetryClick: (MessageUi.LocalUserMessage) -> Unit,
     onCopyClick: (String) -> Unit,
+    onReactionTapped: (String, String) -> Unit = { _, _ -> },
+    onDoubleTapReact: (String) -> Unit = {},
     modifier: Modifier = Modifier,
     highlightText: String? = null
 ) {
@@ -47,6 +49,8 @@ fun MessageListItemUi(
                     onDeleteClick = { onDeleteClick(messageUi) },
                     onRetryClick = { onRetryClick(messageUi) },
                     onCopyClick = { onCopyClick(messageUi.content) },
+                    onReactionTapped = { emoji -> onReactionTapped(messageUi.id, emoji) },
+                    onDoubleTapReact = { onDoubleTapReact(messageUi.id) },
                     highlightText = highlightText
                 )
             }
@@ -58,6 +62,8 @@ fun MessageListItemUi(
                     onMessageLongClick = { onMessageLongClick(messageUi) },
                     onDismissMessageMenu = onDismissMessageMenu,
                     onCopyClick = { onCopyClick(messageUi.content) },
+                    onReactionTapped = { emoji -> onReactionTapped(messageUi.id, emoji) },
+                    onDoubleTapReact = { onDoubleTapReact(messageUi.id) },
                     highlightText = highlightText
                 )
             }

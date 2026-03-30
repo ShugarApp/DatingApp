@@ -91,6 +91,7 @@ import com.dating.core.presentation.util.UiText
 import com.dating.core.presentation.util.clearFocusOnTap
 import com.dating.core.presentation.util.currentDeviceConfiguration
 import com.dating.home.presentation.chat.audiorecorder.AudioRecorderSheet
+import com.dating.home.presentation.chat.chat_detail.components.EmojiPickerOverlay
 import com.dating.home.presentation.chat.gif.GifPickerSheet
 import com.dating.home.presentation.chat.mediapicker.MediaFilter
 import com.dating.home.presentation.chat.mediapicker.rememberMediaPickerLauncher
@@ -124,6 +125,7 @@ fun ChatDetailRoot(
     var showMediaPickerSheet by remember { mutableStateOf(false) }
     var showAudioRecorderSheet by remember { mutableStateOf(false) }
     var showGifPickerSheet by remember { mutableStateOf(false) }
+    var emojiPickerTargetMessageId by remember { mutableStateOf<String?>(null) }
     val giphyService: GiphyService = koinInject()
 
     val onMediaPicked: (com.dating.home.presentation.profile.mediapicker.PickedImageData) -> Unit = { pickedData ->
@@ -202,22 +204,40 @@ fun ChatDetailRoot(
         }
     }
 
-    ChatDetailScreen(
-        state = state,
-        messageListState = messageListState,
-        onAction = { action ->
-            when (action) {
-                is ChatDetailAction.OnBackClick -> onBack()
-                is ChatDetailAction.OnCopyMessage -> {
-                    clipboardManager.setText(AnnotatedString(action.content))
+    Box {
+        ChatDetailScreen(
+            state = state,
+            messageListState = messageListState,
+            onAction = { action ->
+                when (action) {
+                    is ChatDetailAction.OnBackClick -> onBack()
+                    is ChatDetailAction.OnCopyMessage -> {
+                        clipboardManager.setText(AnnotatedString(action.content))
+                    }
+                    is ChatDetailAction.OnMessageLongClick -> {
+                        emojiPickerTargetMessageId = action.message.id
+                    }
+                    else -> Unit
                 }
-                else -> Unit
+                viewModel.onAction(action)
+            },
+            onAttachClick = { showMediaPickerSheet = true },
+            snackbarState = snackbarState
+        )
+
+        EmojiPickerOverlay(
+            visible = emojiPickerTargetMessageId != null,
+            onEmojiSelected = { emoji ->
+                emojiPickerTargetMessageId?.let { messageId ->
+                    viewModel.onAction(ChatDetailAction.OnReactToMessage(messageId, emoji))
+                }
+                emojiPickerTargetMessageId = null
+            },
+            onDismiss = {
+                emojiPickerTargetMessageId = null
             }
-            viewModel.onAction(action)
-        },
-        onAttachClick = { showMediaPickerSheet = true },
-        snackbarState = snackbarState
-    )
+        )
+    }
 
     if (showMediaPickerSheet) {
         val mediaSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -499,6 +519,12 @@ fun ChatDetailScreen(
                             },
                             onCopyClick = { content ->
                                 onAction(ChatDetailAction.OnCopyMessage(content))
+                            },
+                            onReactionTapped = { messageId, emoji ->
+                                onAction(ChatDetailAction.OnReactToMessage(messageId, emoji))
+                            },
+                            onDoubleTapReact = { messageId ->
+                                onAction(ChatDetailAction.OnReactToMessage(messageId, "❤️"))
                             },
                             modifier = Modifier
                                 .fillMaxWidth()

@@ -5,6 +5,7 @@ import com.dating.home.domain.models.ChatMessageDeliveryStatus
 import com.dating.home.domain.models.MessageType
 import com.dating.home.domain.models.MessageWithSender
 import com.dating.home.domain.models.OutgoingNewMessage
+import com.dating.home.domain.models.ReactionSummary
 import com.dating.core.domain.util.DataError
 import com.dating.core.domain.util.EmptyResult
 import com.dating.core.domain.util.Result
@@ -36,4 +37,10 @@ interface MessageRepository {
     suspend fun deleteMessage(messageId: String): EmptyResult<DataError.Remote>
 
     fun getMessagesForChat(chatId: String): Flow<List<MessageWithSender>>
+
+    suspend fun reactToMessage(messageId: String, chatId: String, emoji: String)
+
+    fun getReactionsForMessage(messageId: String): Flow<List<ReactionSummary>>
+
+    fun getReactionsMapForChat(chatId: String): Flow<Map<String, List<ReactionSummary>>>
 }

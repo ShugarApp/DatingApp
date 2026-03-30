@@ -45,4 +45,5 @@ sealed interface ChatDetailAction {
     data object OnDismissReportSheet: ChatDetailAction
     data object OnConfirmBlockAfterReport: ChatDetailAction
     data object OnDismissBlockAfterReportDialog: ChatDetailAction
+    data class OnReactToMessage(val messageId: String, val emoji: String): ChatDetailAction
 }

@@ -44,6 +44,8 @@ fun MessageList(
     onDismissMessageMenu: () -> Unit,
     onDeleteMessageClick: (MessageUi.LocalUserMessage) -> Unit,
     onCopyClick: (String) -> Unit,
+    onReactionTapped: (String, String) -> Unit = { _, _ -> },
+    onDoubleTapReact: (String) -> Unit = {},
     modifier: Modifier = Modifier,
     highlightText: String? = null
 ) {
@@ -78,6 +80,8 @@ fun MessageList(
                     onDeleteClick = onDeleteMessageClick,
                     onRetryClick = onMessageRetryClick,
                     onCopyClick = onCopyClick,
+                    onReactionTapped = onReactionTapped,
+                    onDoubleTapReact = onDoubleTapReact,
                     highlightText = highlightText,
                     modifier = Modifier
                         .fillMaxWidth()

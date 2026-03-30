@@ -16,6 +16,8 @@ import com.dating.home.domain.models.ChatMessageDeliveryStatus
 import com.dating.home.domain.models.MessageType
 import com.dating.home.domain.models.MessageWithSender
 import com.dating.home.domain.models.OutgoingNewMessage
+import com.dating.home.domain.models.ReactionSummary
+import com.dating.home.database.entities.MessageReactionEntity
 import com.dating.core.data.database.safeDatabaseUpdate
 import com.dating.core.domain.auth.SessionStorage
 import com.dating.core.domain.util.DataError
@@ -221,6 +223,76 @@ class OfflineFirstMessageRepository(
             .map { messages ->
                 messages.map { it.toDomain() }
             }
+    }
+
+    override suspend fun reactToMessage(messageId: String, chatId: String, emoji: String) {
+        val reactionId = "${messageId}_${emoji}"
+        val existingReactions = database.messageReactionDao
+            .getReactionsForMessage(messageId)
+            .first()
+
+        val existing = existingReactions.find { it.emoji == emoji }
+
+        // Optimistic update: toggle reaction
+        if (existing != null && existing.reactedByMe) {
+            val newCount = existing.count - 1
+            if (newCount <= 0) {
+                database.messageReactionDao.deleteReactionById(reactionId)
+            } else {
+                database.messageReactionDao.upsertReaction(
+                    existing.copy(count = newCount, reactedByMe = false)
+                )
+            }
+        } else {
+            database.messageReactionDao.upsertReaction(
+                MessageReactionEntity(
+                    id = reactionId,
+                    messageId = messageId,
+                    emoji = emoji,
+                    count = (existing?.count ?: 0) + 1,
+                    reactedByMe = true
+                )
+            )
+        }
+
+        // Send via WebSocket
+        val dto = OutgoingWebSocketDto.ReactMessage(
+            messageId = messageId,
+            chatId = chatId,
+            emoji = emoji
+        )
+        val webSocketMessage = WebSocketMessageDto(
+            type = dto.type.name,
+            payload = json.encodeToString(dto)
+        )
+        webSocketConnector.sendMessage(json.encodeToString(webSocketMessage))
+    }
+
+    override fun getReactionsForMessage(messageId: String): Flow<List<ReactionSummary>> {
+        return database.messageReactionDao
+            .getReactionsForMessage(messageId)
+            .map { reactions ->
+                reactions.map { it.toDomain() }
+            }
+    }
+
+    override fun getReactionsMapForChat(chatId: String): Flow<Map<String, List<ReactionSummary>>> {
+        return database.messageReactionDao
+            .getReactionsForChat(chatId)
+            .map { reactions ->
+                reactions.groupBy { it.messageId }
+                    .mapValues { (_, entities) ->
+                        entities.map { it.toDomain() }
+                    }
+            }
+    }
+
+    private fun MessageReactionEntity.toDomain(): ReactionSummary {
+        return ReactionSummary(
+            emoji = emoji,
+            count = count,
+            reactedByMe = reactedByMe
+        )
     }
 
     private fun OutgoingWebSocketDto.NewMessage.toJsonPayload(): String {
