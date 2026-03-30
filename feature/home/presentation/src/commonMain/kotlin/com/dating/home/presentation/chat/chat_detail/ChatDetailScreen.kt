@@ -71,12 +71,15 @@ import com.dating.home.presentation.report.ReportUserBottomSheet
 import com.dating.home.presentation.chat.chat_detail.components.ChatDetailHeader
 import com.dating.home.presentation.chat.chat_detail.components.DateChip
 import com.dating.home.presentation.chat.chat_detail.components.MessageBannerListener
+import com.dating.home.presentation.chat.chat_detail.components.MediaPickerContent
+import com.dating.home.presentation.chat.chat_detail.components.MediaPickerOption
 import com.dating.home.presentation.chat.chat_detail.components.MessageBox
 import com.dating.home.presentation.chat.chat_detail.components.MessageList
 import com.dating.home.presentation.chat.chat_detail.components.PaginationScrollListener
 import com.dating.home.presentation.chat.chat_detail.components.TypingIndicator
 import com.dating.core.designsystem.components.brand.ChirpHorizontalDivider
 import com.dating.core.designsystem.components.header.TopAppBarGeneric
+import com.dating.home.domain.models.MessageType
 import com.dating.home.presentation.chat.components.EmptySection
 import com.dating.home.presentation.chat.model.ChatUi
 import com.dating.home.presentation.chat.model.MessageUi
@@ -87,6 +90,12 @@ import com.dating.core.presentation.util.ObserveAsEvents
 import com.dating.core.presentation.util.UiText
 import com.dating.core.presentation.util.clearFocusOnTap
 import com.dating.core.presentation.util.currentDeviceConfiguration
+import com.dating.home.presentation.chat.audiorecorder.AudioRecorderSheet
+import com.dating.home.presentation.chat.gif.GifPickerSheet
+import com.dating.home.presentation.chat.mediapicker.MediaFilter
+import com.dating.home.presentation.chat.mediapicker.rememberMediaPickerLauncher
+import com.dating.home.domain.giphy.GiphyService
+import org.koin.compose.koinInject
 import kotlin.time.Clock
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -111,6 +120,33 @@ fun ChatDetailRoot(
     val messageListState = rememberLazyListState()
     val scope = rememberCoroutineScope()
     val clipboardManager = LocalClipboardManager.current
+
+    var showMediaPickerSheet by remember { mutableStateOf(false) }
+    var showAudioRecorderSheet by remember { mutableStateOf(false) }
+    var showGifPickerSheet by remember { mutableStateOf(false) }
+    val giphyService: GiphyService = koinInject()
+
+    val onMediaPicked: (com.dating.home.presentation.profile.mediapicker.PickedImageData) -> Unit = { pickedData ->
+        val mimeType = pickedData.mimeType ?: "image/jpeg"
+        val messageType = when {
+            mimeType == "image/gif" -> MessageType.GIF
+            mimeType.startsWith("image/") -> MessageType.IMAGE
+            mimeType.startsWith("audio/") -> MessageType.AUDIO
+            else -> MessageType.IMAGE
+        }
+        viewModel.onAction(
+            ChatDetailAction.OnSendMediaMessage(
+                mediaBytes = pickedData.bytes,
+                mimeType = mimeType,
+                messageType = messageType
+            )
+        )
+    }
+
+    val imagePickerLauncher = rememberMediaPickerLauncher(
+        mediaFilter = MediaFilter.IMAGES_AND_GIFS,
+        onResult = onMediaPicked
+    )
 
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
@@ -179,8 +215,62 @@ fun ChatDetailRoot(
             }
             viewModel.onAction(action)
         },
+        onAttachClick = { showMediaPickerSheet = true },
         snackbarState = snackbarState
     )
+
+    if (showMediaPickerSheet) {
+        val mediaSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+        ModalBottomSheet(
+            onDismissRequest = { showMediaPickerSheet = false },
+            sheetState = mediaSheetState
+        ) {
+            MediaPickerContent(
+                onOptionSelected = { option ->
+                    scope.launch {
+                        mediaSheetState.hide()
+                        showMediaPickerSheet = false
+                        when (option) {
+                            MediaPickerOption.GALLERY -> imagePickerLauncher.launch()
+                            MediaPickerOption.GIF -> showGifPickerSheet = true
+                            MediaPickerOption.AUDIO -> showAudioRecorderSheet = true
+                        }
+                    }
+                }
+            )
+        }
+    }
+
+    if (showAudioRecorderSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showAudioRecorderSheet = false },
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+        ) {
+            AudioRecorderSheet(
+                onDismiss = { showAudioRecorderSheet = false },
+                onRecordingComplete = { pickedData ->
+                    showAudioRecorderSheet = false
+                    onMediaPicked(pickedData)
+                }
+            )
+        }
+    }
+
+    if (showGifPickerSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showGifPickerSheet = false },
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+        ) {
+            GifPickerSheet(
+                giphyService = giphyService,
+                onGifSelected = { gif ->
+                    showGifPickerSheet = false
+                    viewModel.onAction(ChatDetailAction.OnSendGifUrl(gif.originalUrl))
+                }
+            )
+        }
+    }
 
     if (state.showBlockDialog) {
         val username = state.chatUi?.otherParticipants?.firstOrNull()?.username ?: ""
@@ -241,6 +331,7 @@ fun ChatDetailScreen(
     messageListState: LazyListState,
     snackbarState: SnackbarHostState,
     onAction: (ChatDetailAction) -> Unit,
+    onAttachClick: () -> Unit = {},
 ) {
     val configuration = currentDeviceConfiguration()
 
@@ -434,6 +525,8 @@ fun ChatDetailScreen(
                                     onTextChanged = { text ->
                                         onAction(ChatDetailAction.OnTextChanged(text))
                                     },
+                                    onAttachClick = onAttachClick,
+                                    isUploadingMedia = state.isUploadingMedia,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .imePadding()
@@ -472,6 +565,8 @@ fun ChatDetailScreen(
                             onTextChanged = { text ->
                                 onAction(ChatDetailAction.OnTextChanged(text))
                             },
+                            onAttachClick = onAttachClick,
+                            isUploadingMedia = state.isUploadingMedia,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .imePadding()

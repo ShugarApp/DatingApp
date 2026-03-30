@@ -8,5 +8,6 @@ data class ChatMessageDto(
     val chatId: String,
     val content: String,
     val createdAt: String,
-    val senderId: String
+    val senderId: String,
+    val messageType: String = "TEXT"
 )

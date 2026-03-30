@@ -16,6 +16,8 @@ kotlin {
             implementation(libs.core.splashscreen)
 
             implementation(libs.koin.android)
+            implementation(libs.coil.compose)
+            implementation(libs.coil.gif)
         }
         commonMain.dependencies {
             implementation(projects.core.data)

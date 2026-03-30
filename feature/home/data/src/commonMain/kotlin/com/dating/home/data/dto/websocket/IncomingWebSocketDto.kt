@@ -21,6 +21,7 @@ sealed interface IncomingWebSocketDto {
         val content: String,
         val senderId: String,
         val createdAt: String,
+        val messageType: String = "TEXT",
         val type: IncomingWebSocketType = IncomingWebSocketType.NEW_MESSAGE
     ): IncomingWebSocketDto
 

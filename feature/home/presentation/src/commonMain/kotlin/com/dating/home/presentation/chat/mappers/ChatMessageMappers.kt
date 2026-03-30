@@ -29,14 +29,16 @@ fun MessageWithSender.toUi(
             id = message.id,
             content = message.content,
             deliveryStatus = message.deliveryStatus,
-            formattedSentTime = DateUtils.formatMessageTime(instant = message.createdAt)
+            formattedSentTime = DateUtils.formatMessageTime(instant = message.createdAt),
+            messageType = message.messageType
         )
     } else {
         MessageUi.OtherUserMessage(
             id = message.id,
             content = message.content,
             formattedSentTime = DateUtils.formatMessageTime(instant = message.createdAt),
-            sender = sender.toUi()
+            sender = sender.toUi(),
+            messageType = message.messageType
         )
     }
 }

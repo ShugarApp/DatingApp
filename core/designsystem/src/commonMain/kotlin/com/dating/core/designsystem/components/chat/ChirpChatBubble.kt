@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
@@ -39,7 +40,8 @@ fun ChirpChatBubble(
     messageStatus: @Composable (() -> Unit)? = null,
     triangleSize: Dp = 10.dp,
     highlightText: String? = null,
-    onLongClick: (() -> Unit)? = null
+    onLongClick: (() -> Unit)? = null,
+    mediaContent: @Composable (() -> Unit)? = null
 ) {
     val padding = 12.dp
     Column(
@@ -73,10 +75,15 @@ fun ChirpChatBubble(
                 top = padding,
                 bottom = padding
             )
-            .width(IntrinsicSize.Max),
+            .then(
+                if (mediaContent != null) Modifier.widthIn(min = 200.dp)
+                else Modifier.width(IntrinsicSize.Max)
+            ),
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
-        if (!highlightText.isNullOrBlank()) {
+        if (mediaContent != null) {
+            mediaContent()
+        } else if (!highlightText.isNullOrBlank()) {
             val annotatedText = buildAnnotatedString {
                 val lowerContent = messageContent.lowercase()
                 val lowerQuery = highlightText.lowercase()
