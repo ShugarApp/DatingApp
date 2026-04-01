@@ -1,8 +1,10 @@
 package com.dating.core.data.mappers
 
 import com.dating.core.data.dto.AuthInfoSerializable
+import com.dating.core.data.dto.GoogleAuthInfoSerializable
 import com.dating.core.data.dto.UserSerializable
 import com.dating.core.domain.auth.AuthInfo
+import com.dating.core.domain.auth.GoogleAuthResult
 import com.dating.core.domain.auth.User
 import com.dating.core.domain.auth.UserStatus
 
@@ -63,6 +65,17 @@ fun User.toSerializable(): UserSerializable {
         smoking = smoking,
         drinking = drinking,
         interests = interests
+    )
+}
+
+fun GoogleAuthInfoSerializable.toDomain(): GoogleAuthResult {
+    return GoogleAuthResult(
+        authInfo = AuthInfo(
+            accessToken = accessToken,
+            refreshToken = refreshToken,
+            user = user.toDomain()
+        ),
+        isNewUser = isNewUser
     )
 }
 

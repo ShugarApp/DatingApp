@@ -8,7 +8,7 @@ import androidx.navigation.navigation
 import com.dating.auth.presentation.email_verification.EmailVerificationRoot
 import com.dating.auth.presentation.forgot_password.ForgotPasswordRoot
 import com.dating.auth.presentation.login.LoginRoot
-import com.dating.auth.presentation.onboarding.OnboardingScreen
+import com.dating.auth.presentation.onboarding.OnboardingRoot
 import com.dating.auth.presentation.register.RegisterRoot
 import com.dating.auth.presentation.register.StepsRegisterRoot
 import com.dating.auth.presentation.register_success.RegisterSuccessRoot
@@ -22,18 +22,41 @@ fun NavGraphBuilder.authGraph(
         startDestination = AuthGraphRoutes.Onboarding
     ) {
         composable<AuthGraphRoutes.Onboarding> {
-            OnboardingScreen(
+            OnboardingRoot(
                 onLoginClick = {
                     navController.navigate(AuthGraphRoutes.Login)
                 },
                 onCreateAccountClick = {
                     navController.navigate(AuthGraphRoutes.Register)
+                },
+                onGoogleSuccess = onLoginSuccess,
+                onGoogleNewUser = { email ->
+                    navController.navigate(
+                        AuthGraphRoutes.StepsRegister(
+                            email = email,
+                            password = "",
+                            isGoogleUser = true
+                        )
+                    )
                 }
             )
         }
         composable<AuthGraphRoutes.Login> {
             LoginRoot(
                 onLoginSuccess = onLoginSuccess,
+                onGoogleNewUser = { email ->
+                    navController.navigate(
+                        AuthGraphRoutes.StepsRegister(
+                            email = email,
+                            password = "",
+                            isGoogleUser = true
+                        )
+                    ) {
+                        popUpTo(AuthGraphRoutes.Login) {
+                            inclusive = true
+                        }
+                    }
+                },
                 onForgotPasswordClick = {
                     navController.navigate(AuthGraphRoutes.ForgotPassword)
                 },
@@ -73,6 +96,7 @@ fun NavGraphBuilder.authGraph(
                 onRegisterSuccess = { email ->
                     navController.navigate(AuthGraphRoutes.RegisterSuccess(email))
                 },
+                onGoogleRegisterSuccess = onLoginSuccess,
                 onBackClick = {
                     navController.popBackStack()
                 }

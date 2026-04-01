@@ -4,16 +4,18 @@ import UIKit
 import UserNotifications
 import FirebaseCore
 import FirebaseMessaging
+import GoogleSignIn
 
 
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate, MessagingDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         FirebaseApp.configure()
-        
+        GoogleSignInHelper.shared.configure()
+
         UNUserNotificationCenter.current().delegate = self
         Messaging.messaging().delegate = self
-        
+
         return true
     }
     

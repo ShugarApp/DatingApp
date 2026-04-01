@@ -42,5 +42,6 @@ sealed interface StepsRegisterAction {
 
 sealed interface StepsRegisterEvent {
     data class Success(val email: String) : StepsRegisterEvent
+    data object GoogleSuccess : StepsRegisterEvent
     data object OnBack : StepsRegisterEvent
 }

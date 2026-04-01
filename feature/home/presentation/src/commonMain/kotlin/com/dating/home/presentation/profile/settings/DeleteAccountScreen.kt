@@ -21,9 +21,11 @@ import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.PersonOff
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Icon
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -53,6 +55,7 @@ import shugar.feature.home.presentation.generated.resources.delete_account_subti
 import shugar.feature.home.presentation.generated.resources.delete_account_title
 import shugar.feature.home.presentation.generated.resources.do_you_want_to_delete_account
 import shugar.feature.home.presentation.generated.resources.do_you_want_to_delete_account_desc
+import shugar.feature.home.presentation.generated.resources.network_error
 import com.dating.core.designsystem.components.buttons.AppButtonStyle
 import com.dating.core.designsystem.components.buttons.ChirpButton
 import com.dating.core.designsystem.components.dialogs.DestructiveConfirmationDialog
@@ -183,6 +186,19 @@ fun DeleteAccountScreen(
                 onConfirmClick = {
                     showConfirmDialog = false
                     viewModel.onAction(SettingsAction.OnConfirmDeleteAccountClick)
+                }
+            )
+        }
+
+        state.errorMessage?.let { errorMessage ->
+            AlertDialog(
+                onDismissRequest = { viewModel.onAction(SettingsAction.OnDismissError) },
+                title = { Text(stringResource(Res.string.network_error)) },
+                text = { Text(errorMessage.asString()) },
+                confirmButton = {
+                    TextButton(onClick = { viewModel.onAction(SettingsAction.OnDismissError) }) {
+                        Text("OK")
+                    }
                 }
             )
         }

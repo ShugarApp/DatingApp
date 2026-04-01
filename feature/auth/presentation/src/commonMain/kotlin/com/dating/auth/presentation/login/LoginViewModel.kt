@@ -78,6 +78,16 @@ class LoginViewModel(
                 }
             }
 
+            is LoginAction.OnGoogleIdTokenReceived -> loginWithGoogle(action.idToken)
+            LoginAction.OnGoogleSignInError -> {
+                _state.update {
+                    it.copy(
+                        error = UiText.DynamicString("Google Sign-In failed"),
+                        isGoogleLoading = false
+                    )
+                }
+            }
+
             else -> Unit
         }
     }
@@ -94,6 +104,34 @@ class LoginViewModel(
                 )
             }
         }.launchIn(viewModelScope)
+    }
+
+    private fun loginWithGoogle(idToken: String) {
+        viewModelScope.launch {
+            _state.update { it.copy(isGoogleLoading = true) }
+
+            authService
+                .loginWithGoogle(idToken)
+                .onSuccess { result ->
+                    sessionStorage.set(result.authInfo)
+
+                    _state.update { it.copy(isGoogleLoading = false) }
+
+                    if (result.isNewUser) {
+                        eventChannel.send(LoginEvent.SuccessNewUser(result.authInfo.user.email))
+                    } else {
+                        eventChannel.send(LoginEvent.Success)
+                    }
+                }
+                .onFailure { error ->
+                    _state.update {
+                        it.copy(
+                            error = error.toUiText(),
+                            isGoogleLoading = false
+                        )
+                    }
+                }
+        }
     }
 
     private fun login() {

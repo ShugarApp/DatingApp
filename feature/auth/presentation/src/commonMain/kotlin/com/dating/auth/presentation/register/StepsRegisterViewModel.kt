@@ -32,7 +32,8 @@ class StepsRegisterViewModel(
 ) : ViewModel() {
 
     private val email: String = checkNotNull(savedStateHandle["email"])
-    private val password: String = checkNotNull(savedStateHandle["password"])
+    private val password: String = savedStateHandle["password"] ?: ""
+    private val isGoogleUser: Boolean = savedStateHandle["isGoogleUser"] ?: false
 
     private val eventChannel = Channel<StepsRegisterEvent>()
     val events = eventChannel.receiveAsFlow()
@@ -167,12 +168,45 @@ class StepsRegisterViewModel(
             _state.update { it.copy(isRegistering = true) }
 
             val username = state.value.usernameTextState.text.toString()
+            val birthDate = state.value.birthDateTextState.text.toString()
+            val gender = state.value.selectedGender
+            val interest = state.value.selectedInterest
+            val lookingFor = state.value.selectedLookingFor
+
+            if (isGoogleUser) {
+                // Google users are already registered, complete their profile
+                authService
+                    .completeProfile(
+                        username = username,
+                        birthDate = birthDate,
+                        gender = gender ?: "",
+                        interestedIn = interest ?: "",
+                        lookingFor = lookingFor ?: ""
+                    )
+                    .onSuccess {
+                        _state.update { it.copy(isRegistering = false) }
+                        eventChannel.send(StepsRegisterEvent.GoogleSuccess)
+                    }
+                    .onFailure { error ->
+                        _state.update {
+                            it.copy(
+                                isRegistering = false,
+                                registrationError = error.toUiText(),
+                            )
+                        }
+                    }
+                return@launch
+            }
 
             authService
                 .register(
                     email = email,
                     username = username,
-                    password = password
+                    password = password,
+                    birthDate = birthDate,
+                    gender = gender,
+                    interestedIn = interest,
+                    lookingFor = lookingFor
                 )
                 .onSuccess {
                     _state.update { it.copy(isRegistering = false) }

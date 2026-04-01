@@ -13,7 +13,11 @@ interface AuthService {
     suspend fun register(
         email: String,
         username: String,
-        password: String
+        password: String,
+        birthDate: String? = null,
+        gender: String? = null,
+        interestedIn: String? = null,
+        lookingFor: String? = null
     ): EmptyResult<DataError.Remote>
 
     suspend fun resendVerificationEmail(
@@ -32,6 +36,16 @@ interface AuthService {
     suspend fun changePassword(
         currentPassword: String,
         newPassword: String
+    ): EmptyResult<DataError.Remote>
+
+    suspend fun loginWithGoogle(idToken: String): Result<GoogleAuthResult, DataError.Remote>
+
+    suspend fun completeProfile(
+        username: String,
+        birthDate: String,
+        gender: String,
+        interestedIn: String,
+        lookingFor: String
     ): EmptyResult<DataError.Remote>
 
     suspend fun logout(refreshToken: String): EmptyResult<DataError.Remote>
