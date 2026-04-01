@@ -6,4 +6,6 @@ sealed interface LoginAction {
     data object OnLoginClick : LoginAction
     data object OnSignUpClick : LoginAction
     data object OnBackClick : LoginAction
+    data class OnGoogleIdTokenReceived(val idToken: String) : LoginAction
+    data object OnGoogleSignInError : LoginAction
 }

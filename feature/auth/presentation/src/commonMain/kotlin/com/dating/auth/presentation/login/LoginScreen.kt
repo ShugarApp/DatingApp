@@ -3,6 +3,7 @@ package com.dating.auth.presentation.login
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,6 +29,8 @@ import aura.feature.auth.presentation.generated.resources.forgot_password
 import aura.feature.auth.presentation.generated.resources.login
 import aura.feature.auth.presentation.generated.resources.password
 import aura.feature.auth.presentation.generated.resources.welcome_back
+import com.dating.auth.presentation.google.GoogleSignInButton
+import com.dating.auth.presentation.google.rememberGoogleSignInLauncher
 import com.dating.core.designsystem.components.brand.AppBrandLogo
 import com.dating.core.designsystem.components.buttons.AppButtonStyle
 import com.dating.core.designsystem.components.buttons.ChirpButton
@@ -45,6 +49,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun LoginRoot(
     viewModel: LoginViewModel = koinViewModel(),
     onLoginSuccess: () -> Unit,
+    onGoogleNewUser: (email: String) -> Unit,
     onForgotPasswordClick: () -> Unit,
     onCreateAccountClick: () -> Unit,
     onBackClick: () -> Unit
@@ -54,9 +59,19 @@ fun LoginRoot(
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
             LoginEvent.Success -> onLoginSuccess()
+            is LoginEvent.SuccessNewUser -> onGoogleNewUser(event.email)
             LoginEvent.OnBack -> onBackClick()
         }
     }
+
+    val launchGoogleSignIn = rememberGoogleSignInLauncher(
+        onIdTokenReceived = { idToken ->
+            viewModel.onAction(LoginAction.OnGoogleIdTokenReceived(idToken))
+        },
+        onError = {
+            viewModel.onAction(LoginAction.OnGoogleSignInError)
+        }
+    )
 
     LoginScreen(
         state = state,
@@ -67,7 +82,8 @@ fun LoginRoot(
                 LoginAction.OnBackClick -> viewModel.onAction(action)
                 else -> viewModel.onAction(action)
             }
-        }
+        },
+        onGoogleSignInClick = launchGoogleSignIn
     )
 }
 
@@ -75,6 +91,7 @@ fun LoginRoot(
 fun LoginScreen(
     state: LoginState,
     onAction: (LoginAction) -> Unit,
+    onGoogleSignInClick: () -> Unit = {},
 ) {
     AuthSnackbarScaffold(
         topBar = {
@@ -156,6 +173,31 @@ fun LoginScreen(
                 },
                 enabled = state.canLogin,
                 isLoading = state.isLoggingIn,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                HorizontalDivider(modifier = Modifier.weight(1f))
+                Text(
+                    text = "o",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.extended.textSecondary,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+                HorizontalDivider(modifier = Modifier.weight(1f))
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            GoogleSignInButton(
+                onClick = onGoogleSignInClick,
+                isLoading = state.isGoogleLoading,
+                enabled = !state.isLoggingIn && !state.isGoogleLoading,
                 modifier = Modifier.fillMaxWidth()
             )
 

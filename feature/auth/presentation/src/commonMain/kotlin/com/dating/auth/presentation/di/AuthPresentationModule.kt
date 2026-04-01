@@ -3,6 +3,7 @@ package com.dating.auth.presentation.di
 import com.dating.auth.presentation.email_verification.EmailVerificationViewModel
 import com.dating.auth.presentation.forgot_password.ForgotPasswordViewModel
 import com.dating.auth.presentation.login.LoginViewModel
+import com.dating.auth.presentation.onboarding.OnboardingViewModel
 import com.dating.auth.presentation.register.RegisterCredentialsViewModel
 import com.dating.auth.presentation.register.StepsRegisterViewModel
 import com.dating.auth.presentation.register_success.RegisterSuccessViewModel
@@ -16,6 +17,7 @@ val authPresentationModule = module {
     viewModelOf(::RegisterSuccessViewModel)
     viewModelOf(::EmailVerificationViewModel)
     viewModelOf(::LoginViewModel)
+    viewModelOf(::OnboardingViewModel)
     viewModelOf(::ForgotPasswordViewModel)
     viewModelOf(::ResetPasswordViewModel)
 }

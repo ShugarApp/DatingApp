@@ -65,6 +65,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun StepsRegisterRoot(
     viewModel: StepsRegisterViewModel = koinViewModel(),
     onRegisterSuccess: (String) -> Unit,
+    onGoogleRegisterSuccess: () -> Unit = {},
     onBackClick: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -74,6 +75,10 @@ fun StepsRegisterRoot(
         when (event) {
             is StepsRegisterEvent.Success -> {
                 onRegisterSuccess(event.email)
+            }
+
+            StepsRegisterEvent.GoogleSuccess -> {
+                onGoogleRegisterSuccess()
             }
 
             StepsRegisterEvent.OnBack -> {

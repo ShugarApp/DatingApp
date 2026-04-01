@@ -1,8 +1,11 @@
 package com.dating.core.data.auth
 
 import com.dating.core.data.dto.AuthInfoSerializable
+import com.dating.core.data.dto.GoogleAuthInfoSerializable
 import com.dating.core.data.dto.requests.ChangePasswordRequest
+import com.dating.core.data.dto.requests.CompleteProfileRequest
 import com.dating.core.data.dto.requests.EmailRequest
+import com.dating.core.data.dto.requests.GoogleLoginRequest
 import com.dating.core.data.dto.requests.LoginRequest
 import com.dating.core.data.dto.requests.RefreshRequest
 import com.dating.core.data.dto.requests.RegisterRequest
@@ -10,8 +13,10 @@ import com.dating.core.data.dto.requests.ResetPasswordRequest
 import com.dating.core.data.mappers.toDomain
 import com.dating.core.data.networking.get
 import com.dating.core.data.networking.post
+import com.dating.core.data.networking.put
 import com.dating.core.domain.auth.AuthInfo
 import com.dating.core.domain.auth.AuthService
+import com.dating.core.domain.auth.GoogleAuthResult
 import com.dating.core.domain.util.DataError
 import com.dating.core.domain.util.EmptyResult
 import com.dating.core.domain.util.Result
@@ -38,17 +43,53 @@ class KtorAuthService(private val httpClient: HttpClient) : AuthService {
         }
     }
 
+    override suspend fun loginWithGoogle(
+        idToken: String
+    ): Result<GoogleAuthResult, DataError.Remote> {
+        return httpClient.post<GoogleLoginRequest, GoogleAuthInfoSerializable>(
+            route = "/auth/google",
+            body = GoogleLoginRequest(idToken = idToken)
+        ).map { it.toDomain() }
+    }
+
     override suspend fun register(
         email: String,
         username: String,
-        password: String
+        password: String,
+        birthDate: String?,
+        gender: String?,
+        interestedIn: String?,
+        lookingFor: String?
     ): EmptyResult<DataError.Remote> {
         return httpClient.post(
             route = "/auth/register",
             body = RegisterRequest(
                 email = email,
                 username = username,
-                password = password
+                password = password,
+                birthDate = birthDate,
+                gender = gender,
+                interestedIn = interestedIn,
+                lookingFor = lookingFor
+            )
+        )
+    }
+
+    override suspend fun completeProfile(
+        username: String,
+        birthDate: String,
+        gender: String,
+        interestedIn: String,
+        lookingFor: String
+    ): EmptyResult<DataError.Remote> {
+        return httpClient.put(
+            route = "/users/profile",
+            body = CompleteProfileRequest(
+                username = username,
+                birthDate = birthDate,
+                gender = gender,
+                interestedIn = interestedIn,
+                lookingFor = lookingFor
             )
         )
     }
