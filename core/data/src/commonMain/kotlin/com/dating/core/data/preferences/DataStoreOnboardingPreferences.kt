@@ -12,6 +12,7 @@ class DataStoreOnboardingPreferences(
 ) : OnboardingPreferences {
 
     private val featuresOnboardingSeenKey = booleanPreferencesKey("features_onboarding_seen")
+    private val profileSetupSeenKey = booleanPreferencesKey("profile_setup_seen")
 
     override suspend fun hasSeenFeaturesOnboarding(): Boolean {
         return dataStore.data.first()[featuresOnboardingSeenKey] ?: false
@@ -20,6 +21,16 @@ class DataStoreOnboardingPreferences(
     override suspend fun markFeaturesOnboardingSeen() {
         dataStore.edit { preferences ->
             preferences[featuresOnboardingSeenKey] = true
+        }
+    }
+
+    override suspend fun hasSeenProfileSetup(): Boolean {
+        return dataStore.data.first()[profileSetupSeenKey] ?: false
+    }
+
+    override suspend fun markProfileSetupSeen() {
+        dataStore.edit { preferences ->
+            preferences[profileSetupSeenKey] = true
         }
     }
 }
