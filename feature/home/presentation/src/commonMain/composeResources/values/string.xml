@@ -262,7 +262,7 @@
 
     <!-- Profile Completion Card -->
     <string name="profile_completion_title">Complete your profile</string>
-    <string name="profile_completion_percent">%1$d%% complete</string>
+    <string name="profile_completion_percent">%1$d% complete</string>
     <string name="profile_completion_cta">Complete now</string>
     <string name="profile_completion_done">Your profile is complete!</string>
     <string name="profile_completion_hint">A complete profile gets up to 3× more matches.</string>
@@ -318,7 +318,7 @@
     <string name="features_onboarding_get_started">Get started</string>
 
     <string name="features_onboarding_safety_title">Your safety, our priority</string>
-    <string name="features_onboarding_safety_subtitle">Add an emergency contact and share your real-time location during every date, so someone you trust always knows you\'re safe.</string>
+    <string name="features_onboarding_safety_subtitle">Add an emergency contact and share your real-time location during every date, so someone you trust always knows you're safe.</string>
     <string name="features_onboarding_safety_badge_1">Emergency contact</string>
     <string name="features_onboarding_safety_badge_2">Real-time tracking</string>
     <string name="features_onboarding_safety_badge_3">One-tap SOS</string>
@@ -394,7 +394,7 @@
     <string name="settings_blocked_users">Blocked Users</string>
     <string name="delete_match">Delete Match</string>
     <string name="delete_match_title">Delete match with %1$s?</string>
-    <string name="delete_match_desc">The match and conversation will be deleted. You will both appear in each other\'s feed again. This action cannot be undone.</string>
+    <string name="delete_match_desc">The match and conversation will be deleted. You will both appear in each other's feed again. This action cannot be undone.</string>
     <string name="delete_match_success">Match deleted</string>
     <string name="block_user">Block</string>
     <string name="block_user_title">Block %1$s?</string>
@@ -425,7 +425,7 @@
 
     <!-- Block after report -->
     <string name="block_after_report_title">Block this user too?</string>
-    <string name="block_after_report_desc">Your report has been submitted. Would you also like to block this user so they can\'t contact you anymore?</string>
+    <string name="block_after_report_desc">Your report has been submitted. Would you also like to block this user so they can't contact you anymore?</string>
     <string name="block_after_report_confirm">Block</string>
     <string name="block_after_report_dismiss">No thanks</string>
 
@@ -443,7 +443,7 @@
     <string name="delete_survey_title">Before you go…</string>
     <string name="delete_survey_subtitle">Tell us why you are deleting your account. Your feedback helps us improve.</string>
     <string name="delete_survey_continue">Continue</string>
-    <string name="delete_reason_found_relationship">I found someone / I\'m in a relationship</string>
+    <string name="delete_reason_found_relationship">I found someone / I'm in a relationship</string>
     <string name="delete_reason_too_many_messages">Too many unwanted messages</string>
     <string name="delete_reason_no_matches">Not finding compatible matches</string>
     <string name="delete_reason_privacy">Privacy or safety concerns</string>
