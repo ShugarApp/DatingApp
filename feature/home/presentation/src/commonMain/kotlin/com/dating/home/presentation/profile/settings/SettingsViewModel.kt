@@ -64,6 +64,15 @@ class SettingsViewModel(
             SettingsAction.OnDismissLogoutConfirmationDialogClick -> dismissLogoutConfirmation()
             SettingsAction.OnConfirmPauseAccountClick -> togglePauseAccount()
             SettingsAction.OnToggleIncognitoClick -> toggleIncognitoMode()
+            SettingsAction.OnDeleteAccountClick -> _state.update { it.copy(showDeleteSurveyDialog = true) }
+            is SettingsAction.OnSurveyReasonSelected -> _state.update { it.copy(selectedDeleteReason = action.reason) }
+            SettingsAction.OnSurveyConfirmClick -> {
+                _state.update { it.copy(showDeleteSurveyDialog = false) }
+                viewModelScope.launch { _events.send(SettingsEvent.OnSurveyCompleted) }
+            }
+            SettingsAction.OnDismissSurvey -> _state.update {
+                it.copy(showDeleteSurveyDialog = false, selectedDeleteReason = null)
+            }
             SettingsAction.OnConfirmDeleteAccountClick -> deleteAccount()
 
             SettingsAction.OnLocationClick -> updateLocation()
@@ -182,7 +191,8 @@ class SettingsViewModel(
     private fun deleteAccount() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            userService.deleteAccount()
+            val reason = state.value.selectedDeleteReason?.value
+            userService.deleteAccount(reason = reason)
                 .onSuccess {
                     _state.update { it.copy(isLoading = false) }
                     sessionStorage.set(null)

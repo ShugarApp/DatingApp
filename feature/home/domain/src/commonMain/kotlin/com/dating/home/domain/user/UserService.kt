@@ -26,7 +26,7 @@ interface UserService {
     suspend fun reorderPhotos(photos: List<String>): EmptyResult<DataError.Remote>
     suspend fun updateLocation(latitude: Double, longitude: Double): Result<User, DataError.Remote>
     suspend fun getUserById(id: String): Result<User, DataError.Remote>
-    suspend fun deleteAccount(): EmptyResult<DataError.Remote>
+    suspend fun deleteAccount(reason: String? = null): EmptyResult<DataError.Remote>
     suspend fun pauseAccount(pause: Boolean): Result<User, DataError.Remote>
     suspend fun toggleIncognitoMode(incognito: Boolean): Result<User, DataError.Remote>
 }

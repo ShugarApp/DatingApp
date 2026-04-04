@@ -153,8 +153,9 @@ class KtorUserService(
         ).map { it.toDomain() }
     }
 
-    override suspend fun deleteAccount(): EmptyResult<DataError.Remote> {
-        return httpClient.delete<Unit>(route = "/users/profile")
+    override suspend fun deleteAccount(reason: String?): EmptyResult<DataError.Remote> {
+        val params = if (reason != null) mapOf("reason" to reason) else emptyMap()
+        return httpClient.delete<Unit>(route = "/users/profile", queryParams = params)
     }
 
     override suspend fun pauseAccount(pause: Boolean): Result<User, DataError.Remote> {
