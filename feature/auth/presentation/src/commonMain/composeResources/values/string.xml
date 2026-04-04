@@ -56,7 +56,12 @@
     <string name="gender_non_binary">Non-binary</string>
     <string name="interest_relationship">Relationship</string>
     <string name="interest_casual">Casual</string>
-    <string name="interest_friends">Friends</string>
+    <string name="interest_friends">Friendship</string>
+    <string name="interest_long_term">Long-term relationship</string>
+    <string name="interest_short_term">Short-term relationship</string>
+    <string name="interest_casual_dates">Casual dates</string>
+    <string name="interest_hookup">One night stand</string>
+    <string name="interest_open_to_anything">Open to anything</string>
 
     <!-- Onboarding -->
     <string name="onboarding_body">Find your perfect match today.</string>
