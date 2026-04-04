@@ -21,5 +21,7 @@ data class SettingsState(
     val showAgeRangeDialog: Boolean = false,
     val themePreference: ThemePreference = ThemePreference.SYSTEM,
     val showThemeDialog: Boolean = false,
-    val errorMessage: UiText? = null
+    val errorMessage: UiText? = null,
+    val showDeleteSurveyDialog: Boolean = false,
+    val selectedDeleteReason: DeleteAccountReason? = null
 )

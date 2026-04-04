@@ -78,6 +78,7 @@ fun DeleteAccountScreen(
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
             SettingsEvent.OnDeleteAccountSuccess -> onDeleteAccount()
+            SettingsEvent.OnSurveyCompleted -> showConfirmDialog = true
             else -> Unit
         }
     }
@@ -165,7 +166,7 @@ fun DeleteAccountScreen(
 
             ChirpButton(
                 text = stringResource(Res.string.delete_account_button),
-                onClick = { showConfirmDialog = true },
+                onClick = { viewModel.onAction(SettingsAction.OnDeleteAccountClick) },
                 style = AppButtonStyle.DESTRUCTIVE_PRIMARY,
                 enabled = !state.isLoading,
                 isLoading = state.isLoading,
@@ -173,6 +174,15 @@ fun DeleteAccountScreen(
             )
 
             Spacer(modifier = Modifier.height(24.dp))
+        }
+
+        if (state.showDeleteSurveyDialog) {
+            DeleteSurveyDialog(
+                selectedReason = state.selectedDeleteReason,
+                onReasonSelected = { viewModel.onAction(SettingsAction.OnSurveyReasonSelected(it)) },
+                onContinue = { viewModel.onAction(SettingsAction.OnSurveyConfirmClick) },
+                onDismiss = { viewModel.onAction(SettingsAction.OnDismissSurvey) }
+            )
         }
 
         if (showConfirmDialog) {

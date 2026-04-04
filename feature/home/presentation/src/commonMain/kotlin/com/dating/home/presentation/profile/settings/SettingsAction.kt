@@ -10,6 +10,10 @@ sealed interface SettingsAction {
 
     data object OnConfirmPauseAccountClick : SettingsAction
     data object OnToggleIncognitoClick : SettingsAction
+    data object OnDeleteAccountClick : SettingsAction
+    data class OnSurveyReasonSelected(val reason: DeleteAccountReason) : SettingsAction
+    data object OnSurveyConfirmClick : SettingsAction
+    data object OnDismissSurvey : SettingsAction
     data object OnConfirmDeleteAccountClick : SettingsAction
 
     // Discovery
