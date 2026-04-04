@@ -260,6 +260,75 @@
     <string name="feed_paused_desc">Your profile is currently hidden from other users. Activate your account to start discovering people again.</string>
     <string name="feed_paused_activate">Activate Account</string>
 
+    <!-- Profile Completion Card -->
+    <string name="profile_completion_title">Complete your profile</string>
+    <string name="profile_completion_percent">%1$d%% complete</string>
+    <string name="profile_completion_cta">Complete now</string>
+    <string name="profile_completion_done">Your profile is complete!</string>
+    <string name="profile_completion_hint">A complete profile gets up to 3× more matches.</string>
+
+    <!-- Profile Setup Wizard -->
+    <string name="profile_setup_skip">Skip</string>
+    <string name="profile_setup_continue">Continue</string>
+    <string name="profile_setup_finish">Complete profile</string>
+    <string name="profile_setup_step_of">Step %1$d of %2$d</string>
+
+    <string name="profile_setup_bio_title">Tell us about you</string>
+    <string name="profile_setup_bio_subtitle">A good bio helps you connect with the right people.</string>
+    <string name="profile_setup_bio_placeholder">I love traveling, good coffee and meeting new people…</string>
+    <string name="profile_setup_bio_counter">%1$d / 500</string>
+
+    <string name="profile_setup_interests_title">What are you into?</string>
+    <string name="profile_setup_interests_subtitle">Pick up to 10 interests to show on your profile.</string>
+    <string name="profile_setup_interests_count">%1$d / 10 selected</string>
+
+    <string name="profile_setup_basic_title">A bit more about you</string>
+    <string name="profile_setup_basic_subtitle">This helps us find better matches for you.</string>
+    <string name="profile_setup_gender">Gender</string>
+    <string name="profile_setup_gender_male">Man</string>
+    <string name="profile_setup_gender_female">Woman</string>
+    <string name="profile_setup_gender_other">Non-binary</string>
+    <string name="profile_setup_birthdate">Date of birth</string>
+    <string name="profile_setup_birthdate_hint">Select your date of birth</string>
+
+    <string name="profile_setup_work_title">Work &amp; education</string>
+    <string name="profile_setup_work_subtitle">Share a bit about what you do (optional).</string>
+    <string name="profile_setup_job_hint">Your job title</string>
+    <string name="profile_setup_company_hint">Company</string>
+    <string name="profile_setup_education_hint">University or degree</string>
+
+    <string name="profile_setup_lifestyle_title">Your lifestyle</string>
+    <string name="profile_setup_lifestyle_subtitle">Help others get to know you better.</string>
+    <string name="profile_setup_height">Height</string>
+    <string name="profile_setup_height_value">%1$d cm</string>
+    <string name="profile_setup_height_add">Add height</string>
+    <string name="profile_setup_zodiac">Zodiac sign</string>
+    <string name="profile_setup_smoking">Smoking</string>
+    <string name="profile_setup_smoking_never">Never</string>
+    <string name="profile_setup_smoking_sometimes">Sometimes</string>
+    <string name="profile_setup_smoking_regularly">Regularly</string>
+    <string name="profile_setup_drinking">Drinking</string>
+    <string name="profile_setup_drinking_never">Never</string>
+    <string name="profile_setup_drinking_socially">Socially</string>
+    <string name="profile_setup_drinking_regularly">Regularly</string>
+
+    <!-- Features Onboarding -->
+    <string name="features_onboarding_skip">Skip</string>
+    <string name="features_onboarding_next">Next</string>
+    <string name="features_onboarding_get_started">Get started</string>
+
+    <string name="features_onboarding_safety_title">Your safety, our priority</string>
+    <string name="features_onboarding_safety_subtitle">Add an emergency contact and share your real-time location during every date, so someone you trust always knows you\'re safe.</string>
+    <string name="features_onboarding_safety_badge_1">Emergency contact</string>
+    <string name="features_onboarding_safety_badge_2">Real-time tracking</string>
+    <string name="features_onboarding_safety_badge_3">One-tap SOS</string>
+
+    <string name="features_onboarding_dates_title">Plan dates with your match</string>
+    <string name="features_onboarding_dates_subtitle">Agree on the day, time and place — all inside the app. No more back-and-forth on other platforms.</string>
+    <string name="features_onboarding_dates_badge_1">Pick a date &amp; time</string>
+    <string name="features_onboarding_dates_badge_2">Choose a place</string>
+    <string name="features_onboarding_dates_badge_3">Built-in reminders</string>
+
     <!-- Photo Onboarding -->
     <string name="photo_onboarding_title">Add your photos</string>
     <string name="photo_onboarding_subtitle">Upload at least 2 photos to start discovering people near you. Show your best side!</string>

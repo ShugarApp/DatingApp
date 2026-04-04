@@ -24,5 +24,8 @@ data class UserSerializable(
     val zodiac: String? = null,
     val smoking: String? = null,
     val drinking: String? = null,
-    val interests: List<String> = emptyList()
+    val interests: List<String> = emptyList(),
+    // Optionally returned by the backend. When present, this value is authoritative
+    // and should be used instead of the locally-computed profileCompletion().
+    val profileCompletion: Int? = null
 )
