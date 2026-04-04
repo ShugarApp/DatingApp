@@ -39,9 +39,12 @@ import aura.feature.auth.presentation.generated.resources.gender
 import aura.feature.auth.presentation.generated.resources.gender_female
 import aura.feature.auth.presentation.generated.resources.gender_male
 import aura.feature.auth.presentation.generated.resources.gender_non_binary
-import aura.feature.auth.presentation.generated.resources.interest_casual
+import aura.feature.auth.presentation.generated.resources.interest_casual_dates
 import aura.feature.auth.presentation.generated.resources.interest_friends
-import aura.feature.auth.presentation.generated.resources.interest_relationship
+import aura.feature.auth.presentation.generated.resources.interest_hookup
+import aura.feature.auth.presentation.generated.resources.interest_long_term
+import aura.feature.auth.presentation.generated.resources.interest_open_to_anything
+import aura.feature.auth.presentation.generated.resources.interest_short_term
 import aura.feature.auth.presentation.generated.resources.interested_in
 import aura.feature.auth.presentation.generated.resources.looking_for
 import aura.feature.auth.presentation.generated.resources.next
@@ -228,9 +231,12 @@ fun StepsRegisterScreen(
                             SectionSelection(
                                 title = stringResource(Res.string.looking_for),
                                 options = listOf(
-                                    stringResource(Res.string.interest_relationship),
-                                    stringResource(Res.string.interest_casual),
-                                    stringResource(Res.string.interest_friends)
+                                    stringResource(Res.string.interest_long_term),
+                                    stringResource(Res.string.interest_short_term),
+                                    stringResource(Res.string.interest_casual_dates),
+                                    stringResource(Res.string.interest_hookup),
+                                    stringResource(Res.string.interest_friends),
+                                    stringResource(Res.string.interest_open_to_anything)
                                 ),
                                 selectedOption = state.selectedLookingFor,
                                 onOptionSelected = {
