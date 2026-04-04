@@ -49,6 +49,9 @@ fun BottomNavigationContainer(
     // null = not yet loaded from DataStore, true/false = loaded value
     var hasSeenFeaturesOnboarding by rememberSaveable { mutableStateOf<Boolean?>(null) }
     var hasSeenProfileSetup by rememberSaveable { mutableStateOf<Boolean?>(null) }
+    // Track if features onboarding was just completed this session,
+    // so we skip profile setup until the next app launch.
+    var justCompletedFeaturesOnboarding by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         hasSeenFeaturesOnboarding = onboardingPreferences.hasSeenFeaturesOnboarding()
@@ -85,14 +88,17 @@ fun BottomNavigationContainer(
     // Show features onboarding once (first launch after sign-up)
     if (hasSeenFeaturesOnboarding == false) {
         FeaturesOnboardingScreen(
-            onComplete = { hasSeenFeaturesOnboarding = true },
+            onComplete = {
+                hasSeenFeaturesOnboarding = true
+                justCompletedFeaturesOnboarding = true
+            },
             modifier = modifier
         )
         return
     }
 
-    // Show profile setup wizard once (second launch, after features onboarding)
-    if (hasSeenProfileSetup == false) {
+    // Show profile setup wizard on the next app launch (not in the same session as features onboarding)
+    if (hasSeenProfileSetup == false && !justCompletedFeaturesOnboarding) {
         ProfileSetupScreen(
             onComplete = { hasSeenProfileSetup = true },
             modifier = modifier
