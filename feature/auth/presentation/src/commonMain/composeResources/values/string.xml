@@ -42,6 +42,7 @@
     <string name="name_placeholder">Your Name</string>
     <string name="birth_date">Birth Date</string>
     <string name="birth_date_placeholder">DD/MM/YYYY</string>
+    <string name="error_underage">You must be at least 18 years old to register</string>
     <string name="gender">Gender</string>
     <string name="interested_in">Interested In</string>
     <string name="looking_for">Looking For</string>

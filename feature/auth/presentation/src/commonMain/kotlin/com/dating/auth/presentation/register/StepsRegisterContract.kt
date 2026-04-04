@@ -13,6 +13,7 @@ data class StepsRegisterState(
 
     // Step 2: Birth Date
     val birthDateTextState: TextFieldState = TextFieldState(),
+    val birthDateError: UiText? = null,
 
     // Step 3: Gender & Interest
     val selectedGender: String? = null,

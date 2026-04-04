@@ -36,9 +36,12 @@ class PhotoUploadManager(
     val pendingSlots: StateFlow<Set<Int>> = _pendingSlots
 
     fun enqueue(requests: List<PhotoUploadRequest>) {
-        for (request in requests) {
-            _pendingSlots.update { it + request.slotIndex }
-            appScope.launch {
+        val sorted = requests.sortedBy { it.slotIndex }
+        // Mark all slots as pending upfront so the UI shows loading immediately
+        sorted.forEach { request -> _pendingSlots.update { slots -> slots + request.slotIndex } }
+        appScope.launch {
+            // Process sequentially so lower indices are confirmed before higher ones
+            for (request in sorted) {
                 userService.uploadPhoto(
                     imageBytes = request.bytes,
                     mimeType = request.mimeType,
