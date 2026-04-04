@@ -190,6 +190,8 @@ fun StepsRegisterScreen(
                                 title = stringResource(Res.string.birth_date),
                                 inputTransformation = DateInputTransformation,
                                 keyboardType = KeyboardType.Number,
+                                supportingText = state.birthDateError?.asString(),
+                                isError = state.birthDateError != null,
                                 modifier = Modifier.fillMaxWidth()
                             )
                         }

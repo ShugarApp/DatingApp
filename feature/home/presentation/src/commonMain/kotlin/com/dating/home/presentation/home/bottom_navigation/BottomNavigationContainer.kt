@@ -34,6 +34,7 @@ fun BottomNavigationContainer(
     onSettings: () -> Unit,
     onVerification: () -> Unit,
     onSubscriptions: () -> Unit,
+    initialSection: BottomNavSection = BottomNavSection.FEED,
     swipedUserId: String? = null,
     swipedIsDislike: Boolean = false,
     blockedUserId: String? = null,
@@ -44,7 +45,7 @@ fun BottomNavigationContainer(
 
     val authInfo by sessionStorage.observeAuthInfo().collectAsStateWithLifecycle(null)
     val userStatus = authInfo?.user?.status
-    var selectedSection by rememberSaveable { mutableStateOf(BottomNavSection.FEED) }
+    var selectedSection by rememberSaveable { mutableStateOf(initialSection) }
 
     // null = not yet loaded from DataStore, true/false = loaded value
     var hasSeenFeaturesOnboarding by rememberSaveable { mutableStateOf<Boolean?>(null) }

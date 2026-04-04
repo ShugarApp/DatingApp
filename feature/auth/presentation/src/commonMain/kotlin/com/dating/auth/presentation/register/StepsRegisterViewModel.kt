@@ -7,12 +7,17 @@ import androidx.lifecycle.viewModelScope
 import shugar.feature.auth.presentation.generated.resources.Res
 import shugar.feature.auth.presentation.generated.resources.error_account_exists
 import shugar.feature.auth.presentation.generated.resources.error_invalid_username
+import shugar.feature.auth.presentation.generated.resources.error_underage
 import com.dating.core.domain.auth.AuthService
 import com.dating.core.domain.util.DataError
 import com.dating.core.domain.util.onFailure
 import com.dating.core.domain.util.onSuccess
 import com.dating.core.presentation.util.UiText
 import com.dating.core.presentation.util.toUiText
+import kotlin.time.Clock
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -87,7 +92,13 @@ class StepsRegisterViewModel(
                     }
 
                     RegisterStep.BirthDate -> {
-                        it.copy(canProceed = birthDate.length == 10)
+                        val isFormatComplete = birthDate.length == 10
+                        val isAgeValid = isFormatComplete && isAtLeast18YearsOld(birthDate)
+                        val birthDateError = when {
+                            isFormatComplete && !isAgeValid -> UiText.Resource(Res.string.error_underage)
+                            else -> null
+                        }
+                        it.copy(canProceed = isAgeValid, birthDateError = birthDateError)
                     }
 
                     RegisterStep.GenderInterest -> {
@@ -241,9 +252,14 @@ class StepsRegisterViewModel(
 
             RegisterStep.BirthDate -> {
                 val birthDate = currentState.birthDateTextState.text.toString()
-                val isValid = birthDate.length == 10
-                _state.update { it.copy(canProceed = isValid) }
-                isValid
+                val isFormatComplete = birthDate.length == 10
+                val isAgeValid = isFormatComplete && isAtLeast18YearsOld(birthDate)
+                val birthDateError = when {
+                    isFormatComplete && !isAgeValid -> UiText.Resource(Res.string.error_underage)
+                    else -> null
+                }
+                _state.update { it.copy(canProceed = isAgeValid, birthDateError = birthDateError) }
+                isAgeValid
             }
 
             RegisterStep.GenderInterest -> {
@@ -271,4 +287,25 @@ private fun String.toIsoDate(): String {
     val parts = split("/")
     if (parts.size != 3) return this
     return "${parts[2]}-${parts[1]}-${parts[0]}"
+}
+
+/**
+ * Returns true if the date (DD/MM/YYYY) corresponds to someone who is at least 18 years old.
+ */
+private fun isAtLeast18YearsOld(birthDateStr: String): Boolean {
+    val parts = birthDateStr.split("/")
+    if (parts.size != 3) return false
+    val day = parts[0].toIntOrNull() ?: return false
+    val month = parts[1].toIntOrNull() ?: return false
+    val year = parts[2].toIntOrNull() ?: return false
+    val birthDate = try {
+        LocalDate(year, month, day)
+    } catch (e: Exception) {
+        return false
+    }
+    val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+    val age = today.year - birthDate.year
+    val hasHadBirthdayThisYear = today.monthNumber > birthDate.monthNumber ||
+        (today.monthNumber == birthDate.monthNumber && today.dayOfMonth >= birthDate.dayOfMonth)
+    return (if (hasHadBirthdayThisYear) age else age - 1) >= 18
 }

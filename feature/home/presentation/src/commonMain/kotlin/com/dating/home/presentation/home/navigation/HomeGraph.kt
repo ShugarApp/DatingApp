@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
+import com.dating.home.presentation.home.bottom_navigation.BottomNavSection
 import com.dating.home.presentation.home.bottom_navigation.BottomNavigationContainer
 import com.dating.home.presentation.profile.edit_profile.EditProfileScreen
 import com.dating.home.presentation.profile.settings.DeleteAccountScreen
@@ -42,7 +43,12 @@ fun NavGraphBuilder.homeGraph(
             )
         }
 
-        composable<HomeGraphRoutes.BottomNavContainer> { backStackEntry ->
+        composable<HomeGraphRoutes.BottomNavContainer>(
+            deepLinks = listOf(
+                navDeepLink { uriPattern = "chirp://home?section={section}" }
+            )
+        ) { backStackEntry ->
+            val route = backStackEntry.toRoute<HomeGraphRoutes.BottomNavContainer>()
             val swipedUserId = backStackEntry.savedStateHandle.get<String>("swiped_user_id")
             val swipedIsDislike = backStackEntry.savedStateHandle.get<Boolean>("swiped_is_dislike") ?: false
             val blockedUserId = backStackEntry.savedStateHandle.get<String>("blocked_user_id")
@@ -58,6 +64,10 @@ fun NavGraphBuilder.homeGraph(
                 }
             }
             BottomNavigationContainer(
+                initialSection = when (route.section) {
+                    "matches" -> BottomNavSection.MATCHES
+                    else -> BottomNavSection.FEED
+                },
                 swipedUserId = swipedUserId,
                 swipedIsDislike = swipedIsDislike,
                 blockedUserId = blockedUserId,
