@@ -13,6 +13,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun FeedRoot(
     onNavigateToProfile: (String, String?) -> Unit,
     onNavigateToEditProfile: () -> Unit,
+    onNavigateToMatches: () -> Unit = {},
     swipedUserId: String? = null,
     swipedIsDislike: Boolean = false,
     blockedUserId: String? = null,
@@ -45,6 +46,9 @@ fun FeedRoot(
             }
             is FeedEvent.NavigateToEditProfile -> {
                 onNavigateToEditProfile()
+            }
+            FeedEvent.NavigateToMatches -> {
+                onNavigateToMatches()
             }
         }
     }

@@ -8,6 +8,8 @@ import com.dating.core.domain.util.onFailure
 import com.dating.core.domain.util.onSuccess
 import com.dating.core.presentation.util.UiText
 import com.dating.core.presentation.util.toUiText
+import com.dating.home.domain.upload.PhotoUploadEvent
+import com.dating.home.domain.upload.PhotoUploadManager
 import com.dating.home.domain.user.UserService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -21,8 +23,20 @@ import aura.feature.home.presentation.generated.resources.error_invalid_file_typ
 
 class PhotoOnboardingViewModel(
     private val sessionStorage: SessionStorage,
-    private val userService: UserService
+    private val userService: UserService,
+    private val uploadManager: PhotoUploadManager
 ) : ViewModel() {
+
+    init {
+        viewModelScope.launch {
+            uploadManager.events.collect { event ->
+                when (event) {
+                    is PhotoUploadEvent.Success -> onPhotoUploaded(event.slotIndex, event.publicUrl)
+                    is PhotoUploadEvent.Failed -> onPhotoUploadFailed(event.slotIndex)
+                }
+            }
+        }
+    }
 
     private val _state = MutableStateFlow(PhotoOnboardingState())
     val state = _state

@@ -177,7 +177,7 @@ fun EditProfileScreen(
     // Multi picker for empty slots
     val emptySlots = (0 until 6).filter { state.photos[it] == null && it !in allUploadingSlots }
     val multiLauncher = rememberMultiImagePickerLauncher(
-        maxSelection = emptySlots.size.coerceAtLeast(1)
+        maxSelection = emptySlots.size.coerceAtLeast(2)
     ) { pickedImages ->
         val currentEmpty = (0 until 6).filter { state.photos[it] == null && it !in allUploadingSlots }
         val requests = pickedImages.zip(currentEmpty).mapNotNull { (image, slot) ->

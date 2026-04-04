@@ -18,7 +18,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,7 +30,6 @@ import aura.feature.home.presentation.generated.resources.photo_onboarding_conti
 import aura.feature.home.presentation.generated.resources.photo_onboarding_photos_count
 import aura.feature.home.presentation.generated.resources.photo_onboarding_subtitle
 import aura.feature.home.presentation.generated.resources.photo_onboarding_title
-import com.dating.home.domain.upload.PhotoUploadEvent
 import com.dating.home.domain.upload.PhotoUploadManager
 import com.dating.home.domain.upload.PhotoUploadRequest
 import com.dating.home.presentation.profile.edit_profile.PhotoGrid
@@ -53,18 +51,9 @@ fun PhotoOnboardingScreen(
     // Merge manager pending slots with local uploading slots
     val allUploadingSlots = state.uploadingSlots + pendingSlots
 
-    LaunchedEffect(Unit) {
-        uploadManager.events.collect { event ->
-            when (event) {
-                is PhotoUploadEvent.Success -> viewModel.onPhotoUploaded(event.slotIndex, event.publicUrl)
-                is PhotoUploadEvent.Failed -> viewModel.onPhotoUploadFailed(event.slotIndex)
-            }
-        }
-    }
-
     val emptySlots = (0 until 4).filter { state.photos[it] == null && it !in allUploadingSlots }
     val launcher = rememberMultiImagePickerLauncher(
-        maxSelection = emptySlots.size.coerceAtLeast(1)
+        maxSelection = emptySlots.size.coerceAtLeast(2)
     ) { pickedImages ->
         val currentEmpty = (0 until 4).filter { state.photos[it] == null && it !in allUploadingSlots }
         val requests = pickedImages.zip(currentEmpty).mapNotNull { (image, slot) ->

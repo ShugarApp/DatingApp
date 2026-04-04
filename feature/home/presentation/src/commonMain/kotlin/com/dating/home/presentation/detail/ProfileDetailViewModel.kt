@@ -2,6 +2,7 @@ package com.dating.home.presentation.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dating.core.domain.auth.SessionStorage
 import com.dating.core.domain.util.DataError
 import com.dating.core.domain.util.onFailure
 import com.dating.core.domain.util.onSuccess
@@ -15,6 +16,7 @@ import com.dating.home.domain.user.UserService
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -23,7 +25,8 @@ class ProfileDetailViewModel(
     private val userService: UserService,
     private val matchingService: MatchingService,
     private val blockService: BlockService,
-    private val reportService: ReportService
+    private val reportService: ReportService,
+    private val sessionStorage: SessionStorage
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ProfileDetailState())
@@ -139,11 +142,13 @@ class ProfileDetailViewModel(
     private fun swipe(userId: String, action: SwipeAction) {
         val isDislike = action == SwipeAction.DISLIKE
         viewModelScope.launch {
+            val currentUserPhotoUrl = sessionStorage.observeAuthInfo().first()?.user?.profilePictureUrl
             matchingService.swipe(swipedId = userId, action = action)
                 .onSuccess { result ->
                     if (result.isMatch) {
                         val name = _state.value.user?.username ?: ""
-                        _events.send(ProfileDetailEvent.ShowMatch(name, userId))
+                        val matchedUserPhotoUrl = _state.value.user?.profilePictureUrl
+                        _events.send(ProfileDetailEvent.ShowMatch(name, userId, matchedUserPhotoUrl, currentUserPhotoUrl))
                     } else {
                         _events.send(ProfileDetailEvent.NavigateBack(swipedUserId = userId, isDislike = isDislike))
                     }

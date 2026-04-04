@@ -11,7 +11,10 @@ data class FeedState(
     val minAge: Int = 18,
     val maxAge: Int = 50,
     val showMatchDialog: Boolean = false,
+    val matchedUserId: String? = null,
     val matchedUserName: String? = null,
+    val matchedUserPhotoUrl: String? = null,
+    val currentUserPhotoUrl: String? = null,
     val showCompleteProfileDialog: Boolean = false,
     val currentPage: Int = 0,
     val hasMore: Boolean = true,
@@ -43,6 +46,7 @@ sealed interface FeedAction {
         val maxAge: Int
     ) : FeedAction
     data object OnDismissMatchDialog : FeedAction
+    data object OnMatchSendMessage : FeedAction
     data object OnCompleteProfileClick : FeedAction
     data object OnDismissCompleteProfileDialog : FeedAction
     data object OnScreenResumed : FeedAction
@@ -55,4 +59,5 @@ sealed interface FeedAction {
 sealed interface FeedEvent {
     data class NavigateToProfile(val userId: String, val imageUrl: String?) : FeedEvent
     data object NavigateToEditProfile : FeedEvent
+    data object NavigateToMatches : FeedEvent
 }

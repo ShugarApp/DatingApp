@@ -3,6 +3,7 @@ import ComposeApp
 import UIKit
 import UserNotifications
 import FirebaseCore
+import FirebaseCrashlytics
 import FirebaseMessaging
 import GoogleSignIn
 

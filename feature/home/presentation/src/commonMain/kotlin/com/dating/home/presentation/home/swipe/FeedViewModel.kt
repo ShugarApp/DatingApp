@@ -40,15 +40,16 @@ class FeedViewModel(
         observeIncognitoMode()
         viewModelScope.launch {
             val prefs = discoveryPreferences.get()
+            val authInfo = sessionStorage.observeAuthInfo().first()
             _state.update {
                 it.copy(
                     minAge = prefs.minAge,
                     maxAge = prefs.maxAge,
                     maxDistance = prefs.maxDistance,
-                    showMe = prefs.showMe
+                    showMe = prefs.showMe,
+                    currentUserPhotoUrl = authInfo?.user?.profilePictureUrl
                 )
             }
-            val authInfo = sessionStorage.observeAuthInfo().first()
             val isPaused = authInfo?.user?.isPaused == true
             if (!isPaused) {
                 loadFeed(page = 0, isInitialLoad = true)
@@ -123,7 +124,11 @@ class FeedViewModel(
                 loadFeed(page = 0, isInitialLoad = true)
             }
             FeedAction.OnDismissMatchDialog -> {
-                _state.update { it.copy(showMatchDialog = false, matchedUserName = null) }
+                _state.update { it.copy(showMatchDialog = false, matchedUserId = null, matchedUserName = null, matchedUserPhotoUrl = null) }
+            }
+            FeedAction.OnMatchSendMessage -> {
+                _state.update { it.copy(showMatchDialog = false, matchedUserId = null, matchedUserName = null, matchedUserPhotoUrl = null) }
+                viewModelScope.launch { _events.send(FeedEvent.NavigateToMatches) }
             }
             FeedAction.OnCompleteProfileClick -> {
                 _state.update { it.copy(showCompleteProfileDialog = false) }
@@ -289,7 +294,12 @@ class FeedViewModel(
                 .onSuccess { result ->
                     if (result.isMatch) {
                         _state.update {
-                            it.copy(showMatchDialog = true, matchedUserName = matchedName)
+                            it.copy(
+                                showMatchDialog = true,
+                                matchedUserId = userId,
+                                matchedUserName = matchedName,
+                                matchedUserPhotoUrl = swipedItem?.profilePictureUrl
+                            )
                         }
                     }
                 }
