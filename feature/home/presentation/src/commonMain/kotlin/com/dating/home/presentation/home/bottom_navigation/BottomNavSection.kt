@@ -1,11 +1,11 @@
 package com.dating.home.presentation.home.bottom_navigation
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.outlined.Send
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
@@ -32,8 +32,8 @@ enum class BottomNavSection(
     ),
     MESSAGES(
         labelKey = BottomNavLabel.MESSAGES,
-        selectedIcon = Icons.Filled.Send,
-        unselectedIcon = Icons.Outlined.Send
+        selectedIcon = Icons.AutoMirrored.Filled.Send,
+        unselectedIcon = Icons.AutoMirrored.Outlined.Send
     ),
     PROFILE(
         labelKey = BottomNavLabel.PROFILE,

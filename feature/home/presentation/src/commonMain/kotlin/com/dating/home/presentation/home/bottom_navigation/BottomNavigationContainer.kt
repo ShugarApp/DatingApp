@@ -4,17 +4,25 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import aura.feature.home.presentation.generated.resources.Res
+import aura.feature.home.presentation.generated.resources.photo_upload_failed
+import aura.feature.home.presentation.generated.resources.photo_upload_success
 import com.dating.core.domain.auth.SessionStorage
 import com.dating.core.domain.auth.UserStatus
 import com.dating.core.domain.preferences.OnboardingPreferences
+import com.dating.home.domain.upload.PhotoUploadEvent
+import com.dating.home.domain.upload.PhotoUploadManager
 import com.dating.home.presentation.chat.chat_list_detail.ChatListDetailAdaptiveLayout
 import com.dating.home.presentation.features_onboarding.FeaturesOnboardingScreen
 import com.dating.home.presentation.home.swipe.FeedRoot
@@ -22,6 +30,7 @@ import com.dating.home.presentation.profile_setup.ProfileSetupScreen
 import com.dating.home.presentation.matches.MatchesRoot
 import com.dating.home.presentation.photo_onboarding.PhotoOnboardingScreen
 import com.dating.home.presentation.profile.profile.ProfileScreen
+import org.jetbrains.compose.resources.getString
 import org.koin.compose.koinInject
 
 @Composable
@@ -41,6 +50,24 @@ fun BottomNavigationContainer(
 ) {
     val sessionStorage: SessionStorage = koinInject()
     val onboardingPreferences: OnboardingPreferences = koinInject()
+    val uploadManager: PhotoUploadManager = koinInject()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // Show in-app notifications when background photo uploads complete
+    LaunchedEffect(Unit) {
+        uploadManager.events.collect { event ->
+            when (event) {
+                is PhotoUploadEvent.Success -> {
+                    val message = getString(Res.string.photo_upload_success, event.slotIndex + 1)
+                    snackbarHostState.showSnackbar(message)
+                }
+                is PhotoUploadEvent.Failed -> {
+                    val message = getString(Res.string.photo_upload_failed, event.slotIndex + 1)
+                    snackbarHostState.showSnackbar(message)
+                }
+            }
+        }
+    }
 
     val authInfo by sessionStorage.observeAuthInfo().collectAsStateWithLifecycle(null)
     val userStatus = authInfo?.user?.status
@@ -108,6 +135,7 @@ fun BottomNavigationContainer(
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             BottomNavigationBar(
                 selectedSection = selectedSection,

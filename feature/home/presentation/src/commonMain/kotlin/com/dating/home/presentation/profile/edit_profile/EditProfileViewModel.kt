@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 
 class EditProfileViewModel(
@@ -53,6 +54,8 @@ class EditProfileViewModel(
             is EditProfileAction.OnDrinkingChanged -> _state.update { it.copy(drinking = action.drinking) }
             is EditProfileAction.OnPhotosReordered -> reorderPhotos(action.newPhotos)
             is EditProfileAction.OnDismissSuccessMessage -> _state.update { it.copy(showSuccessMessage = false) }
+            is EditProfileAction.OnPhotoUploaded -> onPhotoUploaded(action.slotIndex, action.publicUrl)
+            is EditProfileAction.OnPhotoUploadFailed -> onPhotoUploadFailed(action.slotIndex)
         }
     }
 
@@ -111,9 +114,9 @@ class EditProfileViewModel(
                     return
                 }
                 val eighteenYearsAgo = try {
-                    LocalDate(today.year - 18, today.monthNumber, today.dayOfMonth)
+                    LocalDate(today.year - 18, today.month.number, today.day)
                 } catch (_: Exception) {
-                    LocalDate(today.year - 18, today.monthNumber, 28)
+                    LocalDate(today.year - 18, today.month.number, 28)
                 }
                 if (selected > eighteenYearsAgo) {
                     _state.update { it.copy(birthDateError = "Debes tener al menos 18 años") }
@@ -263,6 +266,27 @@ class EditProfileViewModel(
                         )
                     }
                 }
+        }
+    }
+
+    private fun onPhotoUploaded(slotIndex: Int, publicUrl: String) {
+        val updatedPhotos = _state.value.photos.toMutableList()
+        updatedPhotos[slotIndex] = publicUrl
+        _state.update {
+            it.copy(
+                uploadingSlots = it.uploadingSlots - slotIndex,
+                photos = updatedPhotos
+            )
+        }
+        updateSessionPhotos(updatedPhotos.filterNotNull())
+    }
+
+    private fun onPhotoUploadFailed(slotIndex: Int) {
+        _state.update {
+            it.copy(
+                uploadingSlots = it.uploadingSlots - slotIndex,
+                imageError = UiText.DynamicString("Error uploading photo")
+            )
         }
     }
 

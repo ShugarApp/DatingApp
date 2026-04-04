@@ -6,7 +6,8 @@ class GoogleSignInHelper {
 
     static let shared = GoogleSignInHelper()
 
-    private let webClientId = "9652613568-l2ql2fgsrp74u29q1q2hiqc4gvbaoc0g.apps.googleusercontent.com"
+    private let iOSClientId = "9652613568-2q8v598lpmeaqbo9o8tnrtpl42gsrjcf.apps.googleusercontent.com"
+    private let serverClientId = "9652613568-l2ql2fgsrp74u29q1q2hiqc4gvbaoc0g.apps.googleusercontent.com"
 
     private init() {}
 
@@ -29,7 +30,7 @@ class GoogleSignInHelper {
             topController = presented
         }
 
-        let config = GIDConfiguration(clientID: webClientId)
+        let config = GIDConfiguration(clientID: iOSClientId, serverClientID: serverClientId)
         GIDSignIn.sharedInstance.configuration = config
 
         GIDSignIn.sharedInstance.signIn(withPresenting: topController) { result, error in

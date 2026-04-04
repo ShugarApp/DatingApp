@@ -115,12 +115,18 @@ import com.dating.core.designsystem.components.dialogs.DestructiveConfirmationDi
 import com.dating.core.designsystem.components.header.AppCenterTopBar
 import com.dating.core.designsystem.components.textfields.ChirpTextField
 import com.dating.core.presentation.util.clearFocusOnTap
+import com.dating.home.domain.upload.PhotoUploadEvent
+import com.dating.home.domain.upload.PhotoUploadManager
+import com.dating.home.domain.upload.PhotoUploadRequest
 import com.dating.home.presentation.profile.mediapicker.rememberImagePickerLauncher
+import com.dating.home.presentation.profile.mediapicker.rememberMultiImagePickerLauncher
+import org.koin.compose.koinInject
 import kotlin.time.Clock.System.now
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -135,12 +141,31 @@ fun EditProfileScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val successMessage = stringResource(Res.string.edit_profile_save_success)
+    val uploadManager: PhotoUploadManager = koinInject()
+    val pendingSlots by uploadManager.pendingSlots.collectAsStateWithLifecycle()
+
+    val allUploadingSlots = state.uploadingSlots + pendingSlots
 
     // Track which slot the user intends to fill — set before launching picker
     var pendingSlotIndex by remember { mutableStateOf<Int?>(null) }
     var showPhotoOptionsDialog by remember { mutableStateOf(false) }
 
-    val launcher = rememberImagePickerLauncher { pickedImageData ->
+    // Listen for background upload events
+    LaunchedEffect(Unit) {
+        uploadManager.events.collect { event ->
+            when (event) {
+                is PhotoUploadEvent.Success -> viewModel.onAction(
+                    EditProfileAction.OnPhotoUploaded(event.slotIndex, event.publicUrl)
+                )
+                is PhotoUploadEvent.Failed -> viewModel.onAction(
+                    EditProfileAction.OnPhotoUploadFailed(event.slotIndex)
+                )
+            }
+        }
+    }
+
+    // Single picker for replacing an existing photo
+    val singleLauncher = rememberImagePickerLauncher { pickedImageData ->
         pendingSlotIndex?.let { index ->
             viewModel.onAction(
                 EditProfileAction.OnPictureSelected(pickedImageData.bytes, pickedImageData.mimeType, index)
@@ -149,12 +174,27 @@ fun EditProfileScreen(
         pendingSlotIndex = null
     }
 
+    // Multi picker for empty slots
+    val emptySlots = (0 until 6).filter { state.photos[it] == null && it !in allUploadingSlots }
+    val multiLauncher = rememberMultiImagePickerLauncher(
+        maxSelection = emptySlots.size.coerceAtLeast(1)
+    ) { pickedImages ->
+        val currentEmpty = (0 until 6).filter { state.photos[it] == null && it !in allUploadingSlots }
+        val requests = pickedImages.zip(currentEmpty).mapNotNull { (image, slot) ->
+            val mime = image.mimeType ?: return@mapNotNull null
+            PhotoUploadRequest(bytes = image.bytes, mimeType = mime, slotIndex = slot)
+        }
+        if (requests.isNotEmpty()) {
+            uploadManager.enqueue(requests)
+        }
+    }
+
     fun onPhotoSlotClicked(index: Int) {
         pendingSlotIndex = index
         if (state.photos.getOrNull(index) != null) {
             showPhotoOptionsDialog = true
         } else {
-            launcher.launch()
+            multiLauncher.launch()
         }
     }
 
@@ -226,7 +266,7 @@ fun EditProfileScreen(
             Spacer(Modifier.height(12.dp))
             PhotoGrid(
                 photos = state.photos,
-                uploadingSlots = state.uploadingSlots,
+                uploadingSlots = allUploadingSlots,
                 deletingSlots = state.deletingSlots,
                 onPhotoSlotClicked = { index -> onPhotoSlotClicked(index) },
                 onPhotosReordered = { newPhotos -> viewModel.onAction(EditProfileAction.OnPhotosReordered(newPhotos)) }
@@ -448,7 +488,7 @@ fun EditProfileScreen(
                         TextButton(
                             onClick = {
                                 showPhotoOptionsDialog = false
-                                launcher.launch()
+                                singleLauncher.launch()
                             },
                             modifier = Modifier.fillMaxWidth()
                         ) {
@@ -556,12 +596,12 @@ private fun String.toDateMillis(): Long? = try {
 
 private fun Long.toIsoDate(): String {
     val date = Instant.fromEpochMilliseconds(this).toLocalDateTime(TimeZone.UTC).date
-    return "${date.year}-${date.monthNumber.toString().padStart(2, '0')}-${date.dayOfMonth.toString().padStart(2, '0')}"
+    return "${date.year}-${date.month.number.toString().padStart(2, '0')}-${date.day.toString().padStart(2, '0')}"
 }
 
 private fun String.toDisplayDate(): String = try {
     val date = LocalDate.parse(this)
-    "${date.dayOfMonth} ${date.month.name.lowercase().replaceFirstChar { it.uppercase() }.take(3)} ${date.year}"
+    "${date.day} ${date.month.name.lowercase().replaceFirstChar { it.uppercase() }.take(3)} ${date.year}"
 } catch (_: Exception) { this }
 
 // --- Reusable components ---

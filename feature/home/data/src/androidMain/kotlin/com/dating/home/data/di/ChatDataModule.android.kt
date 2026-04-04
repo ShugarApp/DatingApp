@@ -1,5 +1,6 @@
 package com.dating.home.data.di
 
+import com.dating.home.data.inactivity.InactivityNotificationScheduler
 import com.dating.home.data.lifecycle.AppLifecycleObserver
 import com.dating.home.data.network.ConnectionErrorHandler
 import com.dating.home.data.network.ConnectivityObserver
@@ -16,6 +17,7 @@ actual val platformChatDataModule = module {
     singleOf(::AppLifecycleObserver)
     singleOf(::ConnectivityObserver)
     singleOf(::ConnectionErrorHandler)
+    single { InactivityNotificationScheduler(androidContext()) }
 
     singleOf(::FirebasePushNotificationService) bind PushNotificationService::class
 }

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="inactivity_notification_channel_name">Recordatorios de actividad</string>
+    <string name="inactivity_notification_title">¡Te extrañamos!</string>
+    <string name="inactivity_notification_body">Han pasado 5 días desde tu última visita. ¡Vuelve a Aura y descubre tus matches!</string>
+</resources>

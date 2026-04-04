@@ -450,4 +450,8 @@
     <string name="delete_reason_taking_break">I need a break</string>
     <string name="delete_reason_poor_experience">App experience is not satisfying</string>
     <string name="delete_reason_other">Other reason</string>
+
+    <!-- Photo Upload Notifications -->
+    <string name="photo_upload_success">Photo %1$d uploaded</string>
+    <string name="photo_upload_failed">Failed to upload photo %1$d</string>
 </resources>

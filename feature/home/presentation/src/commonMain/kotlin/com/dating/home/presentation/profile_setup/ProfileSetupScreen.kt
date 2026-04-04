@@ -103,10 +103,11 @@ import com.dating.core.presentation.util.clearFocusOnTap
 import com.dating.home.presentation.profile.edit_profile.EditProfileAction
 import com.dating.home.presentation.profile.edit_profile.EditProfileViewModel
 import kotlin.time.Clock.System.now
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -676,17 +677,17 @@ private fun SetupChip(label: String, selected: Boolean, onClick: () -> Unit) {
 
 private fun String.toDateMillis(): Long? = try {
     val date = LocalDate.parse(this)
-    date.atStartOfDayIn(kotlinx.datetime.TimeZone.UTC).toEpochMilliseconds()
+    date.atStartOfDayIn(TimeZone.UTC).toEpochMilliseconds()
 } catch (_: Exception) { null }
 
 private fun Long.toIsoDate(): String {
     val date = Instant.fromEpochMilliseconds(this).toLocalDateTime(TimeZone.UTC).date
-    return "${date.year}-${date.monthNumber.toString().padStart(2, '0')}-${date.dayOfMonth.toString().padStart(2, '0')}"
+    return "${date.year}-${date.month.number.toString().padStart(2, '0')}-${date.day.toString().padStart(2, '0')}"
 }
 
 private fun String.toDisplayDate(): String = try {
     val date = LocalDate.parse(this)
-    "${date.dayOfMonth} ${date.month.name.lowercase().replaceFirstChar { it.uppercase() }.take(3)} ${date.year}"
+    "${date.day} ${date.month.name.lowercase().replaceFirstChar { it.uppercase() }.take(3)} ${date.year}"
 } catch (_: Exception) { this }
 
 private fun interestDisplayName(key: String): String = when (key) {

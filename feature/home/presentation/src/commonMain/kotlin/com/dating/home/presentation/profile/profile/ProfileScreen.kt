@@ -26,7 +26,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Help
+import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Lock
@@ -265,7 +265,7 @@ fun ProfileScreen(
             // 4. SUPPORT
             AccessCardList(title = stringResource(Res.string.profile_support)) {
                 AccessCardItem(
-                    icon = Icons.Default.Help,
+                    icon = Icons.AutoMirrored.Filled.Help,
                     title = stringResource(Res.string.profile_help_support),
                     onClick = { openUrl(URL_HELP) }
                 )

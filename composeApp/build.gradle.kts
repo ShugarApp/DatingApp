@@ -18,6 +18,7 @@ kotlin {
             implementation(libs.koin.android)
             implementation(libs.coil.compose)
             implementation(libs.coil.gif)
+            implementation(libs.androidx.lifecycle.process)
         }
         commonMain.dependencies {
             implementation(projects.core.data)

@@ -19,6 +19,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.Cake
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Groups
@@ -140,7 +141,7 @@ fun FeedScreen(
                                 )
                             } else {
                                 Icon(
-                                    imageVector = Icons.Default.Undo,
+                                    imageVector = Icons.AutoMirrored.Filled.Undo,
                                     contentDescription = stringResource(Res.string.feed_undo_swipe)
                                 )
                             }

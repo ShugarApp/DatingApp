@@ -1,8 +1,6 @@
 package com.dating.home.presentation.photo_onboarding
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,10 +18,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -35,9 +31,13 @@ import aura.feature.home.presentation.generated.resources.photo_onboarding_conti
 import aura.feature.home.presentation.generated.resources.photo_onboarding_photos_count
 import aura.feature.home.presentation.generated.resources.photo_onboarding_subtitle
 import aura.feature.home.presentation.generated.resources.photo_onboarding_title
+import com.dating.home.domain.upload.PhotoUploadEvent
+import com.dating.home.domain.upload.PhotoUploadManager
+import com.dating.home.domain.upload.PhotoUploadRequest
 import com.dating.home.presentation.profile.edit_profile.PhotoGrid
-import com.dating.home.presentation.profile.mediapicker.rememberImagePickerLauncher
+import com.dating.home.presentation.profile.mediapicker.rememberMultiImagePickerLauncher
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -47,14 +47,33 @@ fun PhotoOnboardingScreen(
     viewModel: PhotoOnboardingViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val uploadManager: PhotoUploadManager = koinInject()
+    val pendingSlots by uploadManager.pendingSlots.collectAsStateWithLifecycle()
 
-    var pendingSlotIndex by remember { mutableStateOf<Int?>(null) }
+    // Merge manager pending slots with local uploading slots
+    val allUploadingSlots = state.uploadingSlots + pendingSlots
 
-    val launcher = rememberImagePickerLauncher { pickedImageData ->
-        pendingSlotIndex?.let { index ->
-            viewModel.onPhotoSelected(pickedImageData.bytes, pickedImageData.mimeType, index)
+    LaunchedEffect(Unit) {
+        uploadManager.events.collect { event ->
+            when (event) {
+                is PhotoUploadEvent.Success -> viewModel.onPhotoUploaded(event.slotIndex, event.publicUrl)
+                is PhotoUploadEvent.Failed -> viewModel.onPhotoUploadFailed(event.slotIndex)
+            }
         }
-        pendingSlotIndex = null
+    }
+
+    val emptySlots = (0 until 4).filter { state.photos[it] == null && it !in allUploadingSlots }
+    val launcher = rememberMultiImagePickerLauncher(
+        maxSelection = emptySlots.size.coerceAtLeast(1)
+    ) { pickedImages ->
+        val currentEmpty = (0 until 4).filter { state.photos[it] == null && it !in allUploadingSlots }
+        val requests = pickedImages.zip(currentEmpty).mapNotNull { (image, slot) ->
+            val mime = image.mimeType ?: return@mapNotNull null
+            PhotoUploadRequest(bytes = image.bytes, mimeType = mime, slotIndex = slot)
+        }
+        if (requests.isNotEmpty()) {
+            uploadManager.enqueue(requests)
+        }
     }
 
     Scaffold(modifier = modifier.fillMaxSize()) { paddingValues ->
@@ -97,11 +116,12 @@ fun PhotoOnboardingScreen(
 
             PhotoGrid(
                 photos = state.photos,
-                uploadingSlots = state.uploadingSlots,
+                uploadingSlots = allUploadingSlots,
                 deletingSlots = emptySet(),
                 onPhotoSlotClicked = { index ->
-                    pendingSlotIndex = index
-                    launcher.launch()
+                    if (state.photos[index] == null) {
+                        launcher.launch()
+                    }
                 }
             )
 

@@ -191,7 +191,7 @@ class SettingsViewModel(
     private fun deleteAccount() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            val reason = state.value.selectedDeleteReason?.value
+            val reason = state.value.selectedDeleteReason?.name
             userService.deleteAccount(reason = reason)
                 .onSuccess {
                     _state.update { it.copy(isLoading = false) }

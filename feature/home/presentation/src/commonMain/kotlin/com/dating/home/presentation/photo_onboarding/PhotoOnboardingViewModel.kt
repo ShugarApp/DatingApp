@@ -90,6 +90,27 @@ class PhotoOnboardingViewModel(
         }
     }
 
+    fun onPhotoUploaded(slotIndex: Int, publicUrl: String) {
+        val updatedPhotos = _state.value.photos.toMutableList()
+        updatedPhotos[slotIndex] = publicUrl
+        _state.update {
+            it.copy(
+                uploadingSlots = it.uploadingSlots - slotIndex,
+                photos = updatedPhotos
+            )
+        }
+        updateSessionPhotos(updatedPhotos.filterNotNull())
+    }
+
+    fun onPhotoUploadFailed(slotIndex: Int) {
+        _state.update {
+            it.copy(
+                uploadingSlots = it.uploadingSlots - slotIndex,
+                imageError = UiText.DynamicString("Error uploading photo")
+            )
+        }
+    }
+
     fun onDismissError() {
         _state.update { it.copy(imageError = null) }
     }

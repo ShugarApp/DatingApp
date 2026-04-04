@@ -111,6 +111,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
+import kotlinx.datetime.number
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -879,7 +880,7 @@ private fun calculateAge(birthDate: String): Int? {
         // Simple cross-platform age calculation without kotlinx-datetime
         val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
         var age = now.year - birthYear
-        if (now.monthNumber < birthMonth || (now.monthNumber == birthMonth && now.dayOfMonth < birthDay)) {
+        if (now.month.number < birthMonth || (now.month.number == birthMonth && now.day < birthDay)) {
             age--
         }
         age

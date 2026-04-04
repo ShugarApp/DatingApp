@@ -1,5 +1,6 @@
 package com.dating.home.presentation.di
 
+import com.dating.home.domain.upload.PhotoUploadManager
 import com.dating.home.presentation.chat.chat_detail.ChatDetailViewModel
 import com.dating.home.presentation.chat.chat_list.ChatListViewModel
 import com.dating.home.presentation.chat.chat_list_detail.ChatListDetailViewModel
@@ -14,10 +15,12 @@ import com.dating.home.presentation.profile.profile.ProfileViewModel
 import com.dating.home.presentation.profile.settings.SettingsViewModel
 import com.dating.home.presentation.profile.settings.blocked.BlockedUsersViewModel
 import com.dating.home.presentation.profile.settings.changepassword.ChangePasswordViewModel
+import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 val homePresentationModule = module {
+    singleOf(::PhotoUploadManager)
     viewModelOf(::ChatListViewModel)
     viewModelOf(::ChatListDetailViewModel)
     viewModelOf(::CreateChatViewModel)
