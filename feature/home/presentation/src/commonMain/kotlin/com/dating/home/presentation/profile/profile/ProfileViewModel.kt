@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dating.core.domain.location.LocationProvider
 import com.dating.core.domain.auth.SessionStorage
+import com.dating.core.domain.auth.profileCompletion
 import com.dating.core.domain.util.onFailure
 import com.dating.core.domain.util.onSuccess
 import com.dating.home.domain.participant.ChatParticipantRepository
@@ -58,7 +59,8 @@ class ProfileViewModel(
                 zodiac = authInfo.user.zodiac,
                 smoking = authInfo.user.smoking,
                 drinking = authInfo.user.drinking,
-                interests = authInfo.user.interests
+                interests = authInfo.user.interests,
+                profileCompletion = authInfo.user.profileCompletion()
             )
         } else currentState
     }

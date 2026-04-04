@@ -22,7 +22,8 @@ data class ProfileState(
     val isUpdatingLocation: Boolean = false,
     val locationError: String? = null,
     val showPreview: Boolean = false,
-    val isLoadingPreview: Boolean = false
+    val isLoadingPreview: Boolean = false,
+    val profileCompletion: Int = 0
 ) {
     val profilePictureUrl: String? get() = photos.firstOrNull()
 }

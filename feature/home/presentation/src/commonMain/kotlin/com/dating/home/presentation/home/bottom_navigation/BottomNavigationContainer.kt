@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -13,8 +14,11 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dating.core.domain.auth.SessionStorage
 import com.dating.core.domain.auth.UserStatus
+import com.dating.core.domain.preferences.OnboardingPreferences
 import com.dating.home.presentation.chat.chat_list_detail.ChatListDetailAdaptiveLayout
+import com.dating.home.presentation.features_onboarding.FeaturesOnboardingScreen
 import com.dating.home.presentation.home.swipe.FeedRoot
+import com.dating.home.presentation.profile_setup.ProfileSetupScreen
 import com.dating.home.presentation.matches.MatchesRoot
 import com.dating.home.presentation.photo_onboarding.PhotoOnboardingScreen
 import com.dating.home.presentation.profile.profile.ProfileScreen
@@ -36,9 +40,32 @@ fun BottomNavigationContainer(
     modifier: Modifier = Modifier
 ) {
     val sessionStorage: SessionStorage = koinInject()
+    val onboardingPreferences: OnboardingPreferences = koinInject()
+
     val authInfo by sessionStorage.observeAuthInfo().collectAsStateWithLifecycle(null)
     val userStatus = authInfo?.user?.status
     var selectedSection by rememberSaveable { mutableStateOf(BottomNavSection.FEED) }
+
+    // null = not yet loaded from DataStore, true/false = loaded value
+    var hasSeenFeaturesOnboarding by rememberSaveable { mutableStateOf<Boolean?>(null) }
+    var hasSeenProfileSetup by rememberSaveable { mutableStateOf<Boolean?>(null) }
+
+    LaunchedEffect(Unit) {
+        hasSeenFeaturesOnboarding = onboardingPreferences.hasSeenFeaturesOnboarding()
+        hasSeenProfileSetup = onboardingPreferences.hasSeenProfileSetup()
+    }
+
+    // Persist flags to DataStore when they change to true
+    LaunchedEffect(hasSeenFeaturesOnboarding) {
+        if (hasSeenFeaturesOnboarding == true) {
+            onboardingPreferences.markFeaturesOnboardingSeen()
+        }
+    }
+    LaunchedEffect(hasSeenProfileSetup) {
+        if (hasSeenProfileSetup == true) {
+            onboardingPreferences.markProfileSetupSeen()
+        }
+    }
 
     // Show full-screen photo onboarding if user status is PENDING
     if (userStatus == UserStatus.PENDING) {
@@ -52,8 +79,26 @@ fun BottomNavigationContainer(
         return
     }
 
-    // Still loading session — avoid showing content briefly
-    if (userStatus == null) return
+    // Still loading session or preferences — avoid showing content briefly
+    if (userStatus == null || hasSeenFeaturesOnboarding == null || hasSeenProfileSetup == null) return
+
+    // Show features onboarding once (first launch after sign-up)
+    if (hasSeenFeaturesOnboarding == false) {
+        FeaturesOnboardingScreen(
+            onComplete = { hasSeenFeaturesOnboarding = true },
+            modifier = modifier
+        )
+        return
+    }
+
+    // Show profile setup wizard once (second launch, after features onboarding)
+    if (hasSeenProfileSetup == false) {
+        ProfileSetupScreen(
+            onComplete = { hasSeenProfileSetup = true },
+            modifier = modifier
+        )
+        return
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
