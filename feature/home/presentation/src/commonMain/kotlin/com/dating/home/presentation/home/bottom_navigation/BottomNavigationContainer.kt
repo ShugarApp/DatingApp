@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -13,7 +14,9 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dating.core.domain.auth.SessionStorage
 import com.dating.core.domain.auth.UserStatus
+import com.dating.core.domain.preferences.OnboardingPreferences
 import com.dating.home.presentation.chat.chat_list_detail.ChatListDetailAdaptiveLayout
+import com.dating.home.presentation.features_onboarding.FeaturesOnboardingScreen
 import com.dating.home.presentation.home.swipe.FeedRoot
 import com.dating.home.presentation.matches.MatchesRoot
 import com.dating.home.presentation.photo_onboarding.PhotoOnboardingScreen
@@ -36,9 +39,25 @@ fun BottomNavigationContainer(
     modifier: Modifier = Modifier
 ) {
     val sessionStorage: SessionStorage = koinInject()
+    val onboardingPreferences: OnboardingPreferences = koinInject()
+
     val authInfo by sessionStorage.observeAuthInfo().collectAsStateWithLifecycle(null)
     val userStatus = authInfo?.user?.status
     var selectedSection by rememberSaveable { mutableStateOf(BottomNavSection.FEED) }
+
+    // null = not yet loaded, true/false = loaded value
+    var hasSeenFeaturesOnboarding by rememberSaveable { mutableStateOf<Boolean?>(null) }
+
+    LaunchedEffect(Unit) {
+        hasSeenFeaturesOnboarding = onboardingPreferences.hasSeenFeaturesOnboarding()
+    }
+
+    // Persist the "seen" flag to DataStore whenever the user completes the onboarding
+    LaunchedEffect(hasSeenFeaturesOnboarding) {
+        if (hasSeenFeaturesOnboarding == true) {
+            onboardingPreferences.markFeaturesOnboardingSeen()
+        }
+    }
 
     // Show full-screen photo onboarding if user status is PENDING
     if (userStatus == UserStatus.PENDING) {
@@ -52,8 +71,19 @@ fun BottomNavigationContainer(
         return
     }
 
-    // Still loading session — avoid showing content briefly
-    if (userStatus == null) return
+    // Still loading session or preferences — avoid showing content briefly
+    if (userStatus == null || hasSeenFeaturesOnboarding == null) return
+
+    // Show features onboarding once after account creation
+    if (hasSeenFeaturesOnboarding == false) {
+        FeaturesOnboardingScreen(
+            onComplete = {
+                hasSeenFeaturesOnboarding = true
+            },
+            modifier = modifier
+        )
+        return
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),

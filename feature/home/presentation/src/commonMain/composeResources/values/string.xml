@@ -260,6 +260,23 @@
     <string name="feed_paused_desc">Your profile is currently hidden from other users. Activate your account to start discovering people again.</string>
     <string name="feed_paused_activate">Activate Account</string>
 
+    <!-- Features Onboarding -->
+    <string name="features_onboarding_skip">Skip</string>
+    <string name="features_onboarding_next">Next</string>
+    <string name="features_onboarding_get_started">Get started</string>
+
+    <string name="features_onboarding_safety_title">Your safety, our priority</string>
+    <string name="features_onboarding_safety_subtitle">Add an emergency contact and share your real-time location during every date, so someone you trust always knows you\'re safe.</string>
+    <string name="features_onboarding_safety_badge_1">Emergency contact</string>
+    <string name="features_onboarding_safety_badge_2">Real-time tracking</string>
+    <string name="features_onboarding_safety_badge_3">One-tap SOS</string>
+
+    <string name="features_onboarding_dates_title">Plan dates with your match</string>
+    <string name="features_onboarding_dates_subtitle">Agree on the day, time and place — all inside the app. No more back-and-forth on other platforms.</string>
+    <string name="features_onboarding_dates_badge_1">Pick a date &amp; time</string>
+    <string name="features_onboarding_dates_badge_2">Choose a place</string>
+    <string name="features_onboarding_dates_badge_3">Built-in reminders</string>
+
     <!-- Photo Onboarding -->
     <string name="photo_onboarding_title">Add your photos</string>
     <string name="photo_onboarding_subtitle">Upload at least 2 photos to start discovering people near you. Show your best side!</string>
