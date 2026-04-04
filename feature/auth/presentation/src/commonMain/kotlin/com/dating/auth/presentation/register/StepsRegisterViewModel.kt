@@ -168,7 +168,7 @@ class StepsRegisterViewModel(
             _state.update { it.copy(isRegistering = true) }
 
             val username = state.value.usernameTextState.text.toString()
-            val birthDate = state.value.birthDateTextState.text.toString()
+            val birthDate = state.value.birthDateTextState.text.toString().toIsoDate()
             val gender = state.value.selectedGender
             val interest = state.value.selectedInterest
             val lookingFor = state.value.selectedLookingFor
@@ -262,4 +262,13 @@ class StepsRegisterViewModel(
             }
         }
     }
+}
+
+/**
+ * Converts DD/MM/YYYY to YYYY-MM-DD (ISO 8601).
+ */
+private fun String.toIsoDate(): String {
+    val parts = split("/")
+    if (parts.size != 3) return this
+    return "${parts[2]}-${parts[1]}-${parts[0]}"
 }
