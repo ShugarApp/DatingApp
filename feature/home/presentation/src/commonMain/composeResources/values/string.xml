@@ -260,6 +260,13 @@
     <string name="feed_paused_desc">Your profile is currently hidden from other users. Activate your account to start discovering people again.</string>
     <string name="feed_paused_activate">Activate Account</string>
 
+    <!-- Profile Completion Card -->
+    <string name="profile_completion_title">Complete your profile</string>
+    <string name="profile_completion_percent">%1$d%% complete</string>
+    <string name="profile_completion_cta">Complete now</string>
+    <string name="profile_completion_done">Your profile is complete!</string>
+    <string name="profile_completion_hint">A complete profile gets up to 3× more matches.</string>
+
     <!-- Profile Setup Wizard -->
     <string name="profile_setup_skip">Skip</string>
     <string name="profile_setup_continue">Continue</string>

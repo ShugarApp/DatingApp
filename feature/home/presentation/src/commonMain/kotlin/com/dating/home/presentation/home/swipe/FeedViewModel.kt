@@ -3,6 +3,7 @@ package com.dating.home.presentation.home.swipe
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dating.core.domain.auth.SessionStorage
+import com.dating.core.domain.auth.profileCompletion
 import com.dating.core.domain.discovery.DiscoveryPreferencesStorage
 import com.dating.core.domain.discovery.Gender
 import com.dating.core.domain.util.onFailure
@@ -84,7 +85,9 @@ class FeedViewModel(
     }
 
     private suspend fun checkCompleteProfilePrompt() {
-        if (!discoveryPreferences.isCompleteProfilePromptShown()) {
+        if (discoveryPreferences.isCompleteProfilePromptShown()) return
+        val user = sessionStorage.observeAuthInfo().first()?.user ?: return
+        if (user.profileCompletion() < 70) {
             _state.update { it.copy(showCompleteProfileDialog = true) }
             discoveryPreferences.setCompleteProfilePromptShown()
         }

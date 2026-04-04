@@ -34,19 +34,28 @@ import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -59,6 +68,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import aura.feature.home.presentation.generated.resources.Res
 import aura.feature.home.presentation.generated.resources.profile_community_guidelines
+import aura.feature.home.presentation.generated.resources.profile_completion_cta
+import aura.feature.home.presentation.generated.resources.profile_completion_done
+import aura.feature.home.presentation.generated.resources.profile_completion_hint
+import aura.feature.home.presentation.generated.resources.profile_completion_percent
+import aura.feature.home.presentation.generated.resources.profile_completion_title
 import aura.feature.home.presentation.generated.resources.profile_edit
 import aura.feature.home.presentation.generated.resources.profile_header_info_format
 import aura.feature.home.presentation.generated.resources.profile_help_support
@@ -75,6 +89,8 @@ import com.dating.core.designsystem.components.avatar.AvatarSize
 import com.dating.core.designsystem.components.avatar.ChirpAvatarPhoto
 import com.dating.core.designsystem.components.cards.AccessCardItem
 import com.dating.core.designsystem.components.cards.AccessCardList
+import com.dating.core.designsystem.components.buttons.AppButtonStyle
+import com.dating.core.designsystem.components.buttons.ChirpButton
 import com.dating.core.designsystem.components.chips.ChirpChip
 import com.dating.core.designsystem.theme.extended
 import com.dating.core.presentation.permissions.Permission
@@ -220,6 +236,15 @@ fun ProfileScreen(
                     modifier = Modifier.weight(1f)
                 )
             }
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // 3b. Profile completion card
+            ProfileCompletionCard(
+                completion = state.profileCompletion,
+                onCompleteClick = onEditProfile,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+
             Spacer(modifier = Modifier.height(32.dp))
 
             // 4. SAFETY & LEGAL
@@ -271,6 +296,97 @@ fun ProfileScreen(
                     state = state,
                     onClose = { viewModel.onAction(ProfileAction.OnDismissPreview) }
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun ProfileCompletionCard(
+    completion: Int,
+    onCompleteClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val isComplete = completion >= 100
+
+    var animatedProgress by remember { mutableFloatStateOf(0f) }
+    LaunchedEffect(completion) {
+        animatedProgress = completion / 100f
+    }
+    val progress by animateFloatAsState(
+        targetValue = animatedProgress,
+        animationSpec = tween(durationMillis = 800),
+        label = "profile_completion_progress"
+    )
+
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp))
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(horizontal = 20.dp, vertical = 16.dp)
+    ) {
+        Column {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = if (isComplete) {
+                        stringResource(Res.string.profile_completion_done)
+                    } else {
+                        stringResource(Res.string.profile_completion_title)
+                    },
+                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
+                    color = MaterialTheme.colorScheme.extended.textPrimary
+                )
+                Text(
+                    text = stringResource(Res.string.profile_completion_percent, completion),
+                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                    color = if (isComplete) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.extended.textSecondary
+                    }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            LinearProgressIndicator(
+                progress = { progress },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(6.dp)
+                    .clip(RoundedCornerShape(50)),
+                color = MaterialTheme.colorScheme.primary,
+                trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                strokeCap = ProgressIndicatorDefaults.LinearStrokeCap
+            )
+
+            if (!isComplete) {
+                Spacer(modifier = Modifier.height(10.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(Res.string.profile_completion_hint),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.extended.textSecondary,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    TextButton(onClick = onCompleteClick) {
+                        Text(
+                            text = stringResource(Res.string.profile_completion_cta),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
             }
         }
     }
