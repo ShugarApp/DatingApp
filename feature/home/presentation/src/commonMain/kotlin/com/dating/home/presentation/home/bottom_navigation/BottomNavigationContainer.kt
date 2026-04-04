@@ -127,6 +127,7 @@ fun BottomNavigationContainer(
                     FeedRoot(
                         onNavigateToProfile = onNavigateToProfile,
                         onNavigateToEditProfile = onEditProfile,
+                        onNavigateToMatches = { selectedSection = BottomNavSection.MATCHES },
                         swipedUserId = swipedUserId,
                         swipedIsDislike = swipedIsDislike,
                         blockedUserId = blockedUserId

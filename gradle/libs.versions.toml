@@ -5,6 +5,7 @@ composeBom = "2025.07.00"
 kotlin = "2.2.0"
 ksp = "2.2.0-2.0.2"
 google-services = "4.4.3"
+firebase-crashlytics-gradle = "3.0.2"
 conveyor = "1.12"
 
 androidDesugarJdkLibs = "2.1.5"
@@ -130,6 +131,7 @@ sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sql
 # Firebase
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
 firebase-messaging = { module = "com.google.firebase:firebase-messaging" }
+firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
 
 # Coil
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
@@ -211,6 +213,7 @@ compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 room = { id = "androidx.room", version.ref = "room" }
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebase-crashlytics-gradle" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 buildkonfig = { id = "com.codingfeline.buildkonfig", version.ref = "buildkonfig" }
 conveyor = { id = "dev.hydraulic.conveyor", version.ref = "conveyor" }

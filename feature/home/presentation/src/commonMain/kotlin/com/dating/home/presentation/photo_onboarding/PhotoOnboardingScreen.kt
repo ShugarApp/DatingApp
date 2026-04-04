@@ -35,6 +35,8 @@ import shugar.feature.home.presentation.generated.resources.photo_onboarding_con
 import shugar.feature.home.presentation.generated.resources.photo_onboarding_photos_count
 import shugar.feature.home.presentation.generated.resources.photo_onboarding_subtitle
 import shugar.feature.home.presentation.generated.resources.photo_onboarding_title
+import com.dating.home.domain.upload.PhotoUploadManager
+import com.dating.home.domain.upload.PhotoUploadRequest
 import com.dating.home.presentation.profile.edit_profile.PhotoGrid
 import com.dating.home.presentation.profile.mediapicker.rememberImagePickerLauncher
 import org.jetbrains.compose.resources.stringResource

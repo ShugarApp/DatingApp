@@ -76,6 +76,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import shugar.feature.home.presentation.generated.resources.Res
+import com.dating.home.presentation.home.swipe.components.MatchCelebrationOverlay
 import shugar.feature.home.presentation.generated.resources.feed_match_dismiss
 import shugar.feature.home.presentation.generated.resources.feed_match_title
 import shugar.feature.home.presentation.generated.resources.go_back
@@ -131,6 +132,8 @@ fun ProfileDetailScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     var showMatchDialog by remember { mutableStateOf(false) }
     var matchName by remember { mutableStateOf("") }
+    var matchedUserPhotoUrl by remember { mutableStateOf<String?>(null) }
+    var currentUserPhotoUrl by remember { mutableStateOf<String?>(null) }
     var swipedUserId by remember { mutableStateOf<String?>(null) }
     val snackbarState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -148,6 +151,8 @@ fun ProfileDetailScreen(
             is ProfileDetailEvent.ShowMatch -> {
                 swipedUserId = event.swipedUserId
                 matchName = event.userName
+                matchedUserPhotoUrl = event.matchedUserPhotoUrl
+                currentUserPhotoUrl = event.currentUserPhotoUrl
                 showMatchDialog = true
             }
             ProfileDetailEvent.OnUserBlocked -> {
@@ -279,35 +284,19 @@ fun ProfileDetailScreen(
     }
 
     if (showMatchDialog) {
-        AlertDialog(
-            onDismissRequest = {
+        MatchCelebrationOverlay(
+            currentUserPhotoUrl = currentUserPhotoUrl,
+            matchedUserName = matchName,
+            matchedUserPhotoUrl = matchedUserPhotoUrl,
+            onSendMessage = {
                 showMatchDialog = false
                 swipedUserId?.let { onSwipedUser(it, false) }
                 onBack()
             },
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.Favorite,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(48.dp)
-                )
-            },
-            title = {
-                Text(
-                    text = stringResource(Res.string.feed_match_title, matchName),
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold
-                )
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    showMatchDialog = false
-                    swipedUserId?.let { onSwipedUser(it, false) }
-                    onBack()
-                }) {
-                    Text(stringResource(Res.string.feed_match_dismiss))
-                }
+            onKeepSwiping = {
+                showMatchDialog = false
+                swipedUserId?.let { onSwipedUser(it, false) }
+                onBack()
             }
         )
     }

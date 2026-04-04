@@ -204,6 +204,7 @@ fun StepsRegisterScreen(
                                     stringResource(Res.string.gender_female),
                                     stringResource(Res.string.gender_non_binary)
                                 ),
+                                optionValues = listOf("MALE", "FEMALE", "OTHER"),
                                 selectedOption = state.selectedGender,
                                 onOptionSelected = {
                                     onAction(StepsRegisterAction.OnGenderSelect(it))
@@ -219,6 +220,7 @@ fun StepsRegisterScreen(
                                     stringResource(Res.string.gender_female),
                                     stringResource(Res.string.everyone)
                                 ),
+                                optionValues = listOf("MALE", "FEMALE", "EVERYONE"),
                                 selectedOption = state.selectedInterest,
                                 onOptionSelected = {
                                     onAction(StepsRegisterAction.OnInterestSelect(it))
@@ -283,7 +285,8 @@ fun SectionSelection(
     title: String,
     options: List<String>,
     selectedOption: String?,
-    onOptionSelected: (String) -> Unit
+    onOptionSelected: (String) -> Unit,
+    optionValues: List<String>? = null
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
@@ -296,11 +299,12 @@ fun SectionSelection(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            options.forEach { option ->
+            options.forEachIndexed { index, label ->
+                val value = optionValues?.getOrNull(index) ?: label
                 ChirpChip(
-                    text = option,
-                    isSelected = option == selectedOption,
-                    onClick = { onOptionSelected(option) }
+                    text = label,
+                    isSelected = value == selectedOption,
+                    onClick = { onOptionSelected(value) }
                 )
             }
         }

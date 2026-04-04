@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		C3E800272E698DB5004ADEC0 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = C3E800262E698DB5004ADEC0 /* FirebaseMessaging */; };
+		A1B200032E698DB5004ADEC0 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = A1B200022E698DB5004ADEC0 /* GoogleSignIn */; };
+		FA1100022E698DB5004ADEC0 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = FA1100012E698DB5004ADEC0 /* FirebaseCrashlytics */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,6 +48,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				C3E800272E698DB5004ADEC0 /* FirebaseMessaging in Frameworks */,
+				A1B200032E698DB5004ADEC0 /* GoogleSignIn in Frameworks */,
+				FA1100022E698DB5004ADEC0 /* FirebaseCrashlytics in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -99,6 +103,8 @@
 			name = iosApp;
 			packageProductDependencies = (
 				C3E800262E698DB5004ADEC0 /* FirebaseMessaging */,
+				A1B200022E698DB5004ADEC0 /* GoogleSignIn */,
+				FA1100012E698DB5004ADEC0 /* FirebaseCrashlytics */,
 			);
 			productName = iosApp;
 			productReference = B9DA97B12DC1472C00A4DA20 /* Shugar.app */;
@@ -414,6 +420,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C3E800252E698DB5004ADEC0 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseMessaging;
+		};
+		A1B200022E698DB5004ADEC0 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A1B200012E698DB5004ADEC0 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		FA1100012E698DB5004ADEC0 /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C3E800252E698DB5004ADEC0 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

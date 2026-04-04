@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.convention.cmp.application)
     alias(libs.plugins.compose.hot.reload)
     alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics)
     alias(libs.plugins.conveyor)
 }
 
@@ -18,6 +19,11 @@ kotlin {
             implementation(libs.koin.android)
             implementation(libs.coil.compose)
             implementation(libs.coil.gif)
+
+            implementation(libs.androidx.lifecycle.process)
+
+            implementation(project.dependencies.platform(libs.firebase.bom))
+            implementation(libs.firebase.crashlytics)
         }
         commonMain.dependencies {
             implementation(projects.core.data)

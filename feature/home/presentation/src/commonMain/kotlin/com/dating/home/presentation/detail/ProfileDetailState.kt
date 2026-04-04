@@ -35,7 +35,12 @@ sealed interface ProfileDetailAction {
 
 sealed interface ProfileDetailEvent {
     data class NavigateBack(val swipedUserId: String? = null, val isDislike: Boolean = false) : ProfileDetailEvent
-    data class ShowMatch(val userName: String, val swipedUserId: String) : ProfileDetailEvent
+    data class ShowMatch(
+        val userName: String,
+        val swipedUserId: String,
+        val matchedUserPhotoUrl: String? = null,
+        val currentUserPhotoUrl: String? = null
+    ) : ProfileDetailEvent
     data object OnUserBlocked : ProfileDetailEvent
     data object OnMatchDeleted : ProfileDetailEvent
     data class OnReportSuccess(val message: String) : ProfileDetailEvent

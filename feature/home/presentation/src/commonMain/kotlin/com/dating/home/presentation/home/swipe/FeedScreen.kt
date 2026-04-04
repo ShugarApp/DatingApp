@@ -68,6 +68,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.dating.core.designsystem.components.header.MainTopAppBar
 import com.dating.core.domain.discovery.Gender
+import com.dating.home.presentation.home.swipe.components.MatchCelebrationOverlay
 import com.dating.home.presentation.home.swipe.components.RadarSearchAnimation
 import com.dating.home.presentation.home.swipe.components.SwipeableCard
 import kotlin.math.roundToInt
@@ -274,28 +275,12 @@ fun FeedScreen(
     }
 
     if (state.showMatchDialog) {
-        AlertDialog(
-            onDismissRequest = { onAction(FeedAction.OnDismissMatchDialog) },
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.Favorite,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(48.dp)
-                )
-            },
-            title = {
-                Text(
-                    text = stringResource(Res.string.feed_match_title, state.matchedUserName ?: ""),
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold
-                )
-            },
-            confirmButton = {
-                TextButton(onClick = { onAction(FeedAction.OnDismissMatchDialog) }) {
-                    Text(stringResource(Res.string.feed_match_dismiss))
-                }
-            }
+        MatchCelebrationOverlay(
+            currentUserPhotoUrl = state.currentUserPhotoUrl,
+            matchedUserName = state.matchedUserName ?: "",
+            matchedUserPhotoUrl = state.matchedUserPhotoUrl,
+            onSendMessage = { onAction(FeedAction.OnMatchSendMessage) },
+            onKeepSwiping = { onAction(FeedAction.OnDismissMatchDialog) }
         )
     }
 
