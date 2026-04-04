@@ -8,11 +8,13 @@ import com.dating.home.database.dao.ChatDao
 import com.dating.home.database.dao.ChatMessageDao
 import com.dating.home.database.dao.ChatParticipantDao
 import com.dating.home.database.dao.ChatParticipantsCrossRefDao
+import com.dating.home.database.dao.EmergencyContactDao
 import com.dating.home.database.dao.MessageReactionDao
 import com.dating.home.database.entities.ChatEntity
 import com.dating.home.database.entities.ChatMessageEntity
 import com.dating.home.database.entities.ChatParticipantCrossRef
 import com.dating.home.database.entities.ChatParticipantEntity
+import com.dating.home.database.entities.EmergencyContactEntity
 import com.dating.home.database.entities.MessageReactionEntity
 import com.dating.home.database.view.LastMessageView
 
@@ -23,14 +25,16 @@ import com.dating.home.database.view.LastMessageView
         ChatMessageEntity::class,
         ChatParticipantCrossRef::class,
         MessageReactionEntity::class,
+        EmergencyContactEntity::class,
     ],
     views = [
         LastMessageView::class
     ],
-    version = 3,
+    version = 4,
     autoMigrations = [
         AutoMigration(from = 1, to = 2),
-        AutoMigration(from = 2, to = 3)
+        AutoMigration(from = 2, to = 3),
+        AutoMigration(from = 3, to = 4)
     ]
 )
 @ConstructedBy(ChirpChatDatabaseConstructor::class)
@@ -40,6 +44,7 @@ abstract class AppChatDatabase : RoomDatabase() {
     abstract val chatMessageDao: ChatMessageDao
     abstract val chatParticipantsCrossRefDao: ChatParticipantsCrossRefDao
     abstract val messageReactionDao: MessageReactionDao
+    abstract val emergencyContactDao: EmergencyContactDao
 
     companion object Companion {
         const val DB_NAME = "aura.db"

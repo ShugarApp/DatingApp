@@ -7,6 +7,8 @@ import com.dating.home.presentation.chat.chat_list_detail.ChatListDetailViewMode
 import com.dating.home.presentation.chat.create_chat.CreateChatViewModel
 import com.dating.home.presentation.chat.manage_chat.ManageChatViewModel
 import com.dating.home.presentation.detail.ProfileDetailViewModel
+import com.dating.home.presentation.emergency.contacts.EmergencyContactsViewModel
+import com.dating.home.presentation.emergency.onboarding.EmergencyOnboardingViewModel
 import com.dating.home.presentation.home.swipe.FeedViewModel
 import com.dating.home.presentation.matches.MatchesViewModel
 import com.dating.home.presentation.photo_onboarding.PhotoOnboardingViewModel
@@ -37,4 +39,6 @@ val homePresentationModule = module {
     viewModelOf(::ProfileDetailViewModel)
     viewModelOf(::BlockedUsersViewModel)
     viewModelOf(::VerificationViewModel)
+    viewModelOf(::EmergencyOnboardingViewModel)
+    viewModelOf(::EmergencyContactsViewModel)
 }

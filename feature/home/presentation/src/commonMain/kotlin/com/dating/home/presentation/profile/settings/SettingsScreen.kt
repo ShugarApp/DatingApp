@@ -13,7 +13,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -77,6 +79,11 @@ import aura.feature.home.presentation.generated.resources.do_you_want_to_logout_
 import aura.feature.home.presentation.generated.resources.logout
 import aura.feature.home.presentation.generated.resources.network_error
 import aura.feature.home.presentation.generated.resources.save
+import androidx.compose.material.icons.filled.ContactPhone
+import androidx.compose.material3.Switch
+import aura.feature.home.presentation.generated.resources.emergency_contacts_title
+import aura.feature.home.presentation.generated.resources.emergency_feature_description
+import aura.feature.home.presentation.generated.resources.emergency_safety_section
 import aura.feature.home.presentation.generated.resources.settings_100_km
 import aura.feature.home.presentation.generated.resources.settings_account
 import aura.feature.home.presentation.generated.resources.settings_age_range
@@ -144,6 +151,7 @@ fun SettingsScreen(
     onPauseAccount: () -> Unit,
     onIncognitoMode: () -> Unit,
     onBlockedUsers: () -> Unit,
+    onEmergencyContacts: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: SettingsViewModel = koinViewModel()
 ) {
@@ -154,6 +162,7 @@ fun SettingsScreen(
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
             SettingsEvent.OnLogoutSuccess -> onLogout()
+            SettingsEvent.OnNavigateToEmergencyContacts -> onEmergencyContacts()
             else -> Unit
         }
     }
@@ -249,6 +258,68 @@ fun SettingsScreen(
                     title = stringResource(Res.string.settings_delete_account),
                     onClick = onDeleteAccount
                 )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Safety / Emergency Contacts
+            AccessCardList(
+                title = stringResource(Res.string.emergency_safety_section)
+            ) {
+                // Toggle row
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(60.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(MaterialTheme.colorScheme.surface)
+                        .padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.errorContainer),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ContactPhone,
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp),
+                            tint = MaterialTheme.colorScheme.onErrorContainer
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(Res.string.emergency_contacts_title),
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.extended.textPrimary
+                        )
+                        Text(
+                            text = stringResource(Res.string.emergency_feature_description),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Switch(
+                        checked = state.isEmergencyEnabled,
+                        onCheckedChange = { enabled ->
+                            viewModel.onAction(SettingsAction.OnEmergencyToggle(enabled))
+                        }
+                    )
+                }
+
+                if (state.isEmergencyEnabled) {
+                    AccessCardItem(
+                        icon = Icons.Default.ContactPhone,
+                        title = stringResource(Res.string.emergency_contacts_title),
+                        subtitle = stringResource(Res.string.emergency_feature_description),
+                        onClick = { viewModel.onAction(SettingsAction.OnEmergencyContactsClick) }
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))

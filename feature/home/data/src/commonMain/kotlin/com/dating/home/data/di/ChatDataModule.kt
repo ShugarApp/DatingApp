@@ -14,6 +14,10 @@ import com.dating.home.data.notification.KtorDeviceTokenService
 import com.dating.home.data.participant.KtorChatParticipantService
 import com.dating.home.data.participant.OfflineFirstChatParticipantRepository
 import com.dating.home.data.block.KtorBlockService
+import com.dating.home.data.emergency.AudioRecorderService
+import com.dating.home.data.emergency.DataStoreEmergencySettingsStorage
+import com.dating.home.data.emergency.EmergencyContactRepositoryImpl
+import com.dating.home.data.emergency.SmsDispatcher
 import com.dating.home.data.giphy.KtorGiphyService
 import com.dating.home.data.report.KtorReportService
 import com.dating.home.data.user.KtorUserService
@@ -21,6 +25,8 @@ import com.dating.home.database.DatabaseFactory
 import com.dating.home.domain.chat.ChatConnectionClient
 import com.dating.home.domain.chat.ChatRepository
 import com.dating.home.domain.chat.ChatService
+import com.dating.home.domain.emergency.EmergencyContactRepository
+import com.dating.home.domain.emergency.EmergencySettingsStorage
 import com.dating.home.domain.matching.MatchingService
 import com.dating.home.domain.message.ChatMediaService
 import com.dating.home.domain.message.ChatMessageService
@@ -59,6 +65,10 @@ val homeDataModule = module {
     singleOf(::KtorBlockService) bind BlockService::class
     singleOf(::KtorReportService) bind ReportService::class
     singleOf(::KtorGiphyService) bind GiphyService::class
+    singleOf(::EmergencyContactRepositoryImpl) bind EmergencyContactRepository::class
+    singleOf(::DataStoreEmergencySettingsStorage) bind EmergencySettingsStorage::class
+    singleOf(::SmsDispatcher)
+    singleOf(::AudioRecorderService)
     single {
         Json {
             ignoreUnknownKeys = true

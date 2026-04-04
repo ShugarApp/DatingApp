@@ -31,4 +31,8 @@ sealed interface SettingsAction {
     data class OnThemeChanged(val theme: ThemePreference) : SettingsAction
 
     data object OnDismissError : SettingsAction
+
+    // Emergency Contacts
+    data class OnEmergencyToggle(val enabled: Boolean) : SettingsAction
+    data object OnEmergencyContactsClick : SettingsAction
 }

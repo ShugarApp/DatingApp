@@ -7,13 +7,16 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import aura.feature.home.presentation.generated.resources.Res
 import aura.feature.home.presentation.generated.resources.photo_upload_failed
@@ -21,17 +24,27 @@ import aura.feature.home.presentation.generated.resources.photo_upload_success
 import com.dating.core.domain.auth.SessionStorage
 import com.dating.core.domain.auth.UserStatus
 import com.dating.core.domain.preferences.OnboardingPreferences
+import com.dating.home.data.emergency.ShakeDetector
+import com.dating.home.data.emergency.VolumeButtonEventBus
+import com.dating.home.domain.emergency.EmergencyContactRepository
+import com.dating.home.domain.emergency.EmergencySettingsStorage
 import com.dating.home.domain.upload.PhotoUploadEvent
 import com.dating.home.domain.upload.PhotoUploadManager
 import com.dating.home.presentation.chat.chat_list_detail.ChatListDetailAdaptiveLayout
+import com.dating.home.presentation.emergency.contacts.EmergencyContactsAction
+import com.dating.home.presentation.emergency.contacts.EmergencyContactsViewModel
+import com.dating.home.presentation.emergency.sos.PanicButton
+import com.dating.home.presentation.emergency.sos.SosCountdownDialog
 import com.dating.home.presentation.features_onboarding.FeaturesOnboardingScreen
 import com.dating.home.presentation.home.swipe.FeedRoot
-import com.dating.home.presentation.profile_setup.ProfileSetupScreen
 import com.dating.home.presentation.matches.MatchesRoot
 import com.dating.home.presentation.photo_onboarding.PhotoOnboardingScreen
 import com.dating.home.presentation.profile.profile.ProfileScreen
+import com.dating.home.presentation.profile_setup.ProfileSetupScreen
+import kotlinx.coroutines.flow.collectLatest
 import org.jetbrains.compose.resources.getString
 import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun BottomNavigationContainer(
@@ -95,6 +108,38 @@ fun BottomNavigationContainer(
     LaunchedEffect(hasSeenProfileSetup) {
         if (hasSeenProfileSetup == true) {
             onboardingPreferences.markProfileSetupSeen()
+        }
+    }
+
+    // Emergency feature
+    val emergencySettingsStorage: EmergencySettingsStorage = koinInject()
+    val emergencySettings by emergencySettingsStorage.observe().collectAsStateWithLifecycle(null)
+    val emergencyRepository: EmergencyContactRepository = koinInject()
+    val emergencyContacts by emergencyRepository.getAll().collectAsStateWithLifecycle(emptyList())
+    val emergencyViewModel: EmergencyContactsViewModel = koinViewModel()
+    val emergencyState by emergencyViewModel.state.collectAsStateWithLifecycle()
+
+    val isEmergencyEnabled = emergencySettings?.isEnabled == true
+    val hasContacts = emergencyContacts.isNotEmpty()
+    val showPanicButton = isEmergencyEnabled && hasContacts
+
+    // Shake detector for SOS activation
+    val shakeDetector = remember { ShakeDetector() }
+    DisposableEffect(showPanicButton) {
+        if (showPanicButton) {
+            shakeDetector.start {
+                emergencyViewModel.startSosCountdown()
+            }
+        }
+        onDispose { shakeDetector.stop() }
+    }
+
+    // Volume button x3 for SOS activation
+    LaunchedEffect(showPanicButton) {
+        if (showPanicButton) {
+            VolumeButtonEventBus.events.collectLatest {
+                emergencyViewModel.startSosCountdown()
+            }
         }
     }
 
@@ -190,6 +235,24 @@ fun BottomNavigationContainer(
                     )
                 }
             }
+
+            // Panic Button overlay
+            if (showPanicButton && !emergencyState.showSosCountdown) {
+                PanicButton(
+                    onTrigger = { emergencyViewModel.onAction(EmergencyContactsAction.OnSosTrigger) },
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(end = 16.dp, bottom = 16.dp)
+                )
+            }
         }
+    }
+
+    // SOS countdown dialog (shown above everything)
+    if (emergencyState.showSosCountdown) {
+        SosCountdownDialog(
+            countdown = emergencyState.sosCountdown,
+            onCancel = { emergencyViewModel.onAction(EmergencyContactsAction.OnSosCancel) }
+        )
     }
 }
