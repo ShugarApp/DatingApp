@@ -1,5 +1,6 @@
 package com.dating.home.data.user
 
+import com.dating.core.data.dto.ProfileVerificationSerializable
 import com.dating.core.data.dto.UserSerializable
 import com.dating.core.data.mappers.toDomain
 import com.dating.core.data.networking.delete
@@ -7,6 +8,7 @@ import com.dating.core.data.networking.get
 import com.dating.core.data.networking.post
 import com.dating.core.data.networking.put
 import com.dating.core.data.networking.safeCall
+import com.dating.core.domain.auth.ProfileVerification
 import com.dating.core.domain.auth.User
 import com.dating.core.domain.image.ImageCompressor
 import com.dating.core.domain.logging.AppLogger
@@ -16,6 +18,7 @@ import com.dating.core.domain.util.Result
 import com.dating.core.domain.util.map
 import com.dating.home.data.dto.request.ConfirmPhotoRequest
 import com.dating.home.data.dto.request.LocationRequest
+import com.dating.home.data.dto.request.SubmitVerificationRequest
 import com.dating.home.data.dto.request.IncognitoModeRequest
 import com.dating.home.data.dto.request.PauseAccountRequest
 import com.dating.home.data.dto.request.ReorderPhotosRequest
@@ -170,5 +173,64 @@ class KtorUserService(
             route = "/users/profile/incognito",
             body = IncognitoModeRequest(incognito = incognito)
         ).map { it.toDomain() }
+    }
+
+    // Upload selfie for identity verification: get signed URL → compress → PUT → return publicUrl.
+    // Does NOT call /confirm since selfies are consumed by the verify endpoint, not stored as profile photos.
+    override suspend fun uploadSelfie(
+        imageBytes: ByteArray,
+        mimeType: String
+    ): Result<String, DataError.Remote> {
+        val (uploadBytes, uploadMimeType) = try {
+            val compressed = imageCompressor.compressImage(
+                bytes = imageBytes,
+                mimeType = mimeType,
+                maxWidthPx = 1080,
+                maxHeightPx = 1080,
+                quality = 85
+            )
+            compressed.bytes to compressed.mimeType
+        } catch (e: Exception) {
+            logger.error("Selfie compression failed, uploading original", e)
+            imageBytes to mimeType
+        }
+
+        val urlResult = httpClient.post<Unit, ProfilePictureUploadUrlsResponse>(
+            route = "/users/profile/photos/upload-url",
+            queryParams = mapOf("mimeType" to uploadMimeType),
+            body = Unit
+        )
+        if (urlResult is Result.Failure) return urlResult
+
+        val urls = (urlResult as Result.Success).data
+        val uploadResult = safeCall<Unit> {
+            httpClient.put {
+                url(urls.uploadUrl)
+                urls.headers.forEach { (key, value) -> headers[key] = value }
+                setBody(uploadBytes)
+            }
+        }
+        if (uploadResult is Result.Failure) return uploadResult
+
+        return Result.Success(urls.publicUrl)
+    }
+
+    override suspend fun submitVerification(selfieUrl: String): Result<ProfileVerification, DataError.Remote> {
+        return httpClient.post<SubmitVerificationRequest, ProfileVerificationSerializable>(
+            route = "/users/profile/verify",
+            body = SubmitVerificationRequest(selfieUrl = selfieUrl)
+        ).map { it.toDomain() }
+    }
+
+    override suspend fun getVerificationStatus(): Result<ProfileVerification?, DataError.Remote> {
+        return when (val result = httpClient.get<ProfileVerificationSerializable>(
+            route = "/users/profile/verify/status"
+        )) {
+            is Result.Success -> Result.Success(result.data.toDomain())
+            is Result.Failure -> {
+                if (result.error == DataError.Remote.NOT_FOUND) Result.Success(null)
+                else result
+            }
+        }
     }
 }

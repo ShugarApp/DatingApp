@@ -25,6 +25,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.HourglassEmpty
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.filled.Info
@@ -89,6 +92,9 @@ import com.dating.core.designsystem.components.avatar.AvatarSize
 import com.dating.core.designsystem.components.avatar.ChirpAvatarPhoto
 import com.dating.core.designsystem.components.cards.AccessCardItem
 import com.dating.core.designsystem.components.cards.AccessCardList
+import com.dating.core.domain.auth.VerificationStatus
+import com.dating.home.presentation.components.VerifiedBadge
+import com.dating.home.presentation.components.VerifiedBlue
 import com.dating.core.designsystem.components.buttons.AppButtonStyle
 import com.dating.core.designsystem.components.buttons.ChirpButton
 import com.dating.core.designsystem.components.chips.ChirpChip
@@ -238,7 +244,16 @@ fun ProfileScreen(
             }
             Spacer(modifier = Modifier.height(24.dp))
 
-            // 3b. Profile completion card
+            // 3b. Verification status card
+            VerificationStatusCard(
+                status = state.verificationStatus,
+                onVerifyClick = onVerification,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // 3c. Profile completion card
             ProfileCompletionCard(
                 completion = state.profileCompletion,
                 onCompleteClick = onEditProfile,
@@ -391,6 +406,77 @@ fun ProfileCompletionCard(
         }
     }
 }
+
+@Composable
+fun VerificationStatusCard(
+    status: VerificationStatus,
+    onVerifyClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val (icon, text, tint, bgTint) = when (status) {
+        VerificationStatus.VERIFIED -> Quadruple(
+            Icons.Default.CheckCircle,
+            "Profile Verified",
+            Color(0xFF4CAF50),
+            Color(0xFF4CAF50).copy(alpha = 0.12f)
+        )
+        VerificationStatus.PENDING -> Quadruple(
+            Icons.Default.HourglassEmpty,
+            "Verification pending...",
+            Color(0xFFFFA000),
+            Color(0xFFFFA000).copy(alpha = 0.12f)
+        )
+        VerificationStatus.REJECTED -> Quadruple(
+            Icons.Default.Error,
+            "Verification rejected — tap to retry",
+            MaterialTheme.colorScheme.error,
+            MaterialTheme.colorScheme.error.copy(alpha = 0.12f)
+        )
+        VerificationStatus.UNVERIFIED -> Quadruple(
+            Icons.Default.Verified,
+            "Verify your profile",
+            MaterialTheme.colorScheme.primary,
+            MaterialTheme.colorScheme.primary.copy(alpha = 0.08f)
+        )
+    }
+
+    val isClickable = status == VerificationStatus.UNVERIFIED || status == VerificationStatus.REJECTED
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp))
+            .background(bgTint)
+            .then(
+                if (isClickable) Modifier.clickable(onClick = onVerifyClick)
+                else Modifier
+            )
+            .padding(horizontal = 20.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if (status == VerificationStatus.VERIFIED) {
+            VerifiedBadge(size = 22.dp, tint = VerifiedBlue)
+        } else {
+            Icon(imageVector = icon, contentDescription = null, tint = tint, modifier = Modifier.size(22.dp))
+        }
+        Spacer(modifier = Modifier.width(12.dp))
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+            color = tint,
+            modifier = Modifier.weight(1f)
+        )
+        if (isClickable) {
+            Text(
+                text = "→",
+                style = MaterialTheme.typography.bodyLarge,
+                color = tint
+            )
+        }
+    }
+}
+
+private data class Quadruple<A, B, C, D>(val first: A, val second: B, val third: C, val fourth: D)
 
 @Composable
 fun ProfileDashboardCard(
