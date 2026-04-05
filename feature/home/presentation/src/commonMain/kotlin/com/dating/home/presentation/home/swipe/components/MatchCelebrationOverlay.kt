@@ -41,11 +41,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import aura.feature.home.presentation.generated.resources.Res
-import aura.feature.home.presentation.generated.resources.match_celebration_keep_swiping
-import aura.feature.home.presentation.generated.resources.match_celebration_send_message
-import aura.feature.home.presentation.generated.resources.match_celebration_subtitle
-import aura.feature.home.presentation.generated.resources.match_celebration_title
+import shugar.feature.home.presentation.generated.resources.Res
+import shugar.feature.home.presentation.generated.resources.match_celebration_keep_swiping
+import shugar.feature.home.presentation.generated.resources.match_celebration_send_message
+import shugar.feature.home.presentation.generated.resources.match_celebration_subtitle
+import shugar.feature.home.presentation.generated.resources.match_celebration_title
 import coil3.compose.AsyncImage
 import org.jetbrains.compose.resources.stringResource
 
