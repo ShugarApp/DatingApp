@@ -73,6 +73,7 @@ import com.dating.home.presentation.chat.chat_detail.components.DateChip
 import com.dating.home.presentation.chat.chat_detail.components.MessageBannerListener
 import com.dating.home.presentation.chat.chat_detail.components.MediaPickerContent
 import com.dating.home.presentation.chat.chat_detail.components.MediaPickerOption
+import com.dating.home.presentation.chat.chat_detail.components.DateProposalSheet
 import com.dating.home.presentation.chat.chat_detail.components.MessageBox
 import com.dating.home.presentation.chat.chat_detail.components.MessageList
 import com.dating.home.presentation.chat.chat_detail.components.PaginationScrollListener
@@ -222,6 +223,7 @@ fun ChatDetailRoot(
                 viewModel.onAction(action)
             },
             onAttachClick = { showMediaPickerSheet = true },
+            onProposeDateClick = { viewModel.onAction(ChatDetailAction.OnProposeDateClick) },
             snackbarState = snackbarState
         )
 
@@ -292,6 +294,18 @@ fun ChatDetailRoot(
         }
     }
 
+    if (state.showDateProposalSheet) {
+        DateProposalSheet(
+            onDismiss = { viewModel.onAction(ChatDetailAction.OnDismissDateProposalSheet) },
+            onSubmit = { dateTime, location ->
+                viewModel.onAction(ChatDetailAction.OnSubmitDateProposal(dateTime, location))
+            },
+            initialDateTime = state.editingProposalDateTime,
+            initialLocation = state.editingProposalLocation,
+            isEditing = state.editingProposalMessageId != null
+        )
+    }
+
     if (state.showBlockDialog) {
         val username = state.chatUi?.otherParticipants?.firstOrNull()?.username ?: ""
         DestructiveConfirmationDialog(
@@ -352,6 +366,7 @@ fun ChatDetailScreen(
     snackbarState: SnackbarHostState,
     onAction: (ChatDetailAction) -> Unit,
     onAttachClick: () -> Unit = {},
+    onProposeDateClick: () -> Unit = {},
 ) {
     val configuration = currentDeviceConfiguration()
 
@@ -526,6 +541,18 @@ fun ChatDetailScreen(
                             onDoubleTapReact = { messageId ->
                                 onAction(ChatDetailAction.OnReactToMessage(messageId, "❤️"))
                             },
+                            onAcceptProposal = { messageId ->
+                                onAction(ChatDetailAction.OnAcceptProposal(messageId))
+                            },
+                            onRejectProposal = { messageId ->
+                                onAction(ChatDetailAction.OnRejectProposal(messageId))
+                            },
+                            onCancelProposal = { messageId ->
+                                onAction(ChatDetailAction.OnCancelProposal(messageId))
+                            },
+                            onEditProposal = { messageId, dateTime, location ->
+                                onAction(ChatDetailAction.OnEditProposal(messageId, dateTime, location))
+                            },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .weight(1f)
@@ -552,6 +579,7 @@ fun ChatDetailScreen(
                                         onAction(ChatDetailAction.OnTextChanged(text))
                                     },
                                     onAttachClick = onAttachClick,
+                                    onProposeDateClick = onProposeDateClick,
                                     isUploadingMedia = state.isUploadingMedia,
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -592,6 +620,7 @@ fun ChatDetailScreen(
                                 onAction(ChatDetailAction.OnTextChanged(text))
                             },
                             onAttachClick = onAttachClick,
+                            onProposeDateClick = onProposeDateClick,
                             isUploadingMedia = state.isUploadingMedia,
                             modifier = Modifier
                                 .fillMaxWidth()

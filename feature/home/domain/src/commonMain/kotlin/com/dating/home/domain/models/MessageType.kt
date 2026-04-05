@@ -4,5 +4,6 @@ enum class MessageType {
     TEXT,
     IMAGE,
     GIF,
-    AUDIO
+    AUDIO,
+    DATE_PROPOSAL
 }
