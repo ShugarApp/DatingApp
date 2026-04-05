@@ -1,5 +1,6 @@
 package com.dating.home.data.message
 
+import com.dating.home.data.dto.DateProposalContentDto
 import com.dating.home.data.dto.websocket.OutgoingWebSocketDto
 import com.dating.home.data.dto.websocket.WebSocketMessageDto
 import com.dating.home.data.mappers.toDomain
@@ -13,6 +14,7 @@ import com.dating.home.domain.message.ChatMessageService
 import com.dating.home.domain.message.MessageRepository
 import com.dating.home.domain.models.ChatMessage
 import com.dating.home.domain.models.ChatMessageDeliveryStatus
+import com.dating.home.domain.models.DateProposalStatus
 import com.dating.home.domain.models.MessageType
 import com.dating.home.domain.models.MessageWithSender
 import com.dating.home.domain.models.OutgoingNewMessage
@@ -324,6 +326,59 @@ class OfflineFirstMessageRepository(
             count = count,
             reactedByMe = reactedByMe
         )
+    }
+
+    override suspend fun sendDateProposal(
+        chatId: String,
+        messageId: String,
+        dateTime: String,
+        location: String
+    ): EmptyResult<DataError> {
+        val proposalContent = DateProposalContentDto(
+            dateTime = dateTime,
+            location = location,
+            status = DateProposalStatus.PENDING.name
+        )
+        val contentJson = json.encodeToString(proposalContent)
+
+        val message = OutgoingNewMessage(
+            chatId = chatId,
+            messageId = messageId,
+            content = contentJson,
+            messageType = MessageType.DATE_PROPOSAL
+        )
+        return sendMessage(message)
+    }
+
+    override suspend fun updateDateProposalStatus(
+        messageId: String,
+        chatId: String,
+        newStatus: DateProposalStatus
+    ): EmptyResult<DataError> {
+        // Optimistic update: update local content JSON
+        val messageEntity = database.chatMessageDao.getMessageById(messageId)
+            ?: return Result.Failure(DataError.Local.NOT_FOUND)
+
+        val currentContent = try {
+            json.decodeFromString<DateProposalContentDto>(messageEntity.content)
+        } catch (_: Exception) {
+            return Result.Failure(DataError.Local.NOT_FOUND)
+        }
+
+        val updatedContent = currentContent.copy(status = newStatus.name)
+        val updatedContentJson = json.encodeToString(updatedContent)
+
+        database.chatMessageDao.upsertMessage(
+            messageEntity.copy(content = updatedContentJson)
+        )
+
+        // Call backend to persist status change
+        return chatMessageService
+            .updateProposalStatus(messageId, newStatus.name)
+            .onFailure {
+                // Revert optimistic update on failure
+                database.chatMessageDao.upsertMessage(messageEntity)
+            }
     }
 
     private fun OutgoingWebSocketDto.NewMessage.toJsonPayload(): String {

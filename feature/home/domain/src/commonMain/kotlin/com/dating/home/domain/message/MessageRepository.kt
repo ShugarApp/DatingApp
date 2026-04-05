@@ -2,6 +2,7 @@ package com.dating.home.domain.message
 
 import com.dating.home.domain.models.ChatMessage
 import com.dating.home.domain.models.ChatMessageDeliveryStatus
+import com.dating.home.domain.models.DateProposalStatus
 import com.dating.home.domain.models.MessageType
 import com.dating.home.domain.models.MessageWithSender
 import com.dating.home.domain.models.OutgoingNewMessage
@@ -43,4 +44,17 @@ interface MessageRepository {
     fun getReactionsForMessage(messageId: String): Flow<List<ReactionSummary>>
 
     fun getReactionsMapForChat(chatId: String): Flow<Map<String, List<ReactionSummary>>>
+
+    suspend fun sendDateProposal(
+        chatId: String,
+        messageId: String,
+        dateTime: String,
+        location: String
+    ): EmptyResult<DataError>
+
+    suspend fun updateDateProposalStatus(
+        messageId: String,
+        chatId: String,
+        newStatus: DateProposalStatus
+    ): EmptyResult<DataError>
 }

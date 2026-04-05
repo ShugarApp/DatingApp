@@ -46,6 +46,10 @@ fun MessageList(
     onCopyClick: (String) -> Unit,
     onReactionTapped: (String, String) -> Unit = { _, _ -> },
     onDoubleTapReact: (String) -> Unit = {},
+    onAcceptProposal: (String) -> Unit = {},
+    onRejectProposal: (String) -> Unit = {},
+    onCancelProposal: (String) -> Unit = {},
+    onEditProposal: (String, String, String) -> Unit = { _, _, _ -> },
     modifier: Modifier = Modifier,
     highlightText: String? = null
 ) {
@@ -82,6 +86,10 @@ fun MessageList(
                     onCopyClick = onCopyClick,
                     onReactionTapped = onReactionTapped,
                     onDoubleTapReact = onDoubleTapReact,
+                    onAcceptProposal = onAcceptProposal,
+                    onRejectProposal = onRejectProposal,
+                    onCancelProposal = onCancelProposal,
+                    onEditProposal = onEditProposal,
                     highlightText = highlightText,
                     modifier = Modifier
                         .fillMaxWidth()

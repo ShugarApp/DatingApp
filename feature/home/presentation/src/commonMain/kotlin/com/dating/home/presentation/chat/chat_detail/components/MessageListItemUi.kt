@@ -27,6 +27,10 @@ fun MessageListItemUi(
     onCopyClick: (String) -> Unit,
     onReactionTapped: (String, String) -> Unit = { _, _ -> },
     onDoubleTapReact: (String) -> Unit = {},
+    onAcceptProposal: (String) -> Unit = {},
+    onRejectProposal: (String) -> Unit = {},
+    onCancelProposal: (String) -> Unit = {},
+    onEditProposal: (String, String, String) -> Unit = { _, _, _ -> },
     modifier: Modifier = Modifier,
     highlightText: String? = null
 ) {
@@ -51,6 +55,7 @@ fun MessageListItemUi(
                     onCopyClick = { onCopyClick(messageUi.content) },
                     onReactionTapped = { emoji -> onReactionTapped(messageUi.id, emoji) },
                     onDoubleTapReact = { onDoubleTapReact(messageUi.id) },
+                    onCancelProposal = { onCancelProposal(messageUi.id) },
                     highlightText = highlightText
                 )
             }
@@ -64,6 +69,14 @@ fun MessageListItemUi(
                     onCopyClick = { onCopyClick(messageUi.content) },
                     onReactionTapped = { emoji -> onReactionTapped(messageUi.id, emoji) },
                     onDoubleTapReact = { onDoubleTapReact(messageUi.id) },
+                    onAcceptProposal = { onAcceptProposal(messageUi.id) },
+                    onRejectProposal = { onRejectProposal(messageUi.id) },
+                    onEditProposal = {
+                        val proposal = messageUi.dateProposal
+                        if (proposal != null) {
+                            onEditProposal(messageUi.id, proposal.dateTime, proposal.location)
+                        }
+                    },
                     highlightText = highlightText
                 )
             }

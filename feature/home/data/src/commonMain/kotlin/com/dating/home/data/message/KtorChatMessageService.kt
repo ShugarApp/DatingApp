@@ -1,11 +1,13 @@
 package com.dating.home.data.message
 
 import com.dating.home.data.dto.ChatMessageDto
+import com.dating.home.data.dto.request.UpdateProposalStatusRequest
 import com.dating.home.data.mappers.toDomain
 import com.dating.home.domain.message.ChatMessageService
 import com.dating.home.domain.models.ChatMessage
 import com.dating.core.data.networking.delete
 import com.dating.core.data.networking.get
+import com.dating.core.data.networking.patch
 import com.dating.core.domain.util.DataError
 import com.dating.core.domain.util.EmptyResult
 import com.dating.core.domain.util.Result
@@ -19,6 +21,16 @@ class KtorChatMessageService(
     override suspend fun deleteMessage(messageId: String): EmptyResult<DataError.Remote> {
         return httpClient.delete(
             route = "/messages/$messageId"
+        )
+    }
+
+    override suspend fun updateProposalStatus(
+        messageId: String,
+        status: String
+    ): EmptyResult<DataError.Remote> {
+        return httpClient.patch<UpdateProposalStatusRequest, Unit>(
+            route = "/messages/$messageId/proposal-status",
+            body = UpdateProposalStatusRequest(status = status)
         )
     }
 

@@ -51,6 +51,7 @@ fun LocalUserMessage(
     onCopyClick: () -> Unit,
     onReactionTapped: (String) -> Unit = {},
     onDoubleTapReact: () -> Unit = {},
+    onCancelProposal: () -> Unit = {},
     modifier: Modifier = Modifier,
     highlightText: String? = null
 ) {
@@ -113,17 +114,31 @@ fun LocalUserMessage(
                     onMessageLongClick()
                 },
                 onDoubleClick = onDoubleTapReact,
-                mediaContent = if (message.messageType != MessageType.TEXT) {
-                    {
-                        MediaMessageContent(
-                            content = message.content,
-                            messageType = message.messageType,
-                            onImageClick = if (message.messageType == MessageType.IMAGE) {
-                                { fullScreenImageUrl = message.content }
-                            } else null
-                        )
+                mediaContent = when {
+                    message.messageType == MessageType.DATE_PROPOSAL && message.dateProposal != null -> {
+                        {
+                            DateProposalBubbleContent(
+                                proposal = message.dateProposal,
+                                onAccept = {},
+                                onReject = {},
+                                onCancel = onCancelProposal,
+                                onEdit = {}
+                            )
+                        }
                     }
-                } else null,
+                    message.messageType != MessageType.TEXT -> {
+                        {
+                            MediaMessageContent(
+                                content = message.content,
+                                messageType = message.messageType,
+                                onImageClick = if (message.messageType == MessageType.IMAGE) {
+                                    { fullScreenImageUrl = message.content }
+                                } else null
+                            )
+                        }
+                    }
+                    else -> null
+                },
                 reactionContent = if (message.reactions.isNotEmpty()) {
                     {
                         ReactionRow(

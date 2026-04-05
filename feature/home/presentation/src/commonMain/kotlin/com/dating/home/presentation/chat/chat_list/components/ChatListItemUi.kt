@@ -41,6 +41,7 @@ fun ChatListItemUi(
         MessageType.IMAGE -> "\uD83D\uDCF7 Photo"
         MessageType.GIF -> "GIF"
         MessageType.AUDIO -> "\uD83C\uDFB5 Audio"
+        MessageType.DATE_PROPOSAL -> "\uD83D\uDCC5 Date proposal"
         else -> chat.lastMessage?.content ?: ""
     }
     Card(
