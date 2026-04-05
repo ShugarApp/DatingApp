@@ -60,7 +60,8 @@ class ProfileViewModel(
                 smoking = authInfo.user.smoking,
                 drinking = authInfo.user.drinking,
                 interests = authInfo.user.interests,
-                profileCompletion = authInfo.user.profileCompletion()
+                profileCompletion = authInfo.user.profileCompletion(),
+                verificationStatus = authInfo.user.verificationStatus
             )
         } else currentState
     }

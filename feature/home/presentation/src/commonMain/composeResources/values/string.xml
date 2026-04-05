@@ -182,6 +182,22 @@
     <string name="verification_feature_3_desc">Prioritized visibility within our verified member database.</string>
     <string name="verification_button">Begin Verification</string>
     <string name="verification_footer">SECURE PROCESSING BY BITVAULT-ID</string>
+    <string name="verification_status_verified">Profile Verified</string>
+    <string name="verification_status_pending">Verification in progress…</string>
+    <string name="verification_status_rejected">Verification rejected — tap to retry</string>
+    <string name="verification_status_unverified">Verify your profile</string>
+    <string name="verification_guidance_title">Position your face</string>
+    <string name="verification_guidance_desc">Align your face within the oval guide, ensure good lighting and look straight at the camera.</string>
+    <string name="verification_take_selfie">Take Selfie</string>
+    <string name="verification_processing">Verifying your identity…</string>
+    <string name="verification_processing_desc">This usually takes just a few seconds.</string>
+    <string name="verification_success_title">Profile Verified!</string>
+    <string name="verification_success_desc">Your profile now displays a verified badge. Other users can trust you are who you say you are.</string>
+    <string name="verification_rejected_title">Verification Failed</string>
+    <string name="verification_rejected_desc">We could not verify your identity. Please try again with a clear, well-lit selfie.</string>
+    <string name="verification_retry">Try Again</string>
+    <string name="verification_done">Done</string>
+    <string name="verification_retry_limit">Maximum attempts reached for today. Try again tomorrow.</string>
 
     <!-- Profile Detail Screen -->
     <string name="profile_about_me">About me</string>

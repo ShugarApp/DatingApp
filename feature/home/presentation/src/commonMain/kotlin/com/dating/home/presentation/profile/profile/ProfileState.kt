@@ -1,8 +1,10 @@
 package com.dating.home.presentation.profile.profile
 
 import androidx.compose.foundation.text.input.TextFieldState
+import com.dating.core.domain.auth.VerificationStatus
 
 data class ProfileState(
+    val verificationStatus: VerificationStatus = VerificationStatus.UNVERIFIED,
     val userId: String = "",
     val username: String = "",
     val userInitials: String = "--",

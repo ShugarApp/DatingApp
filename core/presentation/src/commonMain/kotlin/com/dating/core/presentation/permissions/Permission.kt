@@ -2,5 +2,6 @@ package com.dating.core.presentation.permissions
 
 enum class Permission {
     NOTIFICATIONS,
-    LOCATION
+    LOCATION,
+    CAMERA
 }

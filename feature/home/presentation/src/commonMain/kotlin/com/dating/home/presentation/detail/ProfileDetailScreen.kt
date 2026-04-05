@@ -445,11 +445,20 @@ private fun ProfileDetailContent(
                         .align(Alignment.BottomStart)
                         .padding(16.dp)
                 ) {
-                    Text(
-                        text = if (age != null) "${user.username}, $age" else user.username,
-                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                        color = Color.White
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = if (age != null) "${user.username}, $age" else user.username,
+                            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                            color = Color.White
+                        )
+                        if (user.verificationStatus == com.dating.core.domain.auth.VerificationStatus.VERIFIED) {
+                            Spacer(Modifier.width(6.dp))
+                            com.dating.home.presentation.components.VerifiedBadge(
+                                size = 22.dp,
+                                tint = com.dating.home.presentation.components.VerifiedBlue
+                            )
+                        }
+                    }
                     if (location.isNotEmpty()) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
