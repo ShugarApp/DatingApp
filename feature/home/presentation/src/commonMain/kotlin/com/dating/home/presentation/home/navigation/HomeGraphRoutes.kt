@@ -41,4 +41,10 @@ sealed interface HomeGraphRoutes {
 
     @Serializable
     data object BlockedUsersRoute : HomeGraphRoutes
+
+    @Serializable
+    data object EmergencyOnboardingRoute : HomeGraphRoutes
+
+    @Serializable
+    data object EmergencyContactsRoute : HomeGraphRoutes
 }

@@ -29,5 +29,7 @@ fun Permission.toMokoPermission(): dev.icerock.moko.permissions.Permission {
         Permission.NOTIFICATIONS -> dev.icerock.moko.permissions.Permission.REMOTE_NOTIFICATION
         Permission.LOCATION -> dev.icerock.moko.permissions.Permission.LOCATION
         Permission.CAMERA -> dev.icerock.moko.permissions.Permission.CAMERA
+        Permission.MICROPHONE -> dev.icerock.moko.permissions.Permission.RECORD_AUDIO
+        Permission.CALL_PHONE -> dev.icerock.moko.permissions.Permission.LOCATION // fallback — CALL_PHONE not in moko; handled natively
     }
 }

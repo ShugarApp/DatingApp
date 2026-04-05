@@ -23,5 +23,6 @@ data class SettingsState(
     val showThemeDialog: Boolean = false,
     val errorMessage: UiText? = null,
     val showDeleteSurveyDialog: Boolean = false,
-    val selectedDeleteReason: DeleteAccountReason? = null
+    val selectedDeleteReason: DeleteAccountReason? = null,
+    val isEmergencyEnabled: Boolean = false
 )

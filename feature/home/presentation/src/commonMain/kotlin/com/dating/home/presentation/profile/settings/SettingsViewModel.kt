@@ -11,6 +11,7 @@ import com.dating.core.domain.util.Result
 import com.dating.core.domain.util.onFailure
 import com.dating.core.domain.util.onSuccess
 import com.dating.core.presentation.util.toUiText
+import com.dating.home.domain.emergency.EmergencySettingsStorage
 import com.dating.home.domain.user.UserService
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,7 +29,8 @@ class SettingsViewModel(
     private val userService: UserService,
     private val discoveryPreferences: DiscoveryPreferencesStorage,
     private val locationProvider: LocationProvider,
-    private val themePreferences: ThemePreferences
+    private val themePreferences: ThemePreferences,
+    private val emergencySettingsStorage: EmergencySettingsStorage
 ) : ViewModel() {
 
     private val _events = Channel<SettingsEvent>()
@@ -39,8 +41,9 @@ class SettingsViewModel(
         _state,
         sessionStorage.observeAuthInfo(),
         discoveryPreferences.observe(),
-        themePreferences.observeThemePreference()
-    ) { currentState, authInfo, discovery, theme ->
+        themePreferences.observeThemePreference(),
+        emergencySettingsStorage.observe()
+    ) { currentState, authInfo, discovery, theme, emergency ->
         currentState.copy(
             username = authInfo?.user?.username ?: currentState.username,
             isAccountPaused = authInfo?.user?.isPaused ?: currentState.isAccountPaused,
@@ -49,7 +52,8 @@ class SettingsViewModel(
             showMe = discovery.showMe,
             minAge = discovery.minAge,
             maxAge = discovery.maxAge,
-            themePreference = theme
+            themePreference = theme,
+            isEmergencyEnabled = emergency.isEnabled
         )
     }.stateIn(
         scope = viewModelScope,
@@ -100,6 +104,12 @@ class SettingsViewModel(
             is SettingsAction.OnThemeChanged -> {
                 viewModelScope.launch { themePreferences.updateThemePreference(action.theme) }
                 _state.update { it.copy(showThemeDialog = false) }
+            }
+            is SettingsAction.OnEmergencyToggle -> {
+                viewModelScope.launch { emergencySettingsStorage.setEnabled(action.enabled) }
+            }
+            SettingsAction.OnEmergencyContactsClick -> {
+                viewModelScope.launch { _events.send(SettingsEvent.OnNavigateToEmergencyContacts) }
             }
         }
     }

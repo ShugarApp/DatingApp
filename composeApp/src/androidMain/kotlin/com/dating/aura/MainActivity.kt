@@ -2,6 +2,7 @@ package com.dating.aura
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.KeyEvent
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -11,6 +12,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import com.dating.aura.navigation.ExternalUriHandler
 import com.dating.core.domain.auth.SessionStorage
+import com.dating.home.data.emergency.VolumeButtonEventBus
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -42,6 +44,29 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         handleNotificationDeeplink(intent)
+    }
+
+    // Volume button x3 SOS trigger
+    private var volumePressCount = 0
+    private var lastVolumePressTime = 0L
+
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        if (event.action == KeyEvent.ACTION_DOWN &&
+            (event.keyCode == KeyEvent.KEYCODE_VOLUME_DOWN || event.keyCode == KeyEvent.KEYCODE_VOLUME_UP)
+        ) {
+            val now = System.currentTimeMillis()
+            if (now - lastVolumePressTime > 2000L) {
+                volumePressCount = 0
+            }
+            volumePressCount++
+            lastVolumePressTime = now
+            if (volumePressCount >= 3) {
+                volumePressCount = 0
+                VolumeButtonEventBus.emit()
+                return true
+            }
+        }
+        return super.dispatchKeyEvent(event)
     }
 
     private fun handleNotificationDeeplink(intent: Intent) {

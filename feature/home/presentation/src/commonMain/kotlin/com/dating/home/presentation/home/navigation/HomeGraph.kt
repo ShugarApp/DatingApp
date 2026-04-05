@@ -10,6 +10,8 @@ import androidx.navigation.toRoute
 import com.dating.home.presentation.home.bottom_navigation.BottomNavSection
 import com.dating.home.presentation.home.bottom_navigation.BottomNavigationContainer
 import com.dating.home.presentation.profile.edit_profile.EditProfileScreen
+import com.dating.home.presentation.emergency.contacts.EmergencyContactsScreen
+import com.dating.home.presentation.emergency.onboarding.EmergencyOnboardingScreen
 import com.dating.home.presentation.profile.settings.DeleteAccountScreen
 import com.dating.home.presentation.profile.settings.IncognitoModeScreen
 import com.dating.home.presentation.profile.settings.PauseAccountScreen
@@ -146,6 +148,9 @@ fun NavGraphBuilder.homeGraph(
                 },
                 onIncognitoMode = {
                     navController.navigate(HomeGraphRoutes.IncognitoModeRoute)
+                },
+                onEmergencyContacts = {
+                    navController.navigate(HomeGraphRoutes.EmergencyContactsRoute)
                 }
             )
         }
@@ -198,6 +203,22 @@ fun NavGraphBuilder.homeGraph(
         composable<HomeGraphRoutes.ChangePasswordRoute> {
             com.dating.home.presentation.profile.settings.changepassword.ChangePasswordScreen(
                 onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable<HomeGraphRoutes.EmergencyOnboardingRoute> {
+            EmergencyOnboardingScreen(
+                onFinished = { navController.popBackStack() }
+            )
+        }
+
+        composable<HomeGraphRoutes.EmergencyContactsRoute> {
+            EmergencyContactsScreen(
+                onBack = { navController.popBackStack() },
+                onCall911 = {
+                    // Launch phone intent via platform-specific mechanism
+                    // On Android this will be handled via Intent in the Activity
+                }
             )
         }
     }
