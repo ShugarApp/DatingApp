@@ -17,10 +17,10 @@ import platform.UIKit.UIApplication
 import platform.UIKit.UIImage
 import platform.UIKit.UIImageJPEGRepresentation
 import platform.UIKit.UIImagePickerController
-import platform.UIKit.UIImagePickerControllerCameraDeviceFront
+import platform.UIKit.UIImagePickerControllerCameraDevice
 import platform.UIKit.UIImagePickerControllerDelegateProtocol
 import platform.UIKit.UIImagePickerControllerOriginalImage
-import platform.UIKit.UIImagePickerControllerSourceTypeCamera
+import platform.UIKit.UIImagePickerControllerSourceType
 import platform.UIKit.UINavigationControllerDelegateProtocol
 import platform.darwin.NSObject
 import platform.posix.memcpy
@@ -70,8 +70,8 @@ actual fun rememberSelfieCameraLauncher(
     return remember {
         SelfieCameraLauncher {
             val picker = UIImagePickerController()
-            picker.sourceType = UIImagePickerControllerSourceTypeCamera
-            picker.cameraDevice = UIImagePickerControllerCameraDeviceFront
+            picker.sourceType = UIImagePickerControllerSourceType.UIImagePickerControllerSourceTypeCamera
+            picker.cameraDevice = UIImagePickerControllerCameraDevice.UIImagePickerControllerCameraDeviceFront
             picker.delegate = delegate
             UIApplication.sharedApplication.keyWindow?.rootViewController
                 ?.presentViewController(picker, animated = true, completion = null)
