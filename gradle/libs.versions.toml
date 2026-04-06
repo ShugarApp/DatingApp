@@ -144,6 +144,7 @@ moko-permissions = { module = "dev.icerock.moko:permissions", version.ref = "mok
 moko-permissions-compose = { module = "dev.icerock.moko:permissions-compose", version.ref = "moko" }
 moko-permissions-notifications = { module = "dev.icerock.moko:permissions-notifications", version.ref = "moko" }
 moko-permissions-camera = { module = "dev.icerock.moko:permissions-camera", version.ref = "moko" }
+moko-permissions-microphone = { module = "dev.icerock.moko:permissions-microphone", version.ref = "moko" }
 
 # Google Sign-In (Android)
 credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }

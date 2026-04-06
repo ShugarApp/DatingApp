@@ -21,18 +21,21 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import aura.feature.home.presentation.generated.resources.Res
 import aura.feature.home.presentation.generated.resources.photo_upload_failed
 import aura.feature.home.presentation.generated.resources.photo_upload_success
+import aura.feature.home.presentation.generated.resources.sos_sent
 import com.dating.core.domain.auth.SessionStorage
 import com.dating.core.domain.auth.UserStatus
 import com.dating.core.domain.preferences.OnboardingPreferences
-import com.dating.home.data.emergency.ShakeDetector
-import com.dating.home.data.emergency.VolumeButtonEventBus
+import com.dating.home.domain.emergency.ShakeDetector
+import com.dating.home.domain.emergency.VolumeButtonEventBus
 import com.dating.home.domain.emergency.EmergencyContactRepository
 import com.dating.home.domain.emergency.EmergencySettingsStorage
 import com.dating.home.domain.upload.PhotoUploadEvent
 import com.dating.home.domain.upload.PhotoUploadManager
 import com.dating.home.presentation.chat.chat_list_detail.ChatListDetailAdaptiveLayout
 import com.dating.home.presentation.emergency.contacts.EmergencyContactsAction
+import com.dating.home.presentation.emergency.contacts.EmergencyContactsEvent
 import com.dating.home.presentation.emergency.contacts.EmergencyContactsViewModel
+import com.dating.home.presentation.emergency.contacts.rememberSmsPermissionLauncher
 import com.dating.home.presentation.emergency.sos.PanicButton
 import com.dating.home.presentation.emergency.sos.SosCountdownDialog
 import com.dating.home.presentation.features_onboarding.FeaturesOnboardingScreen
@@ -123,8 +126,27 @@ fun BottomNavigationContainer(
     val hasContacts = emergencyContacts.isNotEmpty()
     val showPanicButton = isEmergencyEnabled && hasContacts
 
+    // Request SMS permission as soon as emergency feature is active
+    val smsPermissionLauncher = rememberSmsPermissionLauncher { /* result handled by OS */ }
+    LaunchedEffect(showPanicButton) {
+        if (showPanicButton) smsPermissionLauncher.launch()
+    }
+
+    // Show snackbar feedback after SOS is sent
+    LaunchedEffect(Unit) {
+        emergencyViewModel.events.collect { event ->
+            when (event) {
+                is EmergencyContactsEvent.SosSent -> {
+                    val message = getString(Res.string.sos_sent, event.contactCount)
+                    snackbarHostState.showSnackbar(message)
+                }
+                else -> Unit
+            }
+        }
+    }
+
     // Shake detector for SOS activation
-    val shakeDetector = remember { ShakeDetector() }
+    val shakeDetector: ShakeDetector = koinInject()
     DisposableEffect(showPanicButton) {
         if (showPanicButton) {
             shakeDetector.start {
@@ -236,8 +258,8 @@ fun BottomNavigationContainer(
                 }
             }
 
-            // Panic Button overlay
-            if (showPanicButton && !emergencyState.showSosCountdown) {
+            // Panic Button overlay — only visible on the Messages tab
+            if (showPanicButton && !emergencyState.showSosCountdown && selectedSection == BottomNavSection.MESSAGES) {
                 PanicButton(
                     onTrigger = { emergencyViewModel.onAction(EmergencyContactsAction.OnSosTrigger) },
                     modifier = Modifier

@@ -3,12 +3,10 @@ package com.dating.home.presentation.emergency.contacts
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dating.core.domain.location.LocationProvider
-import com.dating.home.data.emergency.AudioRecorderService
-import com.dating.home.data.emergency.SmsDispatcher
 import com.dating.home.domain.emergency.EmergencyContact
 import com.dating.home.domain.emergency.EmergencyContactRepository
-import com.dating.home.domain.emergency.EmergencySettings
 import com.dating.home.domain.emergency.EmergencySettingsStorage
+import com.dating.home.domain.emergency.SmsDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -24,8 +22,7 @@ class EmergencyContactsViewModel(
     private val repository: EmergencyContactRepository,
     private val settingsStorage: EmergencySettingsStorage,
     private val locationProvider: LocationProvider,
-    private val smsDispatcher: SmsDispatcher,
-    private val audioRecorderService: AudioRecorderService
+    private val smsDispatcher: SmsDispatcher
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(EmergencyContactsState())
@@ -136,12 +133,6 @@ class EmergencyContactsViewModel(
             contacts.forEach { contact ->
                 val sent = smsDispatcher.send(contact.phoneNumber, message)
                 if (sent) sentCount++
-            }
-
-            if (!audioRecorderService.isRecording()) {
-                try {
-                    audioRecorderService.start("/tmp/sos_recording_${System.currentTimeMillis()}.m4a")
-                } catch (_: Exception) {}
             }
 
             _state.update { it.copy(isSendingSos = false) }

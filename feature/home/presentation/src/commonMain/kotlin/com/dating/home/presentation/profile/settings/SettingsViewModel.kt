@@ -111,6 +111,9 @@ class SettingsViewModel(
             SettingsAction.OnEmergencyContactsClick -> {
                 viewModelScope.launch { _events.send(SettingsEvent.OnNavigateToEmergencyContacts) }
             }
+            SettingsAction.OnEmergencyTutorialClick -> {
+                viewModelScope.launch { _events.send(SettingsEvent.OnNavigateToEmergencyTutorial) }
+            }
         }
     }
 

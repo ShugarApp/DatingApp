@@ -5,6 +5,7 @@ import dev.icerock.moko.permissions.DeniedException
 import dev.icerock.moko.permissions.PermissionsController
 import dev.icerock.moko.permissions.RequestCanceledException
 import dev.icerock.moko.permissions.camera.CAMERA
+import dev.icerock.moko.permissions.microphone.RECORD_AUDIO
 import dev.icerock.moko.permissions.notifications.REMOTE_NOTIFICATION
 
 actual class PermissionController(

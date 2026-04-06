@@ -83,6 +83,7 @@ import androidx.compose.material.icons.filled.ContactPhone
 import androidx.compose.material3.Switch
 import aura.feature.home.presentation.generated.resources.emergency_contacts_title
 import aura.feature.home.presentation.generated.resources.emergency_feature_description
+import aura.feature.home.presentation.generated.resources.emergency_how_it_works
 import aura.feature.home.presentation.generated.resources.emergency_safety_section
 import aura.feature.home.presentation.generated.resources.settings_100_km
 import aura.feature.home.presentation.generated.resources.settings_account
@@ -152,6 +153,7 @@ fun SettingsScreen(
     onIncognitoMode: () -> Unit,
     onBlockedUsers: () -> Unit,
     onEmergencyContacts: () -> Unit = {},
+    onEmergencyTutorial: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: SettingsViewModel = koinViewModel()
 ) {
@@ -163,6 +165,7 @@ fun SettingsScreen(
         when (event) {
             SettingsEvent.OnLogoutSuccess -> onLogout()
             SettingsEvent.OnNavigateToEmergencyContacts -> onEmergencyContacts()
+            SettingsEvent.OnNavigateToEmergencyTutorial -> onEmergencyTutorial()
             else -> Unit
         }
     }
@@ -320,6 +323,11 @@ fun SettingsScreen(
                         onClick = { viewModel.onAction(SettingsAction.OnEmergencyContactsClick) }
                     )
                 }
+                AccessCardItem(
+                    icon = Icons.AutoMirrored.Filled.Help,
+                    title = stringResource(Res.string.emergency_how_it_works),
+                    onClick = { viewModel.onAction(SettingsAction.OnEmergencyTutorialClick) }
+                )
             }
 
             Spacer(modifier = Modifier.height(16.dp))

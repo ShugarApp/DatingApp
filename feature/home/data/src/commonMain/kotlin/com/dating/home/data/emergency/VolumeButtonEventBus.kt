@@ -1,14 +1,9 @@
 package com.dating.home.data.emergency
 
-import kotlinx.coroutines.flow.MutableSharedFlow
+import com.dating.home.domain.emergency.VolumeButtonEventBus as DomainVolumeButtonEventBus
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
 
 object VolumeButtonEventBus {
-    private val _events = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
-    val events: SharedFlow<Unit> = _events.asSharedFlow()
-
-    fun emit() {
-        _events.tryEmit(Unit)
-    }
+    val events: SharedFlow<Unit> = DomainVolumeButtonEventBus.events
+    fun emit() = DomainVolumeButtonEventBus.emit()
 }

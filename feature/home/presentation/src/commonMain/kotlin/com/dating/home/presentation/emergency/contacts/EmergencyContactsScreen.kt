@@ -58,9 +58,11 @@ import aura.feature.home.presentation.generated.resources.emergency_max_contacts
 import aura.feature.home.presentation.generated.resources.sos_sent
 import com.dating.core.designsystem.components.dialogs.DestructiveConfirmationDialog
 import com.dating.core.designsystem.components.header.AppCenterTopBar
+import androidx.compose.runtime.LaunchedEffect
 import com.dating.core.presentation.util.ObserveAsEvents
 import com.dating.home.domain.emergency.EmergencyContact
 import com.dating.home.presentation.emergency.sos.SosCountdownDialog
+import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -76,12 +78,13 @@ fun EmergencyContactsScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    val sosSentTemplate = stringResource(Res.string.sos_sent)
+    val smsPermissionLauncher = rememberSmsPermissionLauncher { /* permission result handled by OS */ }
+    LaunchedEffect(Unit) { smsPermissionLauncher.launch() }
 
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
             is EmergencyContactsEvent.SosSent -> {
-                snackbarHostState.showSnackbar(sosSentTemplate.format(event.contactCount))
+                snackbarHostState.showSnackbar(getString(Res.string.sos_sent, event.contactCount))
             }
             EmergencyContactsEvent.Call911 -> onCall911()
         }

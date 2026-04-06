@@ -151,6 +151,9 @@ fun NavGraphBuilder.homeGraph(
                 },
                 onEmergencyContacts = {
                     navController.navigate(HomeGraphRoutes.EmergencyContactsRoute)
+                },
+                onEmergencyTutorial = {
+                    navController.navigate(HomeGraphRoutes.EmergencyOnboardingRoute)
                 }
             )
         }

@@ -35,4 +35,5 @@ sealed interface SettingsAction {
     // Emergency Contacts
     data class OnEmergencyToggle(val enabled: Boolean) : SettingsAction
     data object OnEmergencyContactsClick : SettingsAction
+    data object OnEmergencyTutorialClick : SettingsAction
 }

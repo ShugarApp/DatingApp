@@ -7,4 +7,5 @@ sealed interface SettingsEvent {
     data object OnIncognitoToggled : SettingsEvent
     data object OnSurveyCompleted : SettingsEvent
     data object OnNavigateToEmergencyContacts : SettingsEvent
+    data object OnNavigateToEmergencyTutorial : SettingsEvent
 }

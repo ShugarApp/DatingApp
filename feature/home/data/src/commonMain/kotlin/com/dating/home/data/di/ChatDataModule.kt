@@ -17,7 +17,11 @@ import com.dating.home.data.block.KtorBlockService
 import com.dating.home.data.emergency.AudioRecorderService
 import com.dating.home.data.emergency.DataStoreEmergencySettingsStorage
 import com.dating.home.data.emergency.EmergencyContactRepositoryImpl
+import com.dating.home.data.emergency.ShakeDetector
 import com.dating.home.data.emergency.SmsDispatcher
+import com.dating.home.domain.emergency.AudioRecorderService as DomainAudioRecorderService
+import com.dating.home.domain.emergency.ShakeDetector as DomainShakeDetector
+import com.dating.home.domain.emergency.SmsDispatcher as DomainSmsDispatcher
 import com.dating.home.data.giphy.KtorGiphyService
 import com.dating.home.data.report.KtorReportService
 import com.dating.home.data.user.KtorUserService
@@ -66,9 +70,31 @@ val homeDataModule = module {
     singleOf(::KtorReportService) bind ReportService::class
     singleOf(::KtorGiphyService) bind GiphyService::class
     singleOf(::EmergencyContactRepositoryImpl) bind EmergencyContactRepository::class
-    singleOf(::DataStoreEmergencySettingsStorage) bind EmergencySettingsStorage::class
+    single { DataStoreEmergencySettingsStorage(get()) } bind EmergencySettingsStorage::class
     singleOf(::SmsDispatcher)
+    single<DomainSmsDispatcher> {
+        val impl = get<SmsDispatcher>()
+        object : DomainSmsDispatcher {
+            override suspend fun send(phoneNumber: String, message: String) = impl.send(phoneNumber, message)
+        }
+    }
     singleOf(::AudioRecorderService)
+    single<DomainAudioRecorderService> {
+        val impl = get<AudioRecorderService>()
+        object : DomainAudioRecorderService {
+            override fun start(filePath: String) = impl.start(filePath)
+            override fun stop() = impl.stop()
+            override fun isRecording() = impl.isRecording()
+        }
+    }
+    singleOf(::ShakeDetector)
+    single<DomainShakeDetector> {
+        val impl = get<ShakeDetector>()
+        object : DomainShakeDetector {
+            override fun start(onShake: () -> Unit) = impl.start(onShake)
+            override fun stop() = impl.stop()
+        }
+    }
     single {
         Json {
             ignoreUnknownKeys = true

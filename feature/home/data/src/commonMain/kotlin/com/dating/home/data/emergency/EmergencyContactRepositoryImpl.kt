@@ -4,9 +4,9 @@ import com.dating.home.database.AppChatDatabase
 import com.dating.home.database.entities.EmergencyContactEntity
 import com.dating.home.domain.emergency.EmergencyContact
 import com.dating.home.domain.emergency.EmergencyContactRepository
+import kotlin.time.Clock.System.now
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.datetime.Clock
 
 class EmergencyContactRepositoryImpl(
     private val database: AppChatDatabase
@@ -49,7 +49,7 @@ class EmergencyContactRepositoryImpl(
             name = name,
             phoneNumber = phoneNumber,
             relationship = relationship,
-            createdAt = Clock.System.now().toEpochMilliseconds()
+            createdAt = now().toEpochMilliseconds()
         )
     }
 }

@@ -7,10 +7,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Contacts
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
@@ -26,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import aura.feature.home.presentation.generated.resources.Res
 import aura.feature.home.presentation.generated.resources.emergency_add_contact
 import aura.feature.home.presentation.generated.resources.emergency_contact_name_hint
+import aura.feature.home.presentation.generated.resources.emergency_import_from_contacts
 import aura.feature.home.presentation.generated.resources.emergency_contact_phone_hint
 import aura.feature.home.presentation.generated.resources.emergency_contact_relationship_hint
 import aura.feature.home.presentation.generated.resources.emergency_edit_contact
@@ -48,6 +55,13 @@ fun AddEmergencyContactBottomSheet(
     var name by remember(contactToEdit) { mutableStateOf(contactToEdit?.name ?: "") }
     var phone by remember(contactToEdit) { mutableStateOf(contactToEdit?.phoneNumber ?: "") }
     var relationship by remember(contactToEdit) { mutableStateOf(contactToEdit?.relationship ?: "") }
+
+    val contactPicker = rememberContactPickerLauncher { picked ->
+        picked?.let {
+            name = it.name
+            phone = it.phoneNumber
+        }
+    }
 
     val isEditing = contactToEdit != null
     val canSave = name.isNotBlank() && phone.isNotBlank()
@@ -73,6 +87,19 @@ fun AddEmergencyContactBottomSheet(
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
+
+            OutlinedButton(
+                onClick = { contactPicker.launch() },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Contacts,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(stringResource(Res.string.emergency_import_from_contacts))
+            }
 
             OutlinedTextField(
                 value = name,

@@ -494,6 +494,8 @@
     <string name="emergency_delete_contact_confirm">Remove</string>
     <string name="emergency_max_contacts">Maximum of 5 contacts allowed.</string>
     <string name="emergency_edit_contact">Edit Contact</string>
+    <string name="emergency_import_from_contacts">Import from contacts</string>
+    <string name="emergency_how_it_works">How it works</string>
     <string name="emergency_auto_call_911">Also call emergency services</string>
     <string name="emergency_auto_call_911_desc">Automatically call 911 when SOS is triggered</string>
     <!-- SOS Countdown -->

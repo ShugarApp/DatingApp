@@ -23,6 +23,9 @@ kotlin {
 
                 implementation(libs.bundles.ktor.common)
                 implementation(libs.koin.core)
+                implementation(libs.datastore)
+                implementation(libs.datastore.preferences)
+                implementation(libs.kotlinx.datetime)
             }
         }
 

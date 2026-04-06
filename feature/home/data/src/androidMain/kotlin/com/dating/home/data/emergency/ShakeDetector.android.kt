@@ -6,6 +6,7 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import kotlin.math.sqrt
+import org.koin.core.context.GlobalContext
 
 actual class ShakeDetector actual constructor() {
 
@@ -53,7 +54,8 @@ actual class ShakeDetector actual constructor() {
     }
 
     actual fun start(onShake: () -> Unit) {
-        // Context-aware version called from BottomNavigationContainer via startWithContext
+        val context = GlobalContext.get().get<android.app.Application>()
+        startWithContext(context, onShake)
     }
 
     actual fun stop() {
