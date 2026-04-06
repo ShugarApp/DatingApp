@@ -34,7 +34,11 @@ data class ChatDetailState(
     val messageSearchResults: List<Int> = emptyList(),
     val currentSearchResultIndex: Int = -1,
     val isMediaPickerOpen: Boolean = false,
-    val isUploadingMedia: Boolean = false
+    val isUploadingMedia: Boolean = false,
+    val showDateProposalSheet: Boolean = false,
+    val editingProposalMessageId: String? = null,
+    val editingProposalDateTime: String? = null,
+    val editingProposalLocation: String? = null
 )
 
 data class BannerState(

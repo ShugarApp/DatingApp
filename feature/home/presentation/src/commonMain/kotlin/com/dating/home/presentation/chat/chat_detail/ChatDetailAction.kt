@@ -46,4 +46,11 @@ sealed interface ChatDetailAction {
     data object OnConfirmBlockAfterReport: ChatDetailAction
     data object OnDismissBlockAfterReportDialog: ChatDetailAction
     data class OnReactToMessage(val messageId: String, val emoji: String): ChatDetailAction
+    data object OnProposeDateClick: ChatDetailAction
+    data object OnDismissDateProposalSheet: ChatDetailAction
+    data class OnSubmitDateProposal(val dateTime: String, val location: String): ChatDetailAction
+    data class OnAcceptProposal(val messageId: String): ChatDetailAction
+    data class OnRejectProposal(val messageId: String): ChatDetailAction
+    data class OnCancelProposal(val messageId: String): ChatDetailAction
+    data class OnEditProposal(val messageId: String, val dateTime: String, val location: String): ChatDetailAction
 }

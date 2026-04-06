@@ -27,6 +27,7 @@ import com.dating.home.domain.report.ReportService
 import com.dating.home.domain.models.ChatMessage
 import com.dating.home.domain.models.ChatMessageDeliveryStatus
 import com.dating.home.domain.models.ConnectionState
+import com.dating.home.domain.models.DateProposalStatus
 import com.dating.home.domain.models.MessageType
 import com.dating.home.domain.models.OutgoingNewMessage
 import com.dating.home.domain.models.ReactionSummary
@@ -203,6 +204,13 @@ class ChatDetailViewModel(
             is ChatDetailAction.OnMessageSearchQueryChanged -> updateMessageSearch(action.query)
             ChatDetailAction.OnNextSearchResult -> navigateSearchResult(forward = true)
             ChatDetailAction.OnPreviousSearchResult -> navigateSearchResult(forward = false)
+            ChatDetailAction.OnProposeDateClick -> onProposeDateClick()
+            ChatDetailAction.OnDismissDateProposalSheet -> onDismissDateProposalSheet()
+            is ChatDetailAction.OnSubmitDateProposal -> submitDateProposal(action.dateTime, action.location)
+            is ChatDetailAction.OnAcceptProposal -> updateProposalStatus(action.messageId, DateProposalStatus.ACCEPTED)
+            is ChatDetailAction.OnRejectProposal -> updateProposalStatus(action.messageId, DateProposalStatus.REJECTED)
+            is ChatDetailAction.OnCancelProposal -> updateProposalStatus(action.messageId, DateProposalStatus.CANCELLED)
+            is ChatDetailAction.OnEditProposal -> onEditProposal(action.messageId, action.dateTime, action.location)
             else -> Unit
         }
     }
@@ -785,6 +793,93 @@ class ChatDetailViewModel(
 
     private fun toggleMediaPicker() {
         _state.update { it.copy(isMediaPickerOpen = !it.isMediaPickerOpen) }
+    }
+
+    private fun onProposeDateClick() {
+        _state.update {
+            it.copy(
+                showDateProposalSheet = true,
+                editingProposalMessageId = null,
+                editingProposalDateTime = null,
+                editingProposalLocation = null
+            )
+        }
+    }
+
+    private fun onDismissDateProposalSheet() {
+        _state.update {
+            it.copy(
+                showDateProposalSheet = false,
+                editingProposalMessageId = null,
+                editingProposalDateTime = null,
+                editingProposalLocation = null
+            )
+        }
+    }
+
+    private fun submitDateProposal(dateTime: String, location: String) {
+        val currentChatId = _chatId.value ?: return
+
+        _state.update { it.copy(showDateProposalSheet = false) }
+
+        viewModelScope.launch {
+            val editingMessageId = state.value.editingProposalMessageId
+
+            // If editing, cancel the original proposal first
+            if (editingMessageId != null) {
+                messageRepository.updateDateProposalStatus(
+                    messageId = editingMessageId,
+                    chatId = currentChatId,
+                    newStatus = DateProposalStatus.EDITED
+                )
+            }
+
+            val messageId = Uuid.random().toString()
+            messageRepository
+                .sendDateProposal(
+                    chatId = currentChatId,
+                    messageId = messageId,
+                    dateTime = dateTime,
+                    location = location
+                )
+                .onFailure { error ->
+                    eventChannel.send(ChatDetailEvent.OnError(error.toUiText()))
+                }
+
+            _state.update {
+                it.copy(
+                    editingProposalMessageId = null,
+                    editingProposalDateTime = null,
+                    editingProposalLocation = null
+                )
+            }
+        }
+    }
+
+    private fun updateProposalStatus(messageId: String, status: DateProposalStatus) {
+        val currentChatId = _chatId.value ?: return
+        viewModelScope.launch {
+            messageRepository
+                .updateDateProposalStatus(
+                    messageId = messageId,
+                    chatId = currentChatId,
+                    newStatus = status
+                )
+                .onFailure { error ->
+                    eventChannel.send(ChatDetailEvent.OnError(error.toUiText()))
+                }
+        }
+    }
+
+    private fun onEditProposal(messageId: String, dateTime: String, location: String) {
+        _state.update {
+            it.copy(
+                showDateProposalSheet = true,
+                editingProposalMessageId = messageId,
+                editingProposalDateTime = dateTime,
+                editingProposalLocation = location
+            )
+        }
     }
 
     companion object {

@@ -145,6 +145,10 @@ class WebSocketChatConnectionClient(
                 json.decodeFromString<IncomingWebSocketDto.MessageReactionUpdatedDto>(message.payload)
             }
 
+            IncomingWebSocketType.DATE_PROPOSAL_UPDATED.name -> {
+                json.decodeFromString<IncomingWebSocketDto.DateProposalUpdatedDto>(message.payload)
+            }
+
             else -> null
         }
     }
@@ -158,6 +162,7 @@ class WebSocketChatConnectionClient(
             is IncomingWebSocketDto.MessagesReadDto -> handleMessagesRead(message)
             is IncomingWebSocketDto.TypingIndicatorDto -> Unit
             is IncomingWebSocketDto.MessageReactionUpdatedDto -> handleReactionUpdated(message)
+            is IncomingWebSocketDto.DateProposalUpdatedDto -> handleDateProposalUpdated(message)
         }
     }
 
@@ -206,6 +211,14 @@ class WebSocketChatConnectionClient(
         if (entities.isNotEmpty()) {
             database.messageReactionDao.upsertReactions(entities)
         }
+    }
+
+    private suspend fun handleDateProposalUpdated(message: IncomingWebSocketDto.DateProposalUpdatedDto) {
+        val existingMessage = database.chatMessageDao.getMessageById(message.messageId)
+            ?: return
+        database.chatMessageDao.upsertMessage(
+            existingMessage.copy(content = message.content)
+        )
     }
 
     private suspend fun updateProfilePicture(message: IncomingWebSocketDto.ProfilePictureUpdated) {

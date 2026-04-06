@@ -13,7 +13,8 @@ sealed class MessageUi(open val id: String) {
         val deliveryStatus: ChatMessageDeliveryStatus,
         val formattedSentTime: UiText,
         val messageType: MessageType = MessageType.TEXT,
-        val reactions: List<ReactionSummary> = emptyList()
+        val reactions: List<ReactionSummary> = emptyList(),
+        val dateProposal: DateProposalUi? = null
     ): MessageUi(id)
 
     data class OtherUserMessage(
@@ -22,7 +23,8 @@ sealed class MessageUi(open val id: String) {
         val formattedSentTime: UiText,
         val sender: ChatParticipantUi,
         val messageType: MessageType = MessageType.TEXT,
-        val reactions: List<ReactionSummary> = emptyList()
+        val reactions: List<ReactionSummary> = emptyList(),
+        val dateProposal: DateProposalUi? = null
     ): MessageUi(id)
 
     data class DateSeparator(

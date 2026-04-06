@@ -12,4 +12,9 @@ interface ChatMessageService {
     ): Result<List<ChatMessage>, DataError.Remote>
 
     suspend fun deleteMessage(messageId: String): EmptyResult<DataError.Remote>
+
+    suspend fun updateProposalStatus(
+        messageId: String,
+        status: String
+    ): EmptyResult<DataError.Remote>
 }

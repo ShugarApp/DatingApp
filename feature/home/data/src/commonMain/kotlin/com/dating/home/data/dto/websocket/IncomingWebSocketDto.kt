@@ -9,7 +9,8 @@ enum class IncomingWebSocketType {
     PROFILE_PICTURE_UPDATED,
     CHAT_PARTICIPANTS_CHANGED,
     TYPING_INDICATOR,
-    MESSAGE_REACTION_UPDATED
+    MESSAGE_REACTION_UPDATED,
+    DATE_PROPOSAL_UPDATED
 }
 
 @Serializable
@@ -68,5 +69,14 @@ sealed interface IncomingWebSocketDto {
         val chatId: String,
         val reactions: List<com.dating.home.data.dto.websocket.ReactionSummaryDto>,
         val type: IncomingWebSocketType = IncomingWebSocketType.MESSAGE_REACTION_UPDATED
+    ): IncomingWebSocketDto
+
+    @Serializable
+    data class DateProposalUpdatedDto(
+        val messageId: String,
+        val chatId: String,
+        val status: String,
+        val content: String,
+        val type: IncomingWebSocketType = IncomingWebSocketType.DATE_PROPOSAL_UPDATED
     ): IncomingWebSocketDto
 }
