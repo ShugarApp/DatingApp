@@ -52,10 +52,23 @@ fun LocalUserMessage(
     onReactionTapped: (String) -> Unit = {},
     onDoubleTapReact: () -> Unit = {},
     onCancelProposal: () -> Unit = {},
+    onEditProposal: () -> Unit = {},
     modifier: Modifier = Modifier,
     highlightText: String? = null
 ) {
     var fullScreenImageUrl by remember { mutableStateOf<String?>(null) }
+    var showProposalDetail by remember { mutableStateOf(false) }
+
+    if (showProposalDetail && message.dateProposal != null) {
+        DateProposalDetailSheet(
+            proposal = message.dateProposal,
+            onDismiss = { showProposalDetail = false },
+            onAccept = {},
+            onReject = {},
+            onCancel = { onCancelProposal(); showProposalDetail = false },
+            onEdit = { onEditProposal(); showProposalDetail = false }
+        )
+    }
 
     fullScreenImageUrl?.let { url ->
         FullScreenImageViewer(
@@ -122,8 +135,14 @@ fun LocalUserMessage(
                                 onAccept = {},
                                 onReject = {},
                                 onCancel = onCancelProposal,
-                                onEdit = {}
+                                onEdit = onEditProposal,
+                                onViewDetail = { showProposalDetail = true }
                             )
+                        }
+                    }
+                    message.messageType == MessageType.LOCATION && message.locationMessage != null -> {
+                        {
+                            LocationBubbleContent(location = message.locationMessage)
                         }
                     }
                     message.messageType != MessageType.TEXT -> {

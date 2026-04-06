@@ -1,11 +1,12 @@
 package com.dating.home.presentation.chat.model
 
+import com.dating.home.domain.models.DateProposalLocation
 import com.dating.home.domain.models.DateProposalStatus
 
 data class DateProposalUi(
     val messageId: String,
     val dateTime: String,
-    val location: String,
+    val location: DateProposalLocation,
     val status: DateProposalStatus,
     val canAccept: Boolean,
     val canReject: Boolean,

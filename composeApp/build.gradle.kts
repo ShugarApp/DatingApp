@@ -1,5 +1,8 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
 plugins {
     alias(libs.plugins.convention.cmp.application)
+    alias(libs.plugins.convention.buildkonfig)
     alias(libs.plugins.compose.hot.reload)
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
@@ -8,11 +11,20 @@ plugins {
 
 version = "1.0.0"
 
+android {
+    defaultConfig {
+        val mapsApiKey = gradleLocalProperties(rootDir, providers)
+            .getProperty("PLACES_API_KEY") ?: ""
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
+    }
+}
+
 kotlin {
     sourceSets {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.places)
 
             implementation(libs.core.splashscreen)
 

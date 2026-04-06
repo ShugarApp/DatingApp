@@ -51,6 +51,7 @@ import aura.feature.home.presentation.generated.resources.no_chat_selected
 import aura.feature.home.presentation.generated.resources.select_a_chat
 import com.dating.home.domain.models.ChatMessage
 import com.dating.home.domain.models.ChatMessageDeliveryStatus
+import com.dating.home.domain.models.DateProposalLocation
 import aura.feature.home.presentation.generated.resources.block_user
 import aura.feature.home.presentation.generated.resources.block_user_title
 import aura.feature.home.presentation.generated.resources.block_user_desc
@@ -75,6 +76,7 @@ import com.dating.home.presentation.chat.chat_detail.components.MediaPickerConte
 import com.dating.home.presentation.chat.chat_detail.components.MediaPickerOption
 import com.dating.home.presentation.chat.chat_detail.components.DateProposalSheet
 import com.dating.home.presentation.chat.chat_detail.components.MessageBox
+import com.dating.home.presentation.chat.chat_detail.components.LocationShareSheet
 import com.dating.home.presentation.chat.chat_detail.components.MessageList
 import com.dating.home.presentation.chat.chat_detail.components.PaginationScrollListener
 import com.dating.home.presentation.chat.chat_detail.components.TypingIndicator
@@ -224,6 +226,7 @@ fun ChatDetailRoot(
             },
             onAttachClick = { showMediaPickerSheet = true },
             onProposeDateClick = { viewModel.onAction(ChatDetailAction.OnProposeDateClick) },
+            onShareLocationClick = { viewModel.onAction(ChatDetailAction.OnShareLocationClick) },
             snackbarState = snackbarState
         )
 
@@ -297,12 +300,21 @@ fun ChatDetailRoot(
     if (state.showDateProposalSheet) {
         DateProposalSheet(
             onDismiss = { viewModel.onAction(ChatDetailAction.OnDismissDateProposalSheet) },
-            onSubmit = { dateTime, location ->
+            onSubmit = { dateTime, location: DateProposalLocation ->
                 viewModel.onAction(ChatDetailAction.OnSubmitDateProposal(dateTime, location))
             },
             initialDateTime = state.editingProposalDateTime,
             initialLocation = state.editingProposalLocation,
             isEditing = state.editingProposalMessageId != null
+        )
+    }
+
+    if (state.showLocationPicker) {
+        LocationShareSheet(
+            onDismiss = { viewModel.onAction(ChatDetailAction.OnDismissLocationPicker) },
+            onLocationSelected = { location ->
+                viewModel.onAction(ChatDetailAction.OnShareLocation(location))
+            }
         )
     }
 
@@ -367,6 +379,7 @@ fun ChatDetailScreen(
     onAction: (ChatDetailAction) -> Unit,
     onAttachClick: () -> Unit = {},
     onProposeDateClick: () -> Unit = {},
+    onShareLocationClick: () -> Unit = {},
 ) {
     val configuration = currentDeviceConfiguration()
 
@@ -550,7 +563,7 @@ fun ChatDetailScreen(
                             onCancelProposal = { messageId ->
                                 onAction(ChatDetailAction.OnCancelProposal(messageId))
                             },
-                            onEditProposal = { messageId, dateTime, location ->
+                            onEditProposal = { messageId, dateTime, location: DateProposalLocation ->
                                 onAction(ChatDetailAction.OnEditProposal(messageId, dateTime, location))
                             },
                             modifier = Modifier
@@ -580,6 +593,7 @@ fun ChatDetailScreen(
                                     },
                                     onAttachClick = onAttachClick,
                                     onProposeDateClick = onProposeDateClick,
+                                    onShareLocationClick = onShareLocationClick,
                                     isUploadingMedia = state.isUploadingMedia,
                                     modifier = Modifier
                                         .fillMaxWidth()

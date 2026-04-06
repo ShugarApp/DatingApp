@@ -15,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
@@ -59,6 +60,7 @@ fun MessageBox(
     onTextChanged: (String) -> Unit = {},
     onAttachClick: (() -> Unit)? = null,
     onProposeDateClick: (() -> Unit)? = null,
+    onShareLocationClick: (() -> Unit)? = null,
     isUploadingMedia: Boolean = false
 ) {
     val isConnected = connectionState == ConnectionState.CONNECTED
@@ -115,6 +117,24 @@ fun MessageBox(
                     Icon(
                         imageVector = Icons.Default.CalendarMonth,
                         contentDescription = "Propose a date",
+                        modifier = Modifier.size(20.dp),
+                        tint = if (isConnected) {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        } else {
+                            MaterialTheme.colorScheme.extended.textDisabled
+                        }
+                    )
+                }
+            }
+            if (onShareLocationClick != null) {
+                IconButton(
+                    onClick = onShareLocationClick,
+                    enabled = isConnected,
+                    modifier = Modifier.size(40.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.LocationOn,
+                        contentDescription = "Share location",
                         modifier = Modifier.size(20.dp),
                         tint = if (isConnected) {
                             MaterialTheme.colorScheme.onSurfaceVariant

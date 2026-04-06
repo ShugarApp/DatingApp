@@ -11,7 +11,9 @@ import coil3.SingletonImageLoader
 import coil3.gif.AnimatedImageDecoder
 import coil3.request.CachePolicy
 import com.dating.aura.di.initKoin
+import com.dating.composeapp.BuildKonfig
 import com.dating.home.data.inactivity.InactivityNotificationScheduler
+import com.google.android.libraries.places.api.Places
 import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -20,6 +22,9 @@ class AppApplication: Application(), SingletonImageLoader.Factory {
 
     override fun onCreate() {
         super.onCreate()
+        if (!Places.isInitialized()) {
+            Places.initialize(applicationContext, BuildKonfig.PLACES_API_KEY)
+        }
         initKoin {
             androidContext(this@AppApplication)
             androidLogger()

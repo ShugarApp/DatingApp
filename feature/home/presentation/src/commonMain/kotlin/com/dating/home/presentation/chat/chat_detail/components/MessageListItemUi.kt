@@ -11,6 +11,7 @@ import com.dating.core.designsystem.components.avatar.ChatParticipantUi
 import com.dating.core.designsystem.theme.AppTheme
 import com.dating.core.presentation.util.UiText
 import com.dating.home.domain.models.ChatMessageDeliveryStatus
+import com.dating.home.domain.models.DateProposalLocation
 import com.dating.home.domain.models.MessageType
 import com.dating.home.presentation.chat.model.MessageUi
 import com.dating.home.presentation.chat.util.getChatBubbleColorForUser
@@ -30,7 +31,7 @@ fun MessageListItemUi(
     onAcceptProposal: (String) -> Unit = {},
     onRejectProposal: (String) -> Unit = {},
     onCancelProposal: (String) -> Unit = {},
-    onEditProposal: (String, String, String) -> Unit = { _, _, _ -> },
+    onEditProposal: (String, String, DateProposalLocation) -> Unit = { _, _, _ -> },
     modifier: Modifier = Modifier,
     highlightText: String? = null
 ) {
@@ -56,6 +57,12 @@ fun MessageListItemUi(
                     onReactionTapped = { emoji -> onReactionTapped(messageUi.id, emoji) },
                     onDoubleTapReact = { onDoubleTapReact(messageUi.id) },
                     onCancelProposal = { onCancelProposal(messageUi.id) },
+                    onEditProposal = {
+                        val proposal = messageUi.dateProposal
+                        if (proposal != null) {
+                            onEditProposal(messageUi.id, proposal.dateTime, proposal.location)
+                        }
+                    },
                     highlightText = highlightText
                 )
             }

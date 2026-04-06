@@ -2,6 +2,7 @@ package com.dating.home.domain.message
 
 import com.dating.home.domain.models.ChatMessage
 import com.dating.home.domain.models.ChatMessageDeliveryStatus
+import com.dating.home.domain.models.DateProposalLocation
 import com.dating.home.domain.models.DateProposalStatus
 import com.dating.home.domain.models.MessageType
 import com.dating.home.domain.models.MessageWithSender
@@ -49,7 +50,13 @@ interface MessageRepository {
         chatId: String,
         messageId: String,
         dateTime: String,
-        location: String
+        location: DateProposalLocation
+    ): EmptyResult<DataError>
+
+    suspend fun sendLocation(
+        chatId: String,
+        messageId: String,
+        location: DateProposalLocation
     ): EmptyResult<DataError>
 
     suspend fun updateDateProposalStatus(
@@ -57,4 +64,6 @@ interface MessageRepository {
         chatId: String,
         newStatus: DateProposalStatus
     ): EmptyResult<DataError>
+
+    fun getActiveDateProposals(): Flow<List<com.dating.home.domain.models.AcceptedDateProposal>>
 }

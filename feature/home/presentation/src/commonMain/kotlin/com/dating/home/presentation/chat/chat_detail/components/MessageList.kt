@@ -26,6 +26,7 @@ import aura.feature.home.presentation.generated.resources.no_messages
 import aura.feature.home.presentation.generated.resources.no_messages_subtitle
 import aura.feature.home.presentation.generated.resources.retry
 import com.dating.home.presentation.chat.components.EmptySection
+import com.dating.home.domain.models.DateProposalLocation
 import com.dating.home.presentation.chat.model.MessageUi
 import com.dating.core.designsystem.components.buttons.ChirpButton
 import com.dating.core.designsystem.components.buttons.AppButtonStyle
@@ -49,7 +50,7 @@ fun MessageList(
     onAcceptProposal: (String) -> Unit = {},
     onRejectProposal: (String) -> Unit = {},
     onCancelProposal: (String) -> Unit = {},
-    onEditProposal: (String, String, String) -> Unit = { _, _, _ -> },
+    onEditProposal: (String, String, DateProposalLocation) -> Unit = { _, _, _ -> },
     modifier: Modifier = Modifier,
     highlightText: String? = null
 ) {

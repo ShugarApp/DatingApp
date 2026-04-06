@@ -14,6 +14,7 @@ import com.dating.home.domain.message.ChatMessageService
 import com.dating.home.domain.message.MessageRepository
 import com.dating.home.domain.models.ChatMessage
 import com.dating.home.domain.models.ChatMessageDeliveryStatus
+import com.dating.home.domain.models.DateProposalLocation
 import com.dating.home.domain.models.DateProposalStatus
 import com.dating.home.domain.models.MessageType
 import com.dating.home.domain.models.MessageWithSender
@@ -29,8 +30,12 @@ import com.dating.core.domain.util.EmptyResult
 import com.dating.core.domain.util.Result
 import com.dating.core.domain.util.onFailure
 import com.dating.core.domain.util.onSuccess
+import com.dating.home.data.dto.DateProposalLocationDto
+import com.dating.home.data.dto.LocationContentDto
+import com.dating.home.domain.models.AcceptedDateProposal
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -332,11 +337,17 @@ class OfflineFirstMessageRepository(
         chatId: String,
         messageId: String,
         dateTime: String,
-        location: String
+        location: DateProposalLocation
     ): EmptyResult<DataError> {
         val proposalContent = DateProposalContentDto(
             dateTime = dateTime,
-            location = location,
+            location = DateProposalLocationDto(
+                name = location.name,
+                address = location.address,
+                latitude = location.latitude,
+                longitude = location.longitude,
+                placeId = location.placeId
+            ),
             status = DateProposalStatus.PENDING.name
         )
         val contentJson = json.encodeToString(proposalContent)
@@ -346,6 +357,27 @@ class OfflineFirstMessageRepository(
             messageId = messageId,
             content = contentJson,
             messageType = MessageType.DATE_PROPOSAL
+        )
+        return sendMessage(message)
+    }
+
+    override suspend fun sendLocation(
+        chatId: String,
+        messageId: String,
+        location: DateProposalLocation
+    ): EmptyResult<DataError> {
+        val locationContent = LocationContentDto(
+            latitude = location.latitude,
+            longitude = location.longitude,
+            name = location.name.ifBlank { null },
+            address = location.address.ifBlank { null }
+        )
+        val contentJson = json.encodeToString(locationContent)
+        val message = OutgoingNewMessage(
+            chatId = chatId,
+            messageId = messageId,
+            content = contentJson,
+            messageType = MessageType.LOCATION
         )
         return sendMessage(message)
     }
@@ -379,6 +411,54 @@ class OfflineFirstMessageRepository(
                 // Revert optimistic update on failure
                 database.chatMessageDao.upsertMessage(messageEntity)
             }
+    }
+
+    override fun getActiveDateProposals(): Flow<List<AcceptedDateProposal>> {
+        val activeStatuses = setOf(DateProposalStatus.PENDING.name, DateProposalStatus.ACCEPTED.name)
+        return combine(
+            database.chatMessageDao.getAllDateProposalMessages(),
+            database.chatDao.getChatsWithParticipants(),
+            sessionStorage.observeAuthInfo()
+        ) { messages, chats, authInfo ->
+            val localUserId = authInfo?.user?.id ?: return@combine emptyList()
+            val chatMap = chats.associateBy { it.chat.chatId }
+
+            messages.mapNotNull { message ->
+                try {
+                    val content = json.decodeFromString<DateProposalContentDto>(message.content)
+                    if (content.status !in activeStatuses) return@mapNotNull null
+
+                    val chat = chatMap[message.chatId] ?: return@mapNotNull null
+                    val otherParticipant = chat.participants.firstOrNull { it.userId != localUserId }
+                        ?: return@mapNotNull null
+
+                    val status = try {
+                        DateProposalStatus.valueOf(content.status)
+                    } catch (_: Exception) {
+                        DateProposalStatus.PENDING
+                    }
+
+                    AcceptedDateProposal(
+                        messageId = message.messageId,
+                        chatId = message.chatId,
+                        dateTime = content.dateTime,
+                        location = DateProposalLocation(
+                            name = content.location.name,
+                            address = content.location.address,
+                            latitude = content.location.latitude,
+                            longitude = content.location.longitude,
+                            placeId = content.location.placeId
+                        ),
+                        status = status,
+                        isSentByMe = message.senderId == localUserId,
+                        otherPersonName = otherParticipant.username,
+                        otherPersonAvatarUrl = otherParticipant.profilePictureUrl
+                    )
+                } catch (_: Exception) {
+                    null
+                }
+            }
+        }
     }
 
     private fun OutgoingWebSocketDto.NewMessage.toJsonPayload(): String {

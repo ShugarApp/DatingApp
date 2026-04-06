@@ -32,6 +32,8 @@ import com.dating.home.domain.emergency.EmergencySettingsStorage
 import com.dating.home.domain.upload.PhotoUploadEvent
 import com.dating.home.domain.upload.PhotoUploadManager
 import com.dating.home.presentation.chat.chat_list_detail.ChatListDetailAdaptiveLayout
+import com.dating.home.presentation.dates.DatesRoot
+import com.dating.home.presentation.dates.DatesViewModel
 import com.dating.home.presentation.emergency.contacts.EmergencyContactsAction
 import com.dating.home.presentation.emergency.contacts.EmergencyContactsEvent
 import com.dating.home.presentation.emergency.contacts.EmergencyContactsViewModel
@@ -69,6 +71,8 @@ fun BottomNavigationContainer(
     val onboardingPreferences: OnboardingPreferences = koinInject()
     val uploadManager: PhotoUploadManager = koinInject()
     val snackbarHostState = remember { SnackbarHostState() }
+    val datesViewModel: DatesViewModel = koinViewModel()
+    val datesState by datesViewModel.state.collectAsStateWithLifecycle()
 
     // Show in-app notifications when background photo uploads complete
     LaunchedEffect(Unit) {
@@ -89,6 +93,24 @@ fun BottomNavigationContainer(
     val authInfo by sessionStorage.observeAuthInfo().collectAsStateWithLifecycle(null)
     val userStatus = authInfo?.user?.status
     var selectedSection by rememberSaveable { mutableStateOf(initialSection) }
+    val datesCount = datesState.dates.size
+    val hasAcceptedDates = datesCount > 0
+    val visibleSections = remember(hasAcceptedDates) {
+        if (hasAcceptedDates) BottomNavSection.entries.toList()
+        else BottomNavSection.entries.filter { it != BottomNavSection.DATES }
+    }
+    // Track previous count to detect the transition 0 → 1 (first date accepted)
+    var prevDatesCount by rememberSaveable { mutableStateOf(0) }
+    LaunchedEffect(datesCount) {
+        if (datesCount == 1 && prevDatesCount == 0) {
+            // First date just got accepted — jump to the Dates tab
+            selectedSection = BottomNavSection.DATES
+        }
+        if (!hasAcceptedDates && selectedSection == BottomNavSection.DATES) {
+            selectedSection = BottomNavSection.MESSAGES
+        }
+        prevDatesCount = datesCount
+    }
 
     // null = not yet loaded from DataStore, true/false = loaded value
     var hasSeenFeaturesOnboarding by rememberSaveable { mutableStateOf<Boolean?>(null) }
@@ -207,6 +229,7 @@ fun BottomNavigationContainer(
         bottomBar = {
             BottomNavigationBar(
                 selectedSection = selectedSection,
+                sections = visibleSections,
                 onSectionSelected = { section ->
                     selectedSection = section
                 }
@@ -244,6 +267,12 @@ fun BottomNavigationContainer(
                         onNavigateToProfile = { userId ->
                             onNavigateToMatchProfile(userId, null)
                         }
+                    )
+                }
+
+                BottomNavSection.DATES -> {
+                    DatesRoot(
+                        onNavigateToChatDetail = onNavigateToChatDetail
                     )
                 }
 

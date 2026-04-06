@@ -18,7 +18,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -30,27 +29,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.dating.home.domain.models.DateProposalLocation
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DateProposalSheet(
     onDismiss: () -> Unit,
-    onSubmit: (dateTime: String, location: String) -> Unit,
+    onSubmit: (dateTime: String, location: DateProposalLocation) -> Unit,
     initialDateTime: String? = null,
-    initialLocation: String? = null,
+    initialLocation: DateProposalLocation? = null,
     isEditing: Boolean = false
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    // Parse initial date/time
     val (initDate, initTime) = remember(initialDateTime) {
         if (initialDateTime != null) {
             val parts = initialDateTime.split("T")
-            if (parts.size == 2) {
-                parts[0] to parts[1].take(5)
-            } else {
-                "" to ""
-            }
+            if (parts.size == 2) parts[0] to parts[1].take(5) else "" to ""
         } else {
             "" to ""
         }
@@ -58,11 +53,12 @@ fun DateProposalSheet(
 
     var selectedDate by remember { mutableStateOf(initDate) }
     var selectedTime by remember { mutableStateOf(initTime) }
-    var location by remember { mutableStateOf(initialLocation ?: "") }
+    var selectedLocation by remember { mutableStateOf(initialLocation) }
     var showDatePicker by remember { mutableStateOf(false) }
     var showTimePicker by remember { mutableStateOf(false) }
+    var showLocationPicker by remember { mutableStateOf(false) }
 
-    val isFormValid = selectedDate.isNotBlank() && selectedTime.isNotBlank() && location.isNotBlank()
+    val isFormValid = selectedDate.isNotBlank() && selectedTime.isNotBlank() && selectedLocation != null
 
     if (showDatePicker) {
         PlatformDatePicker(
@@ -83,6 +79,17 @@ fun DateProposalSheet(
                 showTimePicker = false
             },
             onDismiss = { showTimePicker = false }
+        )
+    }
+
+    if (showLocationPicker) {
+        PlatformLocationPicker(
+            initialLocation = selectedLocation,
+            onLocationSelected = { location ->
+                selectedLocation = location
+                showLocationPicker = false
+            },
+            onDismiss = { showLocationPicker = false }
         )
     }
 
@@ -113,19 +120,11 @@ fun DateProposalSheet(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.CalendarMonth,
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp)
-                    )
+                    Icon(imageVector = Icons.Default.CalendarMonth, contentDescription = null, modifier = Modifier.size(20.dp))
                     Text(
                         text = if (selectedDate.isNotBlank()) selectedDate else "Select date",
                         style = MaterialTheme.typography.bodyLarge,
-                        color = if (selectedDate.isNotBlank()) {
-                            MaterialTheme.colorScheme.onSurface
-                        } else {
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                        }
+                        color = if (selectedDate.isNotBlank()) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
@@ -140,47 +139,49 @@ fun DateProposalSheet(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Schedule,
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp)
-                    )
+                    Icon(imageVector = Icons.Default.Schedule, contentDescription = null, modifier = Modifier.size(20.dp))
                     Text(
                         text = if (selectedTime.isNotBlank()) selectedTime else "Select time",
                         style = MaterialTheme.typography.bodyLarge,
-                        color = if (selectedTime.isNotBlank()) {
-                            MaterialTheme.colorScheme.onSurface
-                        } else {
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                        }
+                        color = if (selectedTime.isNotBlank()) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
 
-            // Location input
-            OutlinedTextField(
-                value = location,
-                onValueChange = { location = it },
-                label = { Text("Location") },
-                placeholder = { Text("e.g. Central Park, Coffee Shop...") },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.LocationOn,
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp)
-                    )
-                },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
-            )
+            // Location picker button
+            OutlinedButton(
+                onClick = { showLocationPicker = true },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(imageVector = Icons.Default.LocationOn, contentDescription = null, modifier = Modifier.size(20.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = selectedLocation?.name ?: "Choose location",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = if (selectedLocation != null) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        if (selectedLocation != null && selectedLocation!!.address.isNotBlank()) {
+                            Text(
+                                text = selectedLocation!!.address,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+            }
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Submit button
             Button(
                 onClick = {
                     val dateTime = "${selectedDate}T${selectedTime}:00"
-                    onSubmit(dateTime, location)
+                    onSubmit(dateTime, selectedLocation!!)
                 },
                 enabled = isFormValid,
                 modifier = Modifier.fillMaxWidth()

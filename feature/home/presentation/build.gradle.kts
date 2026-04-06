@@ -37,6 +37,10 @@ kotlin {
                 // commonMain by default and will correctly pull the Android artifacts of any KMP
                 // dependencies declared in commonMain.
                 implementation(libs.coil.gif)
+                implementation(libs.maps.compose)
+                implementation(libs.places)
+                implementation(libs.play.services.location)
+                implementation(libs.play.services.maps)
             }
         }
 

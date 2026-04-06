@@ -2,6 +2,7 @@ package com.dating.home.presentation.chat.chat_detail
 
 import androidx.compose.foundation.text.input.TextFieldState
 import com.dating.home.domain.models.ConnectionState
+import com.dating.home.domain.models.DateProposalLocation
 import com.dating.home.presentation.chat.model.ChatUi
 import com.dating.home.presentation.chat.model.MessageUi
 import com.dating.core.presentation.util.UiText
@@ -38,7 +39,8 @@ data class ChatDetailState(
     val showDateProposalSheet: Boolean = false,
     val editingProposalMessageId: String? = null,
     val editingProposalDateTime: String? = null,
-    val editingProposalLocation: String? = null
+    val editingProposalLocation: DateProposalLocation? = null,
+    val showLocationPicker: Boolean = false
 )
 
 data class BannerState(

@@ -14,7 +14,8 @@ sealed class MessageUi(open val id: String) {
         val formattedSentTime: UiText,
         val messageType: MessageType = MessageType.TEXT,
         val reactions: List<ReactionSummary> = emptyList(),
-        val dateProposal: DateProposalUi? = null
+        val dateProposal: DateProposalUi? = null,
+        val locationMessage: LocationMessageUi? = null
     ): MessageUi(id)
 
     data class OtherUserMessage(
@@ -24,7 +25,8 @@ sealed class MessageUi(open val id: String) {
         val sender: ChatParticipantUi,
         val messageType: MessageType = MessageType.TEXT,
         val reactions: List<ReactionSummary> = emptyList(),
-        val dateProposal: DateProposalUi? = null
+        val dateProposal: DateProposalUi? = null,
+        val locationMessage: LocationMessageUi? = null
     ): MessageUi(id)
 
     data class DateSeparator(

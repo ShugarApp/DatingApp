@@ -1,12 +1,12 @@
 package com.dating.home.presentation.chat.chat_detail.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -16,9 +16,11 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -40,6 +42,7 @@ fun DateProposalBubbleContent(
     onReject: () -> Unit,
     onCancel: () -> Unit,
     onEdit: () -> Unit,
+    onViewDetail: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -47,15 +50,32 @@ fun DateProposalBubbleContent(
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+            .clickable { onViewDetail() }
             .padding(12.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Text(
-            text = "Date Proposal",
-            style = MaterialTheme.typography.titleSmall,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.onSurface
-        )
+        // Header row
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Favorite,
+                contentDescription = null,
+                modifier = Modifier.size(16.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
+            Text(
+                text = "Date Proposal",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.weight(1f)
+            )
+            ProposalStatusChip(status = proposal.status)
+        }
+
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
 
         // Date/Time row
         Row(
@@ -65,12 +85,12 @@ fun DateProposalBubbleContent(
             Icon(
                 imageVector = Icons.Default.CalendarMonth,
                 contentDescription = null,
-                modifier = Modifier.size(18.dp),
+                modifier = Modifier.size(16.dp),
                 tint = MaterialTheme.colorScheme.primary
             )
             Text(
                 text = formatProposalDateTime(proposal.dateTime),
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurface
             )
         }
@@ -83,22 +103,27 @@ fun DateProposalBubbleContent(
             Icon(
                 imageVector = Icons.Default.LocationOn,
                 contentDescription = null,
-                modifier = Modifier.size(18.dp),
+                modifier = Modifier.size(16.dp),
                 tint = MaterialTheme.colorScheme.primary
             )
             Text(
-                text = proposal.location,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface
+                text = proposal.location.name,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1
             )
         }
 
-        // Status chip
-        ProposalStatusChip(status = proposal.status)
+        // Tap hint
+        Text(
+            text = "Tap to view details",
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
 
-        // Action buttons (only if proposal is PENDING)
+        // Action buttons
         if (proposal.canAccept || proposal.canReject || proposal.canCancel || proposal.canEdit) {
-            Spacer(modifier = Modifier.height(4.dp))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -112,13 +137,9 @@ fun DateProposalBubbleContent(
                             contentColor = MaterialTheme.colorScheme.onPrimary
                         )
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Check,
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp)
-                        )
+                        Icon(imageVector = Icons.Default.Check, contentDescription = null, modifier = Modifier.size(14.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Accept", style = MaterialTheme.typography.labelMedium)
+                        Text("Accept", style = MaterialTheme.typography.labelSmall)
                     }
                 }
                 if (proposal.canReject) {
@@ -126,13 +147,9 @@ fun DateProposalBubbleContent(
                         onClick = onReject,
                         modifier = Modifier.weight(1f)
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp)
-                        )
+                        Icon(imageVector = Icons.Default.Close, contentDescription = null, modifier = Modifier.size(14.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Reject", style = MaterialTheme.typography.labelMedium)
+                        Text("Reject", style = MaterialTheme.typography.labelSmall)
                     }
                 }
                 if (proposal.canEdit) {
@@ -140,27 +157,22 @@ fun DateProposalBubbleContent(
                         onClick = onEdit,
                         modifier = Modifier.weight(1f)
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp)
-                        )
+                        Icon(imageVector = Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(14.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Edit", style = MaterialTheme.typography.labelMedium)
+                        Text("Edit", style = MaterialTheme.typography.labelSmall)
                     }
                 }
                 if (proposal.canCancel) {
                     OutlinedButton(
                         onClick = onCancel,
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp)
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = MaterialTheme.colorScheme.error
                         )
+                    ) {
+                        Icon(imageVector = Icons.Default.Close, contentDescription = null, modifier = Modifier.size(14.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Cancel", style = MaterialTheme.typography.labelMedium)
+                        Text("Cancel", style = MaterialTheme.typography.labelSmall)
                     }
                 }
             }
@@ -168,8 +180,21 @@ fun DateProposalBubbleContent(
     }
 }
 
+internal fun buildMapsUrl(proposal: DateProposalUi): String {
+    val lat = proposal.location.latitude
+    val lng = proposal.location.longitude
+    return if (lat != 0.0 || lng != 0.0) {
+        "https://www.google.com/maps/search/?api=1&query=$lat,$lng"
+    } else {
+        val query = "${proposal.location.name} ${proposal.location.address}"
+            .trim()
+            .replace(" ", "+")
+        "https://www.google.com/maps/search/?api=1&query=$query"
+    }
+}
+
 @Composable
-private fun ProposalStatusChip(
+internal fun ProposalStatusChip(
     status: DateProposalStatus,
     modifier: Modifier = Modifier
 ) {
@@ -212,9 +237,8 @@ private fun ProposalStatusChip(
     )
 }
 
-private fun formatProposalDateTime(isoDateTime: String): String {
+internal fun formatProposalDateTime(isoDateTime: String): String {
     return try {
-        // Parse ISO-8601 and format for display
         val parts = isoDateTime.split("T")
         if (parts.size == 2) {
             val datePart = parts[0] // "2026-04-10"

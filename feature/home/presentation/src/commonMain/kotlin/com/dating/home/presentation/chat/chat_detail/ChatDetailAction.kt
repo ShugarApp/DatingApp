@@ -1,5 +1,6 @@
 package com.dating.home.presentation.chat.chat_detail
 
+import com.dating.home.domain.models.DateProposalLocation
 import com.dating.home.domain.models.MessageType
 import com.dating.home.presentation.chat.model.MessageUi
 
@@ -48,9 +49,12 @@ sealed interface ChatDetailAction {
     data class OnReactToMessage(val messageId: String, val emoji: String): ChatDetailAction
     data object OnProposeDateClick: ChatDetailAction
     data object OnDismissDateProposalSheet: ChatDetailAction
-    data class OnSubmitDateProposal(val dateTime: String, val location: String): ChatDetailAction
+    data object OnShareLocationClick: ChatDetailAction
+    data class OnShareLocation(val location: DateProposalLocation): ChatDetailAction
+    data object OnDismissLocationPicker: ChatDetailAction
+    data class OnSubmitDateProposal(val dateTime: String, val location: DateProposalLocation): ChatDetailAction
     data class OnAcceptProposal(val messageId: String): ChatDetailAction
     data class OnRejectProposal(val messageId: String): ChatDetailAction
     data class OnCancelProposal(val messageId: String): ChatDetailAction
-    data class OnEditProposal(val messageId: String, val dateTime: String, val location: String): ChatDetailAction
+    data class OnEditProposal(val messageId: String, val dateTime: String, val location: DateProposalLocation): ChatDetailAction
 }

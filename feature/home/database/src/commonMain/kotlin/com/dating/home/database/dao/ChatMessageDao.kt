@@ -39,6 +39,9 @@ interface ChatMessageDao {
     @Query("SELECT * FROM chatmessageentity WHERE messageId = :messageId")
     suspend fun getMessageById(messageId: String): ChatMessageEntity?
 
+    @Query("SELECT * FROM chatmessageentity WHERE messageType = 'DATE_PROPOSAL' ORDER BY timestamp DESC")
+    fun getAllDateProposalMessages(): Flow<List<ChatMessageEntity>>
+
     @Query("""
         UPDATE chatmessageentity
         SET deliveryStatus = :status, deliveryStatusTimestamp = :timestamp

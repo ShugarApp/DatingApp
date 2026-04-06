@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import aura.feature.home.presentation.generated.resources.Res
+import aura.feature.home.presentation.generated.resources.bottom_nav_dates
 import aura.feature.home.presentation.generated.resources.bottom_nav_feed
 import aura.feature.home.presentation.generated.resources.bottom_nav_matches
 import aura.feature.home.presentation.generated.resources.bottom_nav_messages
@@ -20,13 +21,14 @@ import org.jetbrains.compose.resources.stringResource
 fun BottomNavigationBar(
     selectedSection: BottomNavSection,
     onSectionSelected: (BottomNavSection) -> Unit,
+    sections: List<BottomNavSection> = BottomNavSection.entries.toList(),
     modifier: Modifier = Modifier
 ) {
     NavigationBar(
         modifier = modifier.fillMaxWidth(),
         containerColor = MaterialTheme.colorScheme.surface
     ) {
-        BottomNavSection.entries.forEach { section ->
+        sections.forEach { section ->
             NavigationBarItem(
                 selected = selectedSection == section,
                 onClick = { onSectionSelected(section) },
@@ -64,6 +66,7 @@ private fun bottomNavLabelText(section: BottomNavSection): String {
         BottomNavLabel.FEED -> stringResource(Res.string.bottom_nav_feed)
         BottomNavLabel.MATCHES -> stringResource(Res.string.bottom_nav_matches)
         BottomNavLabel.MESSAGES -> stringResource(Res.string.bottom_nav_messages)
+        BottomNavLabel.DATES -> stringResource(Res.string.bottom_nav_dates)
         BottomNavLabel.PROFILE -> stringResource(Res.string.bottom_nav_profile)
     }
 }

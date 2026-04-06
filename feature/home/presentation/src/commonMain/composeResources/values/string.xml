@@ -74,6 +74,7 @@
     <string name="bottom_nav_feed">Feed</string>
     <string name="bottom_nav_matches">Matches</string>
     <string name="bottom_nav_messages">Messages</string>
+    <string name="bottom_nav_dates">Dates</string>
 
 
     <!-- Settings Screen -->
@@ -444,6 +445,13 @@
     <string name="block_after_report_desc">Your report has been submitted. Would you also like to block this user so they can't contact you anymore?</string>
     <string name="block_after_report_confirm">Block</string>
     <string name="block_after_report_dismiss">No thanks</string>
+
+    <!-- Location Messages -->
+    <string name="location_message">Location</string>
+    <string name="share_location">Share location</string>
+    <string name="open_in_maps">Open in Maps</string>
+    <string name="getting_location">Getting location…</string>
+    <string name="send_location">Send location</string>
 
     <!-- Media Messages -->
     <string name="photo_message">Photo</string>
