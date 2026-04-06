@@ -414,7 +414,12 @@ class OfflineFirstMessageRepository(
     }
 
     override fun getActiveDateProposals(): Flow<List<AcceptedDateProposal>> {
-        val activeStatuses = setOf(DateProposalStatus.PENDING.name, DateProposalStatus.ACCEPTED.name)
+        val activeStatuses = setOf(
+            DateProposalStatus.PENDING.name,
+            DateProposalStatus.ACCEPTED.name,
+            DateProposalStatus.CANCELLED.name,
+            DateProposalStatus.REJECTED.name
+        )
         return combine(
             database.chatMessageDao.getAllDateProposalMessages(),
             database.chatDao.getChatsWithParticipants(),

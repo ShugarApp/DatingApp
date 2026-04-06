@@ -37,11 +37,14 @@ fun ChatListItemUi(
 ) {
     val isGroupChat = chat.otherParticipants.size > 1
     val chatName = chat.otherParticipants.joinToString(", ") { it.username }
-    val lastMessagePreview = when (chat.lastMessage?.messageType) {
-        MessageType.IMAGE -> "\uD83D\uDCF7 Photo"
-        MessageType.GIF -> "GIF"
-        MessageType.AUDIO -> "\uD83C\uDFB5 Audio"
-        MessageType.DATE_PROPOSAL -> "\uD83D\uDCC5 Date proposal"
+    val lastMessagePreview = when {
+        chat.lastMessage?.messageType == MessageType.IMAGE -> "\uD83D\uDCF7 Photo"
+        chat.lastMessage?.messageType == MessageType.GIF -> "GIF"
+        chat.lastMessage?.messageType == MessageType.AUDIO -> "\uD83C\uDFB5 Audio"
+        chat.lastMessage?.messageType == MessageType.DATE_PROPOSAL -> "\uD83D\uDCC5 Date proposal"
+        chat.lastMessage?.messageType == MessageType.LOCATION -> "\uD83D\uDCCD Location"
+        chat.lastMessage?.content?.contains("\"dateTime\"") == true -> "\uD83D\uDCC5 Date proposal"
+        chat.lastMessage?.content?.contains("\"latitude\"") == true -> "\uD83D\uDCCD Location"
         else -> chat.lastMessage?.content ?: ""
     }
     Card(

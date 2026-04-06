@@ -62,6 +62,7 @@ actual fun PlatformLocationMap(
 ) {
     val mapDelegate = remember { MapRegionDelegate() }
     val locationManager = remember { CLLocationManager() }
+    val geocoder = remember { CLGeocoder() }
     var mapViewRef by remember { mutableStateOf<MKMapView?>(null) }
 
     val locationDelegate = remember {
@@ -94,22 +95,33 @@ actual fun PlatformLocationMap(
         } ?: locationManager.startUpdatingLocation()
     }
 
-    SideEffect {
-        mapDelegate.onRegionWillChange = { onMovingChanged(true) }
-        mapDelegate.onRegionDidChange = { lat, lng ->
-            onMovingChanged(false)
-            val clLocation = CLLocation(latitude = lat, longitude = lng)
-            CLGeocoder().reverseGeocodeLocation(clLocation) { placemarks, _ ->
-                @Suppress("UNCHECKED_CAST")
-                val placemark = (placemarks as? List<platform.CoreLocation.CLPlacemark>)?.firstOrNull()
-                val name = placemark?.name ?: placemark?.thoroughfare ?: "Selected location"
+    // Build the regionDidChange handler as a lambda so it can be assigned in
+    // both factory (before the first SideEffect) and SideEffect (kept fresh).
+    val makeRegionDidChange: (lat: Double, lng: Double) -> Unit = { lat, lng ->
+        onMovingChanged(false)
+        // Emit coordinates immediately — button is never blocked
+        onLocationChanged(
+            DateProposalLocation(
+                name = "Selected location",
+                address = "%.5f, %.5f".format(lat, lng),
+                latitude = lat,
+                longitude = lng
+            )
+        )
+        // Geocode and update with proper name if successful
+        val clLocation = CLLocation(latitude = lat, longitude = lng)
+        geocoder.cancelGeocode()
+        geocoder.reverseGeocodeLocation(clLocation) { placemarks, _ ->
+            @Suppress("UNCHECKED_CAST")
+            val placemark = (placemarks as? List<platform.CoreLocation.CLPlacemark>)?.firstOrNull()
+            val name = placemark?.name ?: placemark?.thoroughfare
+            if (placemark != null && name != null) {
                 val addressParts = listOfNotNull(
-                    placemark?.thoroughfare,
-                    placemark?.locality,
-                    placemark?.administrativeArea
+                    placemark.thoroughfare,
+                    placemark.locality,
+                    placemark.administrativeArea
                 )
-                val address = addressParts.joinToString(", ")
-                    .ifBlank { "%.5f, %.5f".format(lat, lng) }
+                val address = addressParts.joinToString(", ").ifBlank { "%.5f, %.5f".format(lat, lng) }
                 onLocationChanged(
                     DateProposalLocation(
                         name = name,
@@ -122,8 +134,19 @@ actual fun PlatformLocationMap(
         }
     }
 
+    // Keep callbacks fresh on every recomposition
+    SideEffect {
+        mapDelegate.onRegionWillChange = { onMovingChanged(true) }
+        mapDelegate.onRegionDidChange = makeRegionDidChange
+    }
+
     UIKitView(
         factory = {
+            // Also set here: factory runs synchronously during composition, before the
+            // first SideEffect. The map can fire regionDidChangeAnimated on the next
+            // runloop tick — if callbacks aren't set yet they'd be missed.
+            mapDelegate.onRegionWillChange = { onMovingChanged(true) }
+            mapDelegate.onRegionDidChange = makeRegionDidChange
             MKMapView().also { map ->
                 mapViewRef = map
                 map.setShowsUserLocation(true)

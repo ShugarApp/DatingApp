@@ -7,8 +7,9 @@ import com.dating.home.domain.models.DateProposalLocation
 import com.dating.home.domain.models.DateProposalStatus
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -17,14 +18,22 @@ class DatesViewModel(
     private val messageRepository: MessageRepository
 ) : ViewModel() {
 
-    val state = messageRepository
-        .getActiveDateProposals()
-        .map { proposals -> DatesState(dates = proposals, isLoading = false) }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000L),
-            initialValue = DatesState(isLoading = true)
-        )
+    private val _filter = MutableStateFlow(DateFilter.ALL)
+
+    val state = combine(
+        messageRepository.getActiveDateProposals(),
+        _filter
+    ) { proposals, filter ->
+        DatesState(dates = proposals, isLoading = false, selectedFilter = filter)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000L),
+        initialValue = DatesState(isLoading = true)
+    )
+
+    fun selectFilter(filter: DateFilter) {
+        _filter.value = filter
+    }
 
     fun cancelDate(messageId: String, chatId: String) {
         viewModelScope.launch {

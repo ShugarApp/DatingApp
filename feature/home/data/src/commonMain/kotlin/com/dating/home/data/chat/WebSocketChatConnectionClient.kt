@@ -180,7 +180,16 @@ class WebSocketChatConnectionClient(
             chatRepository.fetchChatById(message.chatId)
         }
 
-        val entity = message.toEntity()
+        val existing = database.chatMessageDao.getMessageById(message.id)
+        val entity = message.toEntity().let { incoming ->
+            // Preserve the real messageType if the echo uses the default "TEXT" fallback
+            // but we already stored the correct type locally (e.g. DATE_PROPOSAL)
+            if (incoming.messageType == "TEXT" && existing != null && existing.messageType != "TEXT") {
+                incoming.copy(messageType = existing.messageType)
+            } else {
+                incoming
+            }
+        }
         database.chatMessageDao.upsertMessage(entity)
     }
 
