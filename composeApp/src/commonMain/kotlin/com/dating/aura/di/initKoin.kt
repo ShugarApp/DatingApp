@@ -17,7 +17,8 @@ fun initKoin(config: KoinAppDeclaration? = null) {
             appModule,
             homePresentationModule,
             corePresentationModule,
-            homeDataModule
+            homeDataModule,
+            platformAnalyticsModule
         )
     }
 }
