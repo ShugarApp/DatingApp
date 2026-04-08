@@ -12,6 +12,7 @@ import com.dating.home.presentation.home.bottom_navigation.BottomNavigationConta
 import com.dating.home.presentation.profile.edit_profile.EditProfileScreen
 import com.dating.home.presentation.emergency.contacts.EmergencyContactsScreen
 import com.dating.home.presentation.emergency.onboarding.EmergencyOnboardingScreen
+import com.dating.home.presentation.profile.settings.DateSafetyTipsScreen
 import com.dating.home.presentation.profile.settings.DeleteAccountScreen
 import com.dating.home.presentation.profile.settings.IncognitoModeScreen
 import com.dating.home.presentation.profile.settings.PauseAccountScreen
@@ -154,6 +155,9 @@ fun NavGraphBuilder.homeGraph(
                 },
                 onEmergencyTutorial = {
                     navController.navigate(HomeGraphRoutes.EmergencyOnboardingRoute)
+                },
+                onDateSafetyTips = {
+                    navController.navigate(HomeGraphRoutes.DateSafetyTipsRoute)
                 }
             )
         }
@@ -222,6 +226,12 @@ fun NavGraphBuilder.homeGraph(
                     // Launch phone intent via platform-specific mechanism
                     // On Android this will be handled via Intent in the Activity
                 }
+            )
+        }
+
+        composable<HomeGraphRoutes.DateSafetyTipsRoute> {
+            DateSafetyTipsScreen(
+                onBack = { navController.popBackStack() }
             )
         }
     }

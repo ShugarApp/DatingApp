@@ -28,5 +28,6 @@ data class UserSerializable(
     val interests: List<String> = emptyList(),
     // Optionally returned by the backend. When present, this value is authoritative
     // and should be used instead of the locally-computed profileCompletion().
-    val profileCompletion: Int? = null
+    val profileCompletion: Int? = null,
+    val idealDate: String? = null
 )

@@ -10,5 +10,6 @@ data class RegisterRequest(
     val birthDate: String? = null,
     val gender: String? = null,
     val interestedIn: String? = null,
-    val lookingFor: String? = null
+    val lookingFor: String? = null,
+    val idealDate: String? = null
 )

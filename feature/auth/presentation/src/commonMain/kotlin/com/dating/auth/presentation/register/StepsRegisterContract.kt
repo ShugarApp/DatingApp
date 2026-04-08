@@ -22,6 +22,9 @@ data class StepsRegisterState(
     // Step 4: Looking For
     val selectedLookingFor: String? = null,
 
+    // Step 5: Ideal Date
+    val selectedIdealDate: String? = null,
+
     val currentStep: RegisterStep = RegisterStep.BasicInfo,
 
     // General
@@ -39,6 +42,7 @@ sealed interface StepsRegisterAction {
     data class OnGenderSelect(val gender: String) : StepsRegisterAction
     data class OnInterestSelect(val interest: String) : StepsRegisterAction
     data class OnLookingForSelect(val lookingFor: String) : StepsRegisterAction
+    data class OnIdealDateSelect(val idealDate: String) : StepsRegisterAction
 }
 
 sealed interface StepsRegisterEvent {

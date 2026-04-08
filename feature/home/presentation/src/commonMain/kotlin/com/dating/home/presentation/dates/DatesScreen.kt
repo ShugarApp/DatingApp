@@ -34,7 +34,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
@@ -47,7 +46,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBarDefaults
+import com.dating.core.designsystem.components.header.MainTopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -103,27 +102,7 @@ private fun DatesScreen(
 ) {
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = "My Dates",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold
-                        )
-                        if (!state.isLoading && state.dates.isNotEmpty()) {
-                            Text(
-                                text = "${state.dates.size} proposal${if (state.dates.size != 1) "s" else ""}",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                )
-            )
+            MainTopAppBar(title = "My Dates")
         }
     ) { paddingValues ->
         when {
@@ -205,13 +184,13 @@ private fun FilterChipRow(
                     )
                 },
                 colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = statusColor(filter.status).copy(alpha = 0.18f),
-                    selectedLabelColor = statusForegroundColor(filter.status)
+                    selectedContainerColor = statusColor(filter.chipStatus).copy(alpha = 0.18f),
+                    selectedLabelColor = statusForegroundColor(filter.chipStatus)
                 ),
                 border = FilterChipDefaults.filterChipBorder(
                     enabled = true,
                     selected = isSelected,
-                    selectedBorderColor = statusForegroundColor(filter.status).copy(alpha = 0.4f),
+                    selectedBorderColor = statusForegroundColor(filter.chipStatus).copy(alpha = 0.4f),
                     selectedBorderWidth = 1.5.dp
                 )
             )
@@ -607,11 +586,11 @@ private fun EmptyDatesState(modifier: Modifier = Modifier) {
 @Composable
 private fun EmptyFilterState(filter: DateFilter, modifier: Modifier = Modifier) {
     val message = when (filter) {
+        DateFilter.UPCOMING -> "No upcoming dates. Propose a date in a chat!"
         DateFilter.PENDING -> "No pending proposals right now."
         DateFilter.ACCEPTED -> "No accepted dates yet."
         DateFilter.CANCELLED -> "No cancelled dates."
         DateFilter.REJECTED -> "No declined proposals."
-        DateFilter.ALL -> "No dates yet."
     }
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
         Text(

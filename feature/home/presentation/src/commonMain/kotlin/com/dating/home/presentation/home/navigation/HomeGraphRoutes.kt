@@ -47,4 +47,7 @@ sealed interface HomeGraphRoutes {
 
     @Serializable
     data object EmergencyContactsRoute : HomeGraphRoutes
+
+    @Serializable
+    data object DateSafetyTipsRoute : HomeGraphRoutes
 }

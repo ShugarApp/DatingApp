@@ -73,4 +73,18 @@
     <string name="enter_your_name">Introduce tu nombre</string>
     <string name="name_appearance_disclaimer">Este nombre aparecerá en tu perfil</string>
     <string name="everyone">Everyone</string>
+
+    <!-- Registration - Step 5: Ideal Date -->
+    <string name="ideal_date">¿Cuál es tu cita ideal?</string>
+    <string name="ideal_date_section">Tipo de cita</string>
+    <string name="ideal_date_dinner">Cena romántica</string>
+    <string name="ideal_date_coffee">Café</string>
+    <string name="ideal_date_adventure">Aventura al aire libre</string>
+    <string name="ideal_date_cinema">Cine</string>
+    <string name="ideal_date_picnic">Picnic</string>
+    <string name="ideal_date_travel">Viaje</string>
+    <string name="ideal_date_concert">Concierto</string>
+    <string name="ideal_date_museum">Museo o arte</string>
+    <string name="ideal_date_beach">Playa</string>
+    <string name="ideal_date_cooking">Cocinar juntos</string>
 </resources>

@@ -8,5 +8,6 @@ data class CompleteProfileRequest(
     val birthDate: String,
     val gender: String,
     val interestedIn: String,
-    val lookingFor: String
+    val lookingFor: String,
+    val idealDate: String? = null
 )

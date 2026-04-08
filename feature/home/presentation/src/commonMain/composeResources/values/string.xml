@@ -480,10 +480,41 @@
     <string name="photo_upload_failed">Failed to upload photo %1$d</string>
 
     <!-- Match Celebration Overlay -->
-    <string name="match_celebration_title">It\'s a Match!</string>
+    <string name="match_celebration_title">It&apos;s a Match!</string>
     <string name="match_celebration_subtitle">You and %1$s liked each other!</string>
     <string name="match_celebration_send_message">Send a Message</string>
     <string name="match_celebration_keep_swiping">Keep Swiping</string>
+
+    <!-- Date Safety Tips -->
+    <string name="settings_date_safety_tips">Tips pre-cita</string>
+    <string name="date_safety_tips_title">Tips pre-cita</string>
+    <string name="date_safety_tips_subtitle">Checklist de seguridad para tu primera cita</string>
+    <string name="date_safety_checklist_section">Checklist antes de salir</string>
+    <string name="date_safety_check_public">¿El lugar es público?</string>
+    <string name="date_safety_check_public_desc">Elige cafeterías, restaurantes o parques concurridos</string>
+    <string name="date_safety_check_someone_knows">¿Alguien sabe adónde vas?</string>
+    <string name="date_safety_check_someone_knows_desc">Avisa a un amigo o familiar del lugar y la hora</string>
+    <string name="date_safety_check_battery">¿Batería cargada?</string>
+    <string name="date_safety_check_battery_desc">Lleva el teléfono con al menos 50% de batería</string>
+    <string name="date_safety_check_transport">¿Tienes cómo volver?</string>
+    <string name="date_safety_check_transport_desc">Ten listo tu transporte de regreso de antemano</string>
+    <string name="date_safety_check_sos">¿SOS activado en Aura?</string>
+    <string name="date_safety_check_sos_desc">Configura tus contactos de emergencia antes de salir</string>
+    <string name="date_safety_tips_section">Consejos de seguridad</string>
+    <string name="date_safety_tip_1_title">Comparte tu ubicación en tiempo real</string>
+    <string name="date_safety_tip_1_desc">Activa el seguimiento de ubicación con un contacto de confianza durante la cita.</string>
+    <string name="date_safety_tip_2_title">Conoce en público primero</string>
+    <string name="date_safety_tip_2_desc">Las primeras citas siempre en lugares con mucha gente. Evita sitios aislados o privados.</string>
+    <string name="date_safety_tip_3_title">Usa tu propio transporte</string>
+    <string name="date_safety_tip_3_desc">No subas al auto de alguien que acabas de conocer. Lleva tu propio medio de transporte.</string>
+    <string name="date_safety_tip_4_title">Confía en tu instinto</string>
+    <string name="date_safety_tip_4_desc">Si algo no se siente bien, está bien terminar la cita. Tu seguridad es lo primero.</string>
+    <string name="date_safety_tip_5_title">Evita compartir datos personales</string>
+    <string name="date_safety_tip_5_desc">No compartas tu dirección, lugar de trabajo ni datos financieros en una primera cita.</string>
+    <string name="date_safety_tip_6_title">Cuida tu bebida</string>
+    <string name="date_safety_tip_6_desc">Nunca dejes tu bebida sin vigilar. Si sospechas algo, no la consumas.</string>
+    <string name="date_safety_checklist_progress">%1$d de %2$d completados</string>
+    <string name="date_safety_all_set">¡Todo listo! Disfruta tu cita con confianza.</string>
 
     <!-- Emergency Contacts / SOS -->
     <string name="emergency_contacts_title">Emergency Contacts</string>

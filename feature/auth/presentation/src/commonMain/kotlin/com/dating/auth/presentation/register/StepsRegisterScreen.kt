@@ -53,6 +53,18 @@ import aura.feature.auth.presentation.generated.resources.what_is_your_name
 import aura.feature.auth.presentation.generated.resources.enter_your_name
 import aura.feature.auth.presentation.generated.resources.name_appearance_disclaimer
 import aura.feature.auth.presentation.generated.resources.everyone
+import aura.feature.auth.presentation.generated.resources.ideal_date
+import aura.feature.auth.presentation.generated.resources.ideal_date_section
+import aura.feature.auth.presentation.generated.resources.ideal_date_dinner
+import aura.feature.auth.presentation.generated.resources.ideal_date_coffee
+import aura.feature.auth.presentation.generated.resources.ideal_date_adventure
+import aura.feature.auth.presentation.generated.resources.ideal_date_cinema
+import aura.feature.auth.presentation.generated.resources.ideal_date_picnic
+import aura.feature.auth.presentation.generated.resources.ideal_date_travel
+import aura.feature.auth.presentation.generated.resources.ideal_date_concert
+import aura.feature.auth.presentation.generated.resources.ideal_date_museum
+import aura.feature.auth.presentation.generated.resources.ideal_date_beach
+import aura.feature.auth.presentation.generated.resources.ideal_date_cooking
 import com.dating.core.designsystem.components.buttons.ChirpButton
 import com.dating.core.designsystem.components.chips.ChirpChip
 import com.dating.core.designsystem.components.header.RegisterTopBar
@@ -109,12 +121,13 @@ fun StepsRegisterScreen(
             Column(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                val totalSteps = 4
+                val totalSteps = 5
                 val currentStepIndex = when (state.currentStep) {
                     RegisterStep.BasicInfo -> 1
                     RegisterStep.BirthDate -> 2
                     RegisterStep.GenderInterest -> 3
                     RegisterStep.LookingFor -> 4
+                    RegisterStep.IdealDate -> 5
                 }
                 RegisterTopBar(
                     totalSteps = totalSteps,
@@ -248,6 +261,34 @@ fun StepsRegisterScreen(
                                 }
                             )
                         }
+
+                        RegisterStep.IdealDate -> {
+                            StepTitle(stringResource(Res.string.ideal_date))
+                            SectionSelection(
+                                title = stringResource(Res.string.ideal_date_section),
+                                options = listOf(
+                                    stringResource(Res.string.ideal_date_dinner),
+                                    stringResource(Res.string.ideal_date_coffee),
+                                    stringResource(Res.string.ideal_date_adventure),
+                                    stringResource(Res.string.ideal_date_cinema),
+                                    stringResource(Res.string.ideal_date_picnic),
+                                    stringResource(Res.string.ideal_date_travel),
+                                    stringResource(Res.string.ideal_date_concert),
+                                    stringResource(Res.string.ideal_date_museum),
+                                    stringResource(Res.string.ideal_date_beach),
+                                    stringResource(Res.string.ideal_date_cooking)
+                                ),
+                                optionValues = listOf(
+                                    "DINNER", "COFFEE", "ADVENTURE", "CINEMA",
+                                    "PICNIC", "TRAVEL", "CONCERT", "MUSEUM",
+                                    "BEACH", "COOKING"
+                                ),
+                                selectedOption = state.selectedIdealDate,
+                                onOptionSelected = {
+                                    onAction(StepsRegisterAction.OnIdealDateSelect(it))
+                                }
+                            )
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(24.dp))
@@ -260,7 +301,7 @@ fun StepsRegisterScreen(
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp, vertical = 64.dp)
             ) {
-                if (state.currentStep == RegisterStep.LookingFor) {
+                if (state.currentStep == RegisterStep.IdealDate) {
                     ChirpButton(
                         text = stringResource(Res.string.register),
                         onClick = { onAction(StepsRegisterAction.OnRegisterClick) },

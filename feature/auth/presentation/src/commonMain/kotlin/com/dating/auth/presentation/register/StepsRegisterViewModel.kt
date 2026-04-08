@@ -75,7 +75,8 @@ class StepsRegisterViewModel(
             snapshotFlow { state.value.birthDateTextState.text.toString() }.distinctUntilChanged(),
             state.map { it.selectedGender },
             state.map { it.selectedInterest },
-            state.map { it.selectedLookingFor }
+            state.map { it.selectedLookingFor },
+            state.map { it.selectedIdealDate }
         ) { values ->
             val isUsernameValid = values[0] as Boolean
             val isRegistering = values[1] as Boolean
@@ -84,6 +85,7 @@ class StepsRegisterViewModel(
             val gender = values[4] as String?
             val interest = values[5] as String?
             val lookingFor = values[6] as String?
+            val idealDate = values[7] as String?
 
             _state.update {
                 when (currentStep) {
@@ -106,7 +108,11 @@ class StepsRegisterViewModel(
                     }
 
                     RegisterStep.LookingFor -> {
-                        it.copy(canRegister = !isRegistering && lookingFor != null)
+                        it.copy(canProceed = lookingFor != null)
+                    }
+
+                    RegisterStep.IdealDate -> {
+                        it.copy(canRegister = !isRegistering && idealDate != null)
                     }
                 }
             }
@@ -133,6 +139,11 @@ class StepsRegisterViewModel(
                 validateStep(RegisterStep.LookingFor)
             }
 
+            is StepsRegisterAction.OnIdealDateSelect -> {
+                _state.update { it.copy(selectedIdealDate = action.idealDate) }
+                validateStep(RegisterStep.IdealDate)
+            }
+
             StepsRegisterAction.OnInputTextFocusGain -> {
                 _state.update { it.copy(registrationError = null, usernameError = null) }
             }
@@ -146,8 +157,8 @@ class StepsRegisterViewModel(
                 RegisterStep.BasicInfo -> RegisterStep.BirthDate
                 RegisterStep.BirthDate -> RegisterStep.GenderInterest
                 RegisterStep.GenderInterest -> RegisterStep.LookingFor
-                RegisterStep.LookingFor -> RegisterStep.LookingFor
-                else -> RegisterStep.BasicInfo
+                RegisterStep.LookingFor -> RegisterStep.IdealDate
+                RegisterStep.IdealDate -> RegisterStep.IdealDate
             }
             _state.update { it.copy(currentStep = nextStep) }
         }
@@ -164,6 +175,7 @@ class StepsRegisterViewModel(
                 RegisterStep.BirthDate -> RegisterStep.BasicInfo
                 RegisterStep.GenderInterest -> RegisterStep.BirthDate
                 RegisterStep.LookingFor -> RegisterStep.GenderInterest
+                RegisterStep.IdealDate -> RegisterStep.LookingFor
                 else -> RegisterStep.BasicInfo
             }
             _state.update { it.copy(currentStep = previousStep) }
@@ -171,7 +183,7 @@ class StepsRegisterViewModel(
     }
 
     private fun register() {
-        if (!validateStep(RegisterStep.LookingFor)) {
+        if (!validateStep(RegisterStep.IdealDate)) {
             return
         }
 
@@ -183,6 +195,7 @@ class StepsRegisterViewModel(
             val gender = state.value.selectedGender
             val interest = state.value.selectedInterest
             val lookingFor = state.value.selectedLookingFor
+            val idealDate = state.value.selectedIdealDate
 
             if (isGoogleUser) {
                 // Google users are already registered, complete their profile
@@ -192,7 +205,8 @@ class StepsRegisterViewModel(
                         birthDate = birthDate,
                         gender = gender ?: "",
                         interestedIn = interest ?: "",
-                        lookingFor = lookingFor ?: ""
+                        lookingFor = lookingFor ?: "",
+                        idealDate = idealDate
                     )
                     .onSuccess {
                         _state.update { it.copy(isRegistering = false) }
@@ -217,7 +231,8 @@ class StepsRegisterViewModel(
                     birthDate = birthDate,
                     gender = gender,
                     interestedIn = interest,
-                    lookingFor = lookingFor
+                    lookingFor = lookingFor,
+                    idealDate = idealDate
                 )
                 .onSuccess {
                     _state.update { it.copy(isRegistering = false) }
@@ -272,9 +287,14 @@ class StepsRegisterViewModel(
 
             RegisterStep.LookingFor -> {
                 val hasLookingFor = currentState.selectedLookingFor != null
-                val isValid = hasLookingFor
-                _state.update { it.copy(canRegister = isValid) }
-                isValid
+                _state.update { it.copy(canProceed = hasLookingFor) }
+                hasLookingFor
+            }
+
+            RegisterStep.IdealDate -> {
+                val hasIdealDate = currentState.selectedIdealDate != null
+                _state.update { it.copy(canRegister = hasIdealDate) }
+                hasIdealDate
             }
         }
     }

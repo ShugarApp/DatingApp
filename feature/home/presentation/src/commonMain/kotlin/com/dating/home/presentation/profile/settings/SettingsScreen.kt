@@ -85,7 +85,9 @@ import aura.feature.home.presentation.generated.resources.emergency_contacts_tit
 import aura.feature.home.presentation.generated.resources.emergency_feature_description
 import aura.feature.home.presentation.generated.resources.emergency_how_it_works
 import aura.feature.home.presentation.generated.resources.emergency_safety_section
+import aura.feature.home.presentation.generated.resources.date_safety_tips_subtitle
 import aura.feature.home.presentation.generated.resources.settings_100_km
+import aura.feature.home.presentation.generated.resources.settings_date_safety_tips
 import aura.feature.home.presentation.generated.resources.settings_account
 import aura.feature.home.presentation.generated.resources.settings_age_range
 import aura.feature.home.presentation.generated.resources.settings_change_password
@@ -154,6 +156,7 @@ fun SettingsScreen(
     onBlockedUsers: () -> Unit,
     onEmergencyContacts: () -> Unit = {},
     onEmergencyTutorial: () -> Unit = {},
+    onDateSafetyTips: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: SettingsViewModel = koinViewModel()
 ) {
@@ -327,6 +330,12 @@ fun SettingsScreen(
                     icon = Icons.AutoMirrored.Filled.Help,
                     title = stringResource(Res.string.emergency_how_it_works),
                     onClick = { viewModel.onAction(SettingsAction.OnEmergencyTutorialClick) }
+                )
+                AccessCardItem(
+                    icon = Icons.Default.Security,
+                    title = stringResource(Res.string.settings_date_safety_tips),
+                    subtitle = stringResource(Res.string.date_safety_tips_subtitle),
+                    onClick = onDateSafetyTips
                 )
             }
 

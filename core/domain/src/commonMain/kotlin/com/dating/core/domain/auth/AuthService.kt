@@ -17,7 +17,8 @@ interface AuthService {
         birthDate: String? = null,
         gender: String? = null,
         interestedIn: String? = null,
-        lookingFor: String? = null
+        lookingFor: String? = null,
+        idealDate: String? = null
     ): EmptyResult<DataError.Remote>
 
     suspend fun resendVerificationEmail(
@@ -45,7 +46,8 @@ interface AuthService {
         birthDate: String,
         gender: String,
         interestedIn: String,
-        lookingFor: String
+        lookingFor: String,
+        idealDate: String? = null
     ): EmptyResult<DataError.Remote>
 
     suspend fun logout(refreshToken: String): EmptyResult<DataError.Remote>

@@ -59,7 +59,8 @@ class KtorAuthService(private val httpClient: HttpClient) : AuthService {
         birthDate: String?,
         gender: String?,
         interestedIn: String?,
-        lookingFor: String?
+        lookingFor: String?,
+        idealDate: String?
     ): EmptyResult<DataError.Remote> {
         return httpClient.post(
             route = "/auth/register",
@@ -70,7 +71,8 @@ class KtorAuthService(private val httpClient: HttpClient) : AuthService {
                 birthDate = birthDate,
                 gender = gender,
                 interestedIn = interestedIn,
-                lookingFor = lookingFor
+                lookingFor = lookingFor,
+                idealDate = idealDate
             )
         )
     }
@@ -80,7 +82,8 @@ class KtorAuthService(private val httpClient: HttpClient) : AuthService {
         birthDate: String,
         gender: String,
         interestedIn: String,
-        lookingFor: String
+        lookingFor: String,
+        idealDate: String?
     ): EmptyResult<DataError.Remote> {
         return httpClient.put(
             route = "/users/profile",
@@ -89,7 +92,8 @@ class KtorAuthService(private val httpClient: HttpClient) : AuthService {
                 birthDate = birthDate,
                 gender = gender,
                 interestedIn = interestedIn,
-                lookingFor = lookingFor
+                lookingFor = lookingFor,
+                idealDate = idealDate
             )
         )
     }

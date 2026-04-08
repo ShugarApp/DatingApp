@@ -30,7 +30,8 @@ data class User(
     val zodiac: String? = null,
     val smoking: String? = null,
     val drinking: String? = null,
-    val interests: List<String> = emptyList()
+    val interests: List<String> = emptyList(),
+    val idealDate: String? = null
 ) {
     val profilePictureUrl: String? get() = photos.firstOrNull()
 }

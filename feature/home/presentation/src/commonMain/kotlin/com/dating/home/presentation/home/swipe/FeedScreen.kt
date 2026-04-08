@@ -1,12 +1,12 @@
 package com.dating.home.presentation.home.swipe
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -36,8 +36,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -414,14 +412,22 @@ private fun FilterBottomSheet(
     var distanceValue by remember { mutableFloatStateOf(currentMaxDistance?.toFloat() ?: 0f) }
     var showMe by remember { mutableStateOf(currentShowMe) }
     var ageRange by remember { mutableStateOf(currentMinAge.toFloat()..currentMaxAge.toFloat()) }
-    val hasDistance = distanceValue > 0f
+    val isNoLimit = distanceValue == 0f
+
+    // Count active (non-default) filters for badge
+    val activeFilters = listOf(
+        !isNoLimit,
+        showMe != Gender.EVERYONE,
+        ageRange.start.roundToInt() != 18 || ageRange.endInclusive.roundToInt() != 50
+    ).count { it }
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp)
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 20.dp)
     ) {
-        // Header
+        // ── Header ────────────────────────────────────────────────────
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -429,37 +435,59 @@ private fun FilterBottomSheet(
         ) {
             Text(
                 text = stringResource(Res.string.feed_filter_title),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
             )
-            TextButton(onClick = {
-                distanceValue = 0f
-                showMe = Gender.EVERYONE
-                ageRange = 18f..50f
-            }) {
-                Text(stringResource(Res.string.feed_filter_reset))
+            TextButton(
+                onClick = {
+                    distanceValue = 0f
+                    showMe = Gender.EVERYONE
+                    ageRange = 18f..50f
+                }
+            ) {
+                Text(
+                    text = stringResource(Res.string.feed_filter_reset),
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Medium
+                )
             }
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
-        // Distance section
-        FilterSectionHeader(
+        // ── Distance ──────────────────────────────────────────────────
+        FilterSectionLabel(
             icon = Icons.Default.Tune,
-            title = stringResource(Res.string.feed_filter_max_distance),
-            value = if (hasDistance)
-                stringResource(Res.string.feed_filter_distance_value, distanceValue.roundToInt())
-            else
-                stringResource(Res.string.feed_filter_no_limit)
+            title = stringResource(Res.string.feed_filter_max_distance)
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.08f))
+                .padding(vertical = 10.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = if (isNoLimit) stringResource(Res.string.feed_filter_no_limit)
+                       else stringResource(Res.string.feed_filter_distance_value, distanceValue.roundToInt()),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+
         Slider(
             value = distanceValue,
             onValueChange = { distanceValue = it },
             valueRange = 0f..500f,
             colors = SliderDefaults.colors(
                 thumbColor = MaterialTheme.colorScheme.primary,
-                activeTrackColor = MaterialTheme.colorScheme.primary
+                activeTrackColor = MaterialTheme.colorScheme.primary,
+                inactiveTrackColor = MaterialTheme.colorScheme.surfaceVariant
             )
         )
         Row(
@@ -479,66 +507,88 @@ private fun FilterBottomSheet(
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Show Me section
-        FilterSectionHeader(
+        // ── Show Me ───────────────────────────────────────────────────
+        FilterSectionLabel(
             icon = Icons.Default.Groups,
-            title = stringResource(Res.string.feed_filter_show_me),
-            value = when (showMe) {
-                Gender.MEN -> stringResource(Res.string.feed_filter_gender_men)
-                Gender.WOMEN -> stringResource(Res.string.feed_filter_gender_women)
-                Gender.EVERYONE -> stringResource(Res.string.feed_filter_gender_everyone)
-            }
+            title = stringResource(Res.string.feed_filter_show_me)
         )
-        Spacer(modifier = Modifier.height(12.dp))
-        FlowRow(
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Gender.entries.forEach { gender ->
-                FilterChip(
-                    selected = showMe == gender,
-                    onClick = { showMe = gender },
-                    label = {
-                        Text(
-                            text = when (gender) {
-                                Gender.MEN -> stringResource(Res.string.feed_filter_gender_men)
-                                Gender.WOMEN -> stringResource(Res.string.feed_filter_gender_women)
-                                Gender.EVERYONE -> stringResource(Res.string.feed_filter_gender_everyone)
-                            }
-                        )
-                    },
-                    colors = FilterChipDefaults.filterChipColors(
-                        selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                        selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
+                val isSelected = showMe == gender
+                val bgColor by animateColorAsState(
+                    targetValue = if (isSelected) MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.surfaceVariant
                 )
+                val textColor by animateColorAsState(
+                    targetValue = if (isSelected) MaterialTheme.colorScheme.onPrimary
+                    else MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(bgColor)
+                        .clickable { showMe = gender }
+                        .padding(vertical = 10.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = when (gender) {
+                            Gender.MEN -> stringResource(Res.string.feed_filter_gender_men)
+                            Gender.WOMEN -> stringResource(Res.string.feed_filter_gender_women)
+                            Gender.EVERYONE -> stringResource(Res.string.feed_filter_gender_everyone)
+                        },
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                        color = textColor
+                    )
+                }
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Age range section
-        FilterSectionHeader(
+        // ── Age Range ─────────────────────────────────────────────────
+        FilterSectionLabel(
             icon = Icons.Default.Cake,
-            title = stringResource(Res.string.feed_filter_age_range),
-            value = stringResource(
-                Res.string.feed_filter_age_value,
-                ageRange.start.roundToInt(),
-                ageRange.endInclusive.roundToInt()
-            )
+            title = stringResource(Res.string.feed_filter_age_range)
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            FilterAgeBox(
+                label = "Min",
+                value = ageRange.start.roundToInt().toString(),
+                modifier = Modifier.weight(1f)
+            )
+            FilterAgeBox(
+                label = "Max",
+                value = ageRange.endInclusive.roundToInt().toString(),
+                modifier = Modifier.weight(1f)
+            )
+        }
+
         RangeSlider(
             value = ageRange,
             onValueChange = { ageRange = it },
             valueRange = 18f..80f,
             colors = SliderDefaults.colors(
                 thumbColor = MaterialTheme.colorScheme.primary,
-                activeTrackColor = MaterialTheme.colorScheme.primary
+                activeTrackColor = MaterialTheme.colorScheme.primary,
+                inactiveTrackColor = MaterialTheme.colorScheme.surfaceVariant
             )
         )
         Row(
@@ -557,13 +607,13 @@ private fun FilterBottomSheet(
             )
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
-        // Apply button
+        // ── Apply button ──────────────────────────────────────────────
         Button(
             onClick = {
                 onApply(
-                    if (hasDistance) distanceValue.toDouble() else null,
+                    if (!isNoLimit) distanceValue.toDouble() else null,
                     showMe,
                     ageRange.start.roundToInt(),
                     ageRange.endInclusive.roundToInt()
@@ -571,52 +621,82 @@ private fun FilterBottomSheet(
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(52.dp),
-            shape = RoundedCornerShape(16.dp),
+                .height(48.dp),
+            shape = RoundedCornerShape(14.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary
             )
         ) {
             Text(
-                text = stringResource(Res.string.feed_filter_apply),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold
-            )
-        }
-        Spacer(modifier = Modifier.height(24.dp))
-    }
-}
-
-@Composable
-private fun FilterSectionHeader(
-    icon: ImageVector,
-    title: String,
-    value: String
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                modifier = Modifier.size(20.dp),
-                tint = MaterialTheme.colorScheme.primary
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = title,
+                text = if (activeFilters > 0)
+                    "${stringResource(Res.string.feed_filter_apply)} ($activeFilters)"
+                else
+                    stringResource(Res.string.feed_filter_apply),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold
             )
         }
+        Spacer(modifier = Modifier.height(16.dp))
+    }
+}
+
+@Composable
+private fun FilterSectionLabel(
+    icon: ImageVector,
+    title: String,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(28.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                modifier = Modifier.size(16.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
+        }
+        Text(
+            text = title,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+    }
+}
+
+@Composable
+private fun FilterAgeBox(
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f))
+            .padding(vertical = 10.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
         Text(
             text = value,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.primary,
-            fontWeight = FontWeight.Medium
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary
         )
     }
 }

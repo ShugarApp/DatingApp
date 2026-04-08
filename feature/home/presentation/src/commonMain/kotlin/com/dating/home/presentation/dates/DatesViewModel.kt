@@ -18,7 +18,7 @@ class DatesViewModel(
     private val messageRepository: MessageRepository
 ) : ViewModel() {
 
-    private val _filter = MutableStateFlow(DateFilter.ALL)
+    private val _filter = MutableStateFlow(DateFilter.UPCOMING)
 
     val state = combine(
         messageRepository.getActiveDateProposals(),

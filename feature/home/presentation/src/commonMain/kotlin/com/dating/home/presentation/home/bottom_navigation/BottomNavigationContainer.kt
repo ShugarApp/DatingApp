@@ -99,11 +99,21 @@ fun BottomNavigationContainer(
         if (hasAcceptedDates) BottomNavSection.entries.toList()
         else BottomNavSection.entries.filter { it != BottomNavSection.DATES }
     }
-    // Track previous count to detect the transition 0 → 1 (first date accepted)
-    var prevDatesCount by rememberSaveable { mutableStateOf(0) }
-    LaunchedEffect(datesCount) {
+    // Track previous count to detect the transition 0 → 1 (first date accepted in-session).
+    // -1 means "not yet initialized after initial load" — avoids false navigation on cold start.
+    var prevDatesCount by rememberSaveable { mutableStateOf(-1) }
+    LaunchedEffect(datesCount, datesState.isLoading) {
+        // Wait until the initial fetch completes before tracking changes
+        if (datesState.isLoading) return@LaunchedEffect
+
+        if (prevDatesCount == -1) {
+            // Establish baseline after first load — do not navigate
+            prevDatesCount = datesCount
+            return@LaunchedEffect
+        }
+
         if (datesCount == 1 && prevDatesCount == 0) {
-            // First date just got accepted — jump to the Dates tab
+            // First date just got accepted this session — jump to the Dates tab
             selectedSection = BottomNavSection.DATES
         }
         if (!hasAcceptedDates && selectedSection == BottomNavSection.DATES) {

@@ -4,5 +4,6 @@ enum class RegisterStep {
     BasicInfo,
     BirthDate,
     GenderInterest,
-    LookingFor
+    LookingFor,
+    IdealDate
 }
