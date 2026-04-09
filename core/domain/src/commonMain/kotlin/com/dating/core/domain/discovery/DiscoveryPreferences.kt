@@ -6,7 +6,8 @@ data class DiscoverySettings(
     val maxDistance: Double? = null,
     val showMe: Gender = Gender.WOMEN,
     val minAge: Int = 18,
-    val maxAge: Int = 50
+    val maxAge: Int = 50,
+    val verifiedProfilesOnly: Boolean = false
 )
 
 enum class Gender(val value: String, val apiValue: String) {
@@ -26,6 +27,7 @@ interface DiscoveryPreferencesStorage {
     suspend fun updateMaxDistance(distance: Double?)
     suspend fun updateShowMe(gender: Gender)
     suspend fun updateAgeRange(minAge: Int, maxAge: Int)
+    suspend fun updateVerifiedProfilesOnly(enabled: Boolean)
     suspend fun isCompleteProfilePromptShown(): Boolean
     suspend fun setCompleteProfilePromptShown()
 }

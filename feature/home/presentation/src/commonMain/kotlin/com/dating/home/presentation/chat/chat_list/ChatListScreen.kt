@@ -2,26 +2,41 @@
 
 package com.dating.home.presentation.chat.chat_list
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.delete
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,6 +48,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
@@ -42,6 +58,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import aura.feature.home.presentation.generated.resources.Res
@@ -54,8 +74,8 @@ import aura.feature.home.presentation.generated.resources.no_chats_subtitle
 import aura.feature.home.presentation.generated.resources.search_conversations
 import com.dating.core.designsystem.components.dialogs.DestructiveConfirmationDialog
 import com.dating.core.designsystem.components.header.MainTopAppBar
-import com.dating.core.designsystem.components.textfields.ChirpMultiLineTextField
 import com.dating.core.designsystem.theme.AppTheme
+import com.dating.core.designsystem.theme.extended
 import com.dating.core.presentation.permissions.Permission
 import com.dating.core.presentation.permissions.rememberPermissionController
 import com.dating.home.presentation.chat.chat_list.components.ChatListItemSkeleton
@@ -115,33 +135,35 @@ fun ChatListScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            MainTopAppBar(
-                title = "Chats",
-                actions = {
-                    IconButton(
-                        onClick = { onAction(ChatListAction.OnToggleSearch) }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = stringResource(Res.string.search_conversations),
-                            tint = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
+            AnimatedContent(
+                targetState = state.isSearchVisible,
+                transitionSpec = {
+                    fadeIn(animationSpec = tween(200)) togetherWith fadeOut(animationSpec = tween(150))
+                },
+                label = "search_header"
+            ) { isSearching ->
+                if (isSearching) {
+                    SearchTopBar(
+                        searchState = state.searchTextFieldState,
+                        placeholder = stringResource(Res.string.search_conversations),
+                        onCloseSearch = { onAction(ChatListAction.OnToggleSearch) }
+                    )
+                } else {
+                    MainTopAppBar(
+                        title = "Chats",
+                        actions = {
+                            IconButton(
+                                onClick = { onAction(ChatListAction.OnToggleSearch) }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Search,
+                                    contentDescription = stringResource(Res.string.search_conversations),
+                                    tint = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        }
+                    )
                 }
-            )
-
-            AnimatedVisibility(
-                visible = state.isSearchVisible,
-                enter = expandVertically(),
-                exit = shrinkVertically()
-            ) {
-                ChirpMultiLineTextField(
-                    state = state.searchTextFieldState,
-                    placeholder = stringResource(Res.string.search_conversations),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 12.dp, vertical = 4.dp)
-                )
             }
 
             PullToRefreshBox(
@@ -259,6 +281,113 @@ fun ChatListScreen(
             onCancelClick = { onAction(ChatListAction.OnDismissDeleteChatDialog) },
             onDismiss = { onAction(ChatListAction.OnDismissDeleteChatDialog) }
         )
+    }
+}
+
+@Composable
+private fun SearchTopBar(
+    searchState: TextFieldState,
+    placeholder: String,
+    onCloseSearch: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val focusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .statusBarsPadding()
+            .height(64.dp)
+            .padding(horizontal = 4.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        IconButton(onClick = {
+            focusManager.clearFocus()
+            onCloseSearch()
+        }) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "Close search",
+                tint = MaterialTheme.colorScheme.onSurface
+            )
+        }
+
+        Row(
+            modifier = Modifier
+                .weight(1f)
+                .background(
+                    color = MaterialTheme.colorScheme.extended.surfaceLower,
+                    shape = RoundedCornerShape(50)
+                )
+                .padding(horizontal = 14.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.extended.textPlaceholder,
+                modifier = Modifier.size(18.dp)
+            )
+
+            BasicTextField(
+                state = searchState,
+                modifier = Modifier
+                    .weight(1f)
+                    .focusRequester(focusRequester),
+                textStyle = MaterialTheme.typography.bodyMedium.copy(
+                    color = MaterialTheme.colorScheme.extended.textPrimary
+                ),
+                lineLimits = TextFieldLineLimits.SingleLine,
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                decorator = { innerBox ->
+                    if (searchState.text.isEmpty()) {
+                        Text(
+                            text = placeholder,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.extended.textPlaceholder
+                        )
+                    }
+                    innerBox()
+                }
+            )
+
+            AnimatedVisibility(
+                visible = searchState.text.isNotEmpty(),
+                enter = fadeIn(tween(150)) + scaleIn(tween(150)),
+                exit = fadeOut(tween(100)) + scaleOut(tween(100))
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(20.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.extended.textPlaceholder.copy(alpha = 0.3f))
+                        .clickable(
+                            interactionSource = null,
+                            indication = null
+                        ) {
+                            searchState.edit { delete(0, length) }
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Clear,
+                        contentDescription = "Clear search",
+                        tint = MaterialTheme.colorScheme.extended.textPrimary,
+                        modifier = Modifier.size(12.dp)
+                    )
+                }
+            }
+        }
+
+        // Right padding balance
+        Box(modifier = Modifier.size(4.dp))
     }
 }
 

@@ -19,7 +19,10 @@ interface UserService {
         zodiac: String?,
         smoking: String?,
         drinking: String?,
-        interests: List<String>?
+        interests: List<String>?,
+        idealDate: String?,
+        interestedIn: String?,
+        lookingFor: String?
     ): Result<User, DataError.Remote>
     // Returns the confirmed publicUrl so the caller can update state locally
     suspend fun uploadPhoto(imageBytes: ByteArray, mimeType: String, index: Int): Result<String, DataError.Remote>

@@ -22,6 +22,7 @@ class DataStoreDiscoveryPreferencesStorage(
     private val showMeKey = stringPreferencesKey("discovery_show_me")
     private val minAgeKey = intPreferencesKey("discovery_min_age")
     private val maxAgeKey = intPreferencesKey("discovery_max_age")
+    private val verifiedProfilesOnlyKey = booleanPreferencesKey("discovery_verified_profiles_only")
     private val completeProfilePromptShownKey = booleanPreferencesKey("complete_profile_prompt_shown")
 
     override fun observe(): Flow<DiscoverySettings> {
@@ -55,6 +56,12 @@ class DataStoreDiscoveryPreferencesStorage(
         }
     }
 
+    override suspend fun updateVerifiedProfilesOnly(enabled: Boolean) {
+        dataStore.edit { prefs ->
+            prefs[verifiedProfilesOnlyKey] = enabled
+        }
+    }
+
     override suspend fun isCompleteProfilePromptShown(): Boolean {
         return dataStore.data.first()[completeProfilePromptShownKey] ?: false
     }
@@ -70,7 +77,8 @@ class DataStoreDiscoveryPreferencesStorage(
             maxDistance = this[maxDistanceKey],
             showMe = this[showMeKey]?.let { Gender.fromValue(it) } ?: Gender.WOMEN,
             minAge = this[minAgeKey] ?: 18,
-            maxAge = this[maxAgeKey] ?: 50
+            maxAge = this[maxAgeKey] ?: 50,
+            verifiedProfilesOnly = this[verifiedProfilesOnlyKey] ?: false
         )
     }
 }

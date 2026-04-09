@@ -14,15 +14,19 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -31,15 +35,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.ViewList
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -49,6 +54,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -60,7 +66,6 @@ import aura.feature.home.presentation.generated.resources.empty_matches
 import aura.feature.home.presentation.generated.resources.feed_error_retry
 import aura.feature.home.presentation.generated.resources.likes_empty_desc
 import aura.feature.home.presentation.generated.resources.likes_empty_title
-import aura.feature.home.presentation.generated.resources.matches_chat
 import aura.feature.home.presentation.generated.resources.matches_empty_desc
 import aura.feature.home.presentation.generated.resources.matches_empty_title
 import aura.feature.home.presentation.generated.resources.matches_tab_likes
@@ -76,21 +81,34 @@ fun MatchesScreen(
     onAction: (MatchesAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Scaffold(
-        modifier = modifier
-    ) { paddingValues ->
+    Scaffold(modifier = modifier) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            MatchesTabSwitcher(
-                selectedTab = state.selectedTab,
-                matchesCount = state.matches.size,
-                likesCount = state.likes.size,
-                onTabSelected = { onAction(MatchesAction.OnTabSelected(it)) },
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                MatchesTabSwitcher(
+                    selectedTab = state.selectedTab,
+                    matchesCount = state.matches.size,
+                    likesCount = state.likes.size,
+                    onTabSelected = { onAction(MatchesAction.OnTabSelected(it)) },
+                    modifier = Modifier.weight(1f)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                IconButton(onClick = { onAction(MatchesAction.OnToggleViewMode) }) {
+                    Icon(
+                        imageVector = if (state.viewMode == MatchesViewMode.GRID) Icons.Default.ViewList else Icons.Default.GridView,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
 
             val currentItems = when (state.selectedTab) {
                 MatchesTab.MATCHES -> state.matches
@@ -112,27 +130,48 @@ fun MatchesScreen(
                         MatchesTab.MATCHES -> EmptyMatchesState()
                         MatchesTab.LIKES -> EmptyLikesState()
                     }
-                } else {
+                } else if (state.viewMode == MatchesViewMode.GRID) {
                     LazyVerticalGrid(
                         columns = GridCells.Fixed(2),
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                        contentPadding = PaddingValues(12.dp),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
-                        items(
-                            items = currentItems,
-                            key = { it.id }
-                        ) { match ->
+                        items(items = currentItems, key = { it.id }) { match ->
                             when (state.selectedTab) {
-                                MatchesTab.MATCHES -> MatchCard(
+                                MatchesTab.MATCHES -> MatchPhotoCard(
                                     match = match,
                                     onClick = { onAction(MatchesAction.OnMatchClick(match.id, match.profilePictureUrl)) },
                                     onLongClick = { onAction(MatchesAction.OnDeleteMatchClick(match)) },
                                     onStartChat = { onAction(MatchesAction.OnStartChat(match.id)) },
                                     isChatLoading = state.isCreatingChat
                                 )
-                                MatchesTab.LIKES -> LikeCard(
+                                MatchesTab.LIKES -> LikePhotoCard(
+                                    match = match,
+                                    onClick = { onAction(MatchesAction.OnLikeClick(match.id, match.profilePictureUrl)) },
+                                    onLike = { onAction(MatchesAction.OnLikeUser(match.id)) },
+                                    onDislike = { onAction(MatchesAction.OnDislikeUser(match.id)) }
+                                )
+                            }
+                        }
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        items(items = currentItems, key = { it.id }) { match ->
+                            when (state.selectedTab) {
+                                MatchesTab.MATCHES -> MatchListCard(
+                                    match = match,
+                                    onClick = { onAction(MatchesAction.OnMatchClick(match.id, match.profilePictureUrl)) },
+                                    onLongClick = { onAction(MatchesAction.OnDeleteMatchClick(match)) },
+                                    onStartChat = { onAction(MatchesAction.OnStartChat(match.id)) },
+                                    isChatLoading = state.isCreatingChat
+                                )
+                                MatchesTab.LIKES -> LikeListCard(
                                     match = match,
                                     onClick = { onAction(MatchesAction.OnLikeClick(match.id, match.profilePictureUrl)) },
                                     onLike = { onAction(MatchesAction.OnLikeUser(match.id)) },
@@ -147,6 +186,8 @@ fun MatchesScreen(
     }
 }
 
+// ── Tab switcher ──────────────────────────────────────────────────────────────
+
 @Composable
 private fun MatchesTabSwitcher(
     selectedTab: MatchesTab,
@@ -157,7 +198,6 @@ private fun MatchesTabSwitcher(
 ) {
     Box(
         modifier = modifier
-            .fillMaxWidth()
             .height(48.dp)
             .clip(RoundedCornerShape(24.dp))
             .background(MaterialTheme.colorScheme.surfaceVariant)
@@ -166,16 +206,13 @@ private fun MatchesTabSwitcher(
             MatchesTab.entries.forEach { tab ->
                 val isSelected = selectedTab == tab
                 val bgColor by animateColorAsState(
-                    targetValue = if (isSelected) MaterialTheme.colorScheme.primary
-                    else Color.Transparent,
+                    targetValue = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
                     animationSpec = spring(stiffness = Spring.StiffnessLow)
                 )
                 val textColor by animateColorAsState(
-                    targetValue = if (isSelected) MaterialTheme.colorScheme.onPrimary
-                    else MaterialTheme.colorScheme.onSurfaceVariant,
+                    targetValue = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
                     animationSpec = spring(stiffness = Spring.StiffnessLow)
                 )
-
                 val label = when (tab) {
                     MatchesTab.MATCHES -> stringResource(Res.string.matches_tab_matches)
                     MatchesTab.LIKES -> stringResource(Res.string.matches_tab_likes)
@@ -184,7 +221,6 @@ private fun MatchesTabSwitcher(
                     MatchesTab.MATCHES -> matchesCount
                     MatchesTab.LIKES -> likesCount
                 }
-
                 Box(
                     modifier = Modifier
                         .weight(1f)
@@ -220,9 +256,11 @@ private fun MatchesTabSwitcher(
     }
 }
 
+// ── Grid cards (foto completa + gradiente) ────────────────────────────────────
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun MatchCard(
+private fun MatchPhotoCard(
     match: Match,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
@@ -233,87 +271,294 @@ private fun MatchCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .combinedClickable(
-                onClick = onClick,
-                onLongClick = onLongClick
-            ),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            .aspectRatio(3f / 4f)
+            .combinedClickable(onClick = onClick, onLongClick = onLongClick),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            ProfilePhoto(
-                photoUrl = match.profilePictureUrl,
-                username = match.username,
-                size = 80
-            )
+        Box(modifier = Modifier.fillMaxSize()) {
+            PhotoBackground(url = match.profilePictureUrl, username = match.username)
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = match.username,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-
-            val location = listOfNotNull(match.city, match.country).joinToString(", ")
-            if (location.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(4.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.LocationOn,
-                        contentDescription = null,
-                        modifier = Modifier.size(14.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+            // Gradiente inferior
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.55f)
+                    .align(Alignment.BottomCenter)
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.78f))
+                        )
                     )
-                    Spacer(modifier = Modifier.width(2.dp))
+            )
+
+            // Info + botón chat
+            Row(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .fillMaxWidth()
+                    .padding(10.dp),
+                verticalAlignment = Alignment.Bottom,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = location,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        text = if (match.age != null) "${match.username}, ${match.age}" else match.username,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
+                    val location = listOfNotNull(match.city, match.country).joinToString(", ")
+                    if (location.isNotEmpty()) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Default.LocationOn,
+                                contentDescription = null,
+                                modifier = Modifier.size(11.dp),
+                                tint = Color.White.copy(alpha = 0.85f)
+                            )
+                            Spacer(modifier = Modifier.width(2.dp))
+                            Text(
+                                text = location,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color.White.copy(alpha = 0.85f),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                    }
                 }
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Button(
-                onClick = onStartChat,
-                enabled = !isChatLoading,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                if (isChatLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(16.dp),
-                        strokeWidth = 2.dp,
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-                } else {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.Send,
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp)
-                    )
+                Spacer(modifier = Modifier.width(8.dp))
+                Box(
+                    modifier = Modifier
+                        .size(38.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primary)
+                        .clickable(enabled = !isChatLoading, onClick = onStartChat),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (isChatLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(18.dp),
+                            strokeWidth = 2.dp,
+                            color = Color.White
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.Send,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                            tint = Color.White
+                        )
+                    }
                 }
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(stringResource(Res.string.matches_chat))
             }
         }
     }
 }
 
 @Composable
-private fun LikeCard(
+private fun LikePhotoCard(
+    match: Match,
+    onClick: () -> Unit,
+    onLike: () -> Unit,
+    onDislike: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .aspectRatio(3f / 4f)
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            PhotoBackground(url = match.profilePictureUrl, username = match.username)
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.55f)
+                    .align(Alignment.BottomCenter)
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.78f))
+                        )
+                    )
+            )
+
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .fillMaxWidth()
+                    .padding(10.dp)
+            ) {
+                Text(
+                    text = if (match.age != null) "${match.username}, ${match.age}" else match.username,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                val location = listOfNotNull(match.city, match.country).joinToString(", ")
+                if (location.isNotEmpty()) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.LocationOn,
+                            contentDescription = null,
+                            modifier = Modifier.size(11.dp),
+                            tint = Color.White.copy(alpha = 0.85f)
+                        )
+                        Spacer(modifier = Modifier.width(2.dp))
+                        Text(
+                            text = location,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color.White.copy(alpha = 0.85f),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(36.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(Color.White.copy(alpha = 0.2f))
+                            .clickable(onClick = onDislike),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp),
+                            tint = Color.White
+                        )
+                    }
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(36.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(MaterialTheme.colorScheme.primary)
+                            .clickable(onClick = onLike),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Favorite,
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp),
+                            tint = Color.White
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+// ── List cards (colores adaptativos al tema) ──────────────────────────────────
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun MatchListCard(
+    match: Match,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit,
+    onStartChat: () -> Unit,
+    isChatLoading: Boolean = false,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .combinedClickable(onClick = onClick, onLongClick = onLongClick),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            ListPhoto(url = match.profilePictureUrl, username = match.username, size = 58)
+            Spacer(modifier = Modifier.width(12.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = if (match.age != null) "${match.username}, ${match.age}" else match.username,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                val location = listOfNotNull(match.city, match.country).joinToString(", ")
+                if (location.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.LocationOn,
+                            contentDescription = null,
+                            modifier = Modifier.size(12.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.width(2.dp))
+                        Text(
+                            text = location,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(
+                        if (isChatLoading) MaterialTheme.colorScheme.surfaceVariant
+                        else MaterialTheme.colorScheme.primary
+                    )
+                    .clickable(enabled = !isChatLoading, onClick = onStartChat),
+                contentAlignment = Alignment.Center
+            ) {
+                if (isChatLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Send,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp),
+                        tint = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun LikeListCard(
     match: Match,
     onClick: () -> Unit,
     onLike: () -> Unit,
@@ -324,83 +569,78 @@ private fun LikeCard(
         modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
-        Column(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            ProfilePhoto(
-                photoUrl = match.profilePictureUrl,
-                username = match.username,
-                size = 80
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = match.username,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-
-            val location = listOfNotNull(match.city, match.country).joinToString(", ")
-            if (location.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(4.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.LocationOn,
-                        contentDescription = null,
-                        modifier = Modifier.size(14.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.width(2.dp))
-                    Text(
-                        text = location,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+            ListPhoto(url = match.profilePictureUrl, username = match.username, size = 58)
+            Spacer(modifier = Modifier.width(12.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = if (match.age != null) "${match.username}, ${match.age}" else match.username,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                val location = listOfNotNull(match.city, match.country).joinToString(", ")
+                if (location.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.LocationOn,
+                            contentDescription = null,
+                            modifier = Modifier.size(12.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.width(2.dp))
+                        Text(
+                            text = location,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
                 }
             }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                FilledTonalButton(
-                    onClick = onDislike,
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.filledTonalButtonColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer,
-                        contentColor = MaterialTheme.colorScheme.onErrorContainer
-                    )
+            Spacer(modifier = Modifier.width(8.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.errorContainer)
+                        .clickable(onClick = onDislike),
+                    contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = null,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(18.dp),
+                        tint = MaterialTheme.colorScheme.onErrorContainer
                     )
                 }
-
-                Button(
-                    onClick = onLike,
-                    modifier = Modifier.weight(1f)
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primary)
+                        .clickable(onClick = onLike),
+                    contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.Favorite,
                         contentDescription = null,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(18.dp),
+                        tint = MaterialTheme.colorScheme.onPrimary
                     )
                 }
             }
@@ -408,33 +648,27 @@ private fun LikeCard(
     }
 }
 
+// ── Helpers de foto ───────────────────────────────────────────────────────────
+
 @Composable
-private fun ProfilePhoto(
-    photoUrl: String?,
-    username: String,
-    size: Int,
-    modifier: Modifier = Modifier
-) {
-    if (photoUrl != null) {
+private fun PhotoBackground(url: String?, username: String) {
+    if (url != null) {
         AsyncImage(
-            model = photoUrl,
+            model = url,
             contentDescription = username,
-            modifier = modifier
-                .size(size.dp)
-                .clip(CircleShape),
+            modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
     } else {
         Box(
-            modifier = modifier
-                .size(size.dp)
-                .clip(CircleShape)
+            modifier = Modifier
+                .fillMaxSize()
                 .background(MaterialTheme.colorScheme.primaryContainer),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = username.first().uppercase(),
-                style = MaterialTheme.typography.headlineMedium,
+                style = MaterialTheme.typography.displayMedium,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                 fontWeight = FontWeight.Bold
             )
@@ -443,13 +677,38 @@ private fun ProfilePhoto(
 }
 
 @Composable
-private fun EmptyMatchesState(
-    modifier: Modifier = Modifier
-) {
+private fun ListPhoto(url: String?, username: String, size: Int) {
+    if (url != null) {
+        AsyncImage(
+            model = url,
+            contentDescription = username,
+            modifier = Modifier.size(size.dp).clip(CircleShape),
+            contentScale = ContentScale.Crop
+        )
+    } else {
+        Box(
+            modifier = Modifier
+                .size(size.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.primaryContainer),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = username.first().uppercase(),
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
+
+// ── Empty / Error states ──────────────────────────────────────────────────────
+
+@Composable
+private fun EmptyMatchesState(modifier: Modifier = Modifier) {
     Box(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
+        modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -481,13 +740,9 @@ private fun EmptyMatchesState(
 }
 
 @Composable
-private fun EmptyLikesState(
-    modifier: Modifier = Modifier
-) {
+private fun EmptyLikesState(modifier: Modifier = Modifier) {
     Box(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
+        modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -525,9 +780,7 @@ private fun ErrorMatchesState(
     modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
+        modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()),
         contentAlignment = Alignment.Center
     ) {
         Column(

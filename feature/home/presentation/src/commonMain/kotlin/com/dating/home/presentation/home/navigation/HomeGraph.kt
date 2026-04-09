@@ -12,7 +12,14 @@ import com.dating.home.presentation.home.bottom_navigation.BottomNavigationConta
 import com.dating.home.presentation.profile.edit_profile.EditProfileScreen
 import com.dating.home.presentation.emergency.contacts.EmergencyContactsScreen
 import com.dating.home.presentation.emergency.onboarding.EmergencyOnboardingScreen
-import com.dating.home.presentation.profile.settings.DateSafetyTipsScreen
+import com.dating.home.presentation.profile.settings.SafeDateScreen
+import com.dating.home.presentation.profile.settings.SafetyTipsScreen
+import com.dating.home.presentation.profile.settings.DateSafetyChecklistScreen
+import com.dating.home.presentation.profile.settings.DiscoverySettingsScreen
+import com.dating.home.presentation.profile.settings.LegalAccountScreen
+import com.dating.home.presentation.profile.settings.PrivacySettingsScreen
+import com.dating.home.presentation.profile.settings.SafetyCenterScreen
+import com.dating.home.presentation.profile.settings.SecuritySettingsScreen
 import com.dating.home.presentation.profile.settings.DeleteAccountScreen
 import com.dating.home.presentation.profile.settings.IncognitoModeScreen
 import com.dating.home.presentation.profile.settings.PauseAccountScreen
@@ -97,6 +104,15 @@ fun NavGraphBuilder.homeGraph(
                 },
                 onSubscriptions = {
                     navController.navigate(HomeGraphRoutes.SubscriptionRoute)
+                },
+                onSafetyCenter = {
+                    navController.navigate(HomeGraphRoutes.SafetyCenterRoute)
+                },
+                onDateSafetyTips = {
+                    navController.navigate(HomeGraphRoutes.DateSafetyTipsRoute)
+                },
+                onDateSafetyChecklist = {
+                    navController.navigate(HomeGraphRoutes.DateSafetyChecklistRoute)
                 }
             )
         }
@@ -135,30 +151,60 @@ fun NavGraphBuilder.homeGraph(
             SettingsScreen(
                 onBack = { navController.popBackStack() },
                 onLogout = onLogout,
+                onPauseAccount = {
+                    navController.navigate(HomeGraphRoutes.PauseAccountRoute)
+                },
+                onIncognitoMode = {
+                    navController.navigate(HomeGraphRoutes.IncognitoModeRoute)
+                },
+                onSafetyCenter = {
+                    navController.navigate(HomeGraphRoutes.SafetyCenterRoute)
+                },
+                onDiscoverySettings = {
+                    navController.navigate(HomeGraphRoutes.DiscoverySettingsRoute)
+                },
+                onLegalAccount = {
+                    navController.navigate(HomeGraphRoutes.LegalAccountRoute)
+                },
+                onSecuritySettings = {
+                    navController.navigate(HomeGraphRoutes.SecuritySettingsRoute)
+                },
+                onPrivacySettings = {
+                    navController.navigate(HomeGraphRoutes.PrivacySettingsRoute)
+                }
+            )
+        }
+
+        composable<HomeGraphRoutes.SecuritySettingsRoute> {
+            SecuritySettingsScreen(
+                onBack = { navController.popBackStack() },
                 onChangePassword = {
                     navController.navigate(HomeGraphRoutes.ChangePasswordRoute)
                 },
                 onDeleteAccount = {
                     navController.navigate(HomeGraphRoutes.DeleteAccountRoute)
-                },
-                onPauseAccount = {
-                    navController.navigate(HomeGraphRoutes.PauseAccountRoute)
-                },
+                }
+            )
+        }
+
+        composable<HomeGraphRoutes.PrivacySettingsRoute> {
+            PrivacySettingsScreen(
+                onBack = { navController.popBackStack() },
                 onBlockedUsers = {
                     navController.navigate(HomeGraphRoutes.BlockedUsersRoute)
-                },
-                onIncognitoMode = {
-                    navController.navigate(HomeGraphRoutes.IncognitoModeRoute)
-                },
-                onEmergencyContacts = {
-                    navController.navigate(HomeGraphRoutes.EmergencyContactsRoute)
-                },
-                onEmergencyTutorial = {
-                    navController.navigate(HomeGraphRoutes.EmergencyOnboardingRoute)
-                },
-                onDateSafetyTips = {
-                    navController.navigate(HomeGraphRoutes.DateSafetyTipsRoute)
                 }
+            )
+        }
+
+        composable<HomeGraphRoutes.DiscoverySettingsRoute> {
+            DiscoverySettingsScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable<HomeGraphRoutes.LegalAccountRoute> {
+            LegalAccountScreen(
+                onBack = { navController.popBackStack() }
             )
         }
 
@@ -230,7 +276,40 @@ fun NavGraphBuilder.homeGraph(
         }
 
         composable<HomeGraphRoutes.DateSafetyTipsRoute> {
-            DateSafetyTipsScreen(
+            SafetyTipsScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable<HomeGraphRoutes.DateSafetyChecklistRoute> {
+            DateSafetyChecklistScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable<HomeGraphRoutes.SafetyCenterRoute> {
+            SafetyCenterScreen(
+                onBack = { navController.popBackStack() },
+                onEmergencyContacts = {
+                    navController.navigate(HomeGraphRoutes.EmergencyContactsRoute)
+                },
+                onEmergencyTutorial = {
+                    navController.navigate(HomeGraphRoutes.EmergencyOnboardingRoute)
+                },
+                onDateSafetyTips = {
+                    navController.navigate(HomeGraphRoutes.DateSafetyTipsRoute)
+                },
+                onDateSafetyChecklist = {
+                    navController.navigate(HomeGraphRoutes.DateSafetyChecklistRoute)
+                },
+                onSafeDate = {
+                    navController.navigate(HomeGraphRoutes.SafeDateRoute)
+                }
+            )
+        }
+
+        composable<HomeGraphRoutes.SafeDateRoute> {
+            SafeDateScreen(
                 onBack = { navController.popBackStack() }
             )
         }

@@ -29,5 +29,7 @@ data class UserSerializable(
     // Optionally returned by the backend. When present, this value is authoritative
     // and should be used instead of the locally-computed profileCompletion().
     val profileCompletion: Int? = null,
-    val idealDate: String? = null
+    val idealDate: String? = null,
+    val interestedIn: String? = null,
+    val lookingFor: String? = null
 )

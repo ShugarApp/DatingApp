@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -28,18 +27,21 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.HourglassEmpty
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Verified
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.material3.Button
+import androidx.compose.ui.draw.scale
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -57,7 +59,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -66,26 +67,24 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.foundation.border
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import aura.feature.home.presentation.generated.resources.Res
-import aura.feature.home.presentation.generated.resources.profile_community_guidelines
 import aura.feature.home.presentation.generated.resources.profile_completion_cta
-import aura.feature.home.presentation.generated.resources.profile_completion_done
 import aura.feature.home.presentation.generated.resources.profile_completion_hint
 import aura.feature.home.presentation.generated.resources.profile_completion_percent
 import aura.feature.home.presentation.generated.resources.profile_completion_title
 import aura.feature.home.presentation.generated.resources.profile_edit
 import aura.feature.home.presentation.generated.resources.profile_header_info_format
-import aura.feature.home.presentation.generated.resources.profile_help_support
-import aura.feature.home.presentation.generated.resources.profile_location_update
-import aura.feature.home.presentation.generated.resources.profile_location_updating
-import aura.feature.home.presentation.generated.resources.profile_privacy_policy
+import aura.feature.home.presentation.generated.resources.profile_sos_button
+import aura.feature.home.presentation.generated.resources.date_safety_checklist_section
+import aura.feature.home.presentation.generated.resources.date_safety_tips_section
 import aura.feature.home.presentation.generated.resources.profile_safety_center
-import aura.feature.home.presentation.generated.resources.profile_safety_legal
+import aura.feature.home.presentation.generated.resources.profile_safety_section
 import aura.feature.home.presentation.generated.resources.profile_settings_dashboard
-import aura.feature.home.presentation.generated.resources.profile_support
 import aura.feature.home.presentation.generated.resources.profile_verify
 import coil3.compose.AsyncImage
 import com.dating.core.designsystem.components.avatar.AvatarSize
@@ -95,22 +94,10 @@ import com.dating.core.designsystem.components.cards.AccessCardList
 import com.dating.core.domain.auth.VerificationStatus
 import com.dating.home.presentation.components.VerifiedBadge
 import com.dating.home.presentation.components.VerifiedBlue
-import com.dating.core.designsystem.components.buttons.AppButtonStyle
-import com.dating.core.designsystem.components.buttons.ChirpButton
 import com.dating.core.designsystem.components.chips.ChirpChip
 import com.dating.core.designsystem.theme.extended
-import com.dating.core.presentation.permissions.Permission
-import com.dating.core.presentation.permissions.PermissionState
-import com.dating.core.presentation.permissions.rememberPermissionController
-import com.dating.core.presentation.util.rememberOpenUrl
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
-
-private const val URL_SAFETY = "https://aura-safe-dating.com/#"
-private const val URL_PRIVACY = "https://aura-safe-dating.com/#"
-private const val URL_HELP = "https://aura-safe-dating.com/#"
-private const val URL_GUIDELINES = "https://aura-safe-dating.com/#"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -119,14 +106,16 @@ fun ProfileScreen(
     onSettings: () -> Unit,
     onVerification: () -> Unit,
     onSubscriptions: () -> Unit,
+    onSafetyCenter: () -> Unit,
+    onDateSafetyTips: () -> Unit,
+    onDateSafetyChecklist: () -> Unit,
+    showSosButton: Boolean,
+    onSosTrigger: () -> Unit,
     onNavigateToProfile: (String, String?) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ProfileViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val permissionController = rememberPermissionController()
-    val coroutineScope = rememberCoroutineScope()
-    val openUrl = rememberOpenUrl()
     val previewSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     Scaffold(
@@ -180,45 +169,27 @@ fun ProfileScreen(
                     )
                 }
             }
-            Spacer(modifier = Modifier.height(8.dp))
-            Button(
-                onClick = {
-                    coroutineScope.launch {
-                        val permissionState = permissionController.requestPermission(Permission.LOCATION)
-                        if (permissionState == PermissionState.GRANTED) {
-                            viewModel.onAction(ProfileAction.OnUpdateLocation)
-                        }
-                    }
-                },
-                enabled = !state.isUpdatingLocation,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            ) {
-                if (state.isUpdatingLocation) {
-                    CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(stringResource(Res.string.profile_location_updating))
-                } else {
-                    Icon(
-                        imageVector = Icons.Default.LocationOn,
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(stringResource(Res.string.profile_location_update))
-                }
-            }
-            val locationError = state.locationError
-            if (locationError != null) {
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = locationError,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.error
-                )
-            }
             Spacer(modifier = Modifier.height(24.dp))
 
-            // 3. Action Buttons Row (Dashboard Cards)
+            // 3. Verification status banner — shown above action buttons
+            VerificationStatusCard(
+                status = state.verificationStatus,
+                onVerifyClick = onVerification,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+
+            if (state.profileCompletion < 100) {
+                Spacer(modifier = Modifier.height(12.dp))
+                ProfileCompletionCard(
+                    completion = state.profileCompletion,
+                    onCompleteClick = onEditProfile,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // 4. Action Buttons Row — Edit | Safety Center | Settings
             Row(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -230,9 +201,9 @@ fun ProfileScreen(
                     modifier = Modifier.weight(1f)
                 )
                 ProfileDashboardCard(
-                    icon = Icons.Default.Verified, // Boost/Bolt icon
-                    text = stringResource(Res.string.profile_verify),
-                    onClick = onVerification,
+                    icon = Icons.Default.Security,
+                    text = stringResource(Res.string.profile_safety_center),
+                    onClick = onSafetyCenter,
                     modifier = Modifier.weight(1f)
                 )
                 ProfileDashboardCard(
@@ -242,54 +213,32 @@ fun ProfileScreen(
                     modifier = Modifier.weight(1f)
                 )
             }
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // 3b. Verification status card
-            VerificationStatusCard(
-                status = state.verificationStatus,
-                onVerifyClick = onVerification,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // 3c. Profile completion card
-            ProfileCompletionCard(
-                completion = state.profileCompletion,
-                onCompleteClick = onEditProfile,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // 4. SAFETY & LEGAL
-            AccessCardList(title = stringResource(Res.string.profile_safety_legal)) {
-                AccessCardItem(
-                    icon = Icons.Default.Security,
-                    title = stringResource(Res.string.profile_safety_center),
-                    onClick = { openUrl(URL_SAFETY) }
+            // 5. SOS Button — shown above Safety Tips when emergency feature is enabled
+            if (showSosButton) {
+                SosActionButton(
+                    onClick = onSosTrigger,
+                    modifier = Modifier.padding(horizontal = 16.dp)
                 )
-                AccessCardItem(
-                    icon = Icons.Default.Lock,
-                    title = stringResource(Res.string.profile_privacy_policy),
-                    onClick = { openUrl(URL_PRIVACY) }
-                )
+                Spacer(modifier = Modifier.height(16.dp))
             }
-            Spacer(modifier = Modifier.height(24.dp))
 
-            // 4. SUPPORT
-            AccessCardList(title = stringResource(Res.string.profile_support)) {
+            // 6. SAFETY
+            AccessCardList(title = stringResource(Res.string.profile_safety_section)) {
                 AccessCardItem(
-                    icon = Icons.AutoMirrored.Filled.Help,
-                    title = stringResource(Res.string.profile_help_support),
-                    onClick = { openUrl(URL_HELP) }
+                    icon = Icons.Default.Info,
+                    title = stringResource(Res.string.date_safety_tips_section),
+                    onClick = onDateSafetyTips
                 )
                 AccessCardItem(
-                    icon = Icons.Default.Favorite,
-                    title = stringResource(Res.string.profile_community_guidelines),
-                    onClick = { openUrl(URL_GUIDELINES) }
+                    icon = Icons.Default.CheckCircle,
+                    title = stringResource(Res.string.date_safety_checklist_section),
+                    onClick = onDateSafetyChecklist
                 )
             }
+
             Spacer(modifier = Modifier.padding(bottom = 30.dp))
         }
     }
@@ -322,8 +271,6 @@ fun ProfileCompletionCard(
     onCompleteClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val isComplete = completion >= 100
-
     var animatedProgress by remember { mutableFloatStateOf(0f) }
     LaunchedEffect(completion) {
         animatedProgress = completion / 100f
@@ -348,22 +295,14 @@ fun ProfileCompletionCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = if (isComplete) {
-                        stringResource(Res.string.profile_completion_done)
-                    } else {
-                        stringResource(Res.string.profile_completion_title)
-                    },
+                    text = stringResource(Res.string.profile_completion_title),
                     style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
                     color = MaterialTheme.colorScheme.extended.textPrimary
                 )
                 Text(
                     text = stringResource(Res.string.profile_completion_percent, completion),
                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-                    color = if (isComplete) {
-                        MaterialTheme.colorScheme.primary
-                    } else {
-                        MaterialTheme.colorScheme.extended.textSecondary
-                    }
+                    color = MaterialTheme.colorScheme.extended.textSecondary
                 )
             }
 
@@ -380,27 +319,25 @@ fun ProfileCompletionCard(
                 strokeCap = ProgressIndicatorDefaults.LinearStrokeCap
             )
 
-            if (!isComplete) {
-                Spacer(modifier = Modifier.height(10.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+            Spacer(modifier = Modifier.height(10.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(Res.string.profile_completion_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.extended.textSecondary,
+                    modifier = Modifier.weight(1f)
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                TextButton(onClick = onCompleteClick) {
                     Text(
-                        text = stringResource(Res.string.profile_completion_hint),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.extended.textSecondary,
-                        modifier = Modifier.weight(1f)
+                        text = stringResource(Res.string.profile_completion_cta),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.primary
                     )
-                    Spacer(modifier = Modifier.width(12.dp))
-                    TextButton(onClick = onCompleteClick) {
-                        Text(
-                            text = stringResource(Res.string.profile_completion_cta),
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
                 }
             }
         }
@@ -483,39 +420,114 @@ fun ProfileDashboardCard(
     icon: ImageVector,
     text: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    iconTint: Color = MaterialTheme.colorScheme.onSurface
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
         modifier = modifier
-            .aspectRatio(1f) // Square-ish
-            .clip(RoundedCornerShape(24.dp))
+            .clip(RoundedCornerShape(16.dp))
             .background(MaterialTheme.colorScheme.surface)
             .clickable { onClick() }
-            .padding(8.dp)
+            .padding(vertical = 14.dp, horizontal = 8.dp)
     ) {
         Box(
             modifier = Modifier
-                .size(48.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.surfaceVariant),
+                .size(42.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(iconTint.copy(alpha = 0.10f)),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = text,
-                tint = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.size(24.dp)
+                tint = iconTint,
+                modifier = Modifier.size(22.dp)
             )
         }
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = text,
             style = MaterialTheme.typography.labelSmall,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.extended.textPrimary
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.extended.textPrimary,
+            textAlign = TextAlign.Center,
+            maxLines = 2
         )
+    }
+}
+
+private val SosRed = Color(0xFFE53935)
+private val SosPulseRing = Color(0xFFEF9A9A)
+
+@Composable
+internal fun SosActionButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val infiniteTransition = rememberInfiniteTransition(label = "sos_pulse")
+    val pulseScale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.4f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 900, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "pulse_scale"
+    )
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp))
+            .background(MaterialTheme.colorScheme.errorContainer)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 20.dp, vertical = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Animated SOS circle — outer container sized so the scaled ring never clips
+        // ring = 48dp, scale max = 1.4 → 67dp → fits inside 72dp container
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.size(72.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .scale(pulseScale)
+                    .clip(CircleShape)
+                    .background(SosPulseRing.copy(alpha = 0.5f))
+            )
+            Box(
+                modifier = Modifier
+                    .size(42.dp)
+                    .clip(CircleShape)
+                    .background(SosRed),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "SOS",
+                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.ExtraBold),
+                    color = Color.White
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = stringResource(Res.string.profile_sos_button),
+                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.onErrorContainer
+            )
+            Text(
+                text = "Tap to trigger emergency countdown",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.7f)
+            )
+        }
     }
 }
 

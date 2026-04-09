@@ -14,5 +14,8 @@ data class UpdateProfileRequest(
     val zodiac: String? = null,
     val smoking: String? = null,
     val drinking: String? = null,
-    val interests: List<String>? = null
+    val interests: List<String>? = null,
+    val idealDate: String? = null,
+    val interestedIn: String? = null,
+    val lookingFor: String? = null
 )

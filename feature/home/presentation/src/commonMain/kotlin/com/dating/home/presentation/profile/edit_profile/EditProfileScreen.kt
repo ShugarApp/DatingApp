@@ -1,5 +1,11 @@
 package com.dating.home.presentation.profile.edit_profile
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -9,12 +15,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -24,33 +32,21 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SelectableDates
+import androidx.compose.material3.Slider
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberDatePickerState
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -73,9 +69,8 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.IntOffset
-import kotlin.math.roundToInt
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import aura.feature.home.presentation.generated.resources.Res
 import aura.feature.home.presentation.generated.resources.add_photo
@@ -85,30 +80,64 @@ import aura.feature.home.presentation.generated.resources.delete_profile_picture
 import aura.feature.home.presentation.generated.resources.delete_profile_picture_desc
 import aura.feature.home.presentation.generated.resources.edit_profile_about_me
 import aura.feature.home.presentation.generated.resources.edit_profile_about_me_placeholder
+import aura.feature.home.presentation.generated.resources.edit_profile_age_format
 import aura.feature.home.presentation.generated.resources.edit_profile_bio_counter
-import aura.feature.home.presentation.generated.resources.edit_profile_birth_date
-import aura.feature.home.presentation.generated.resources.edit_profile_birth_date_select
+import aura.feature.home.presentation.generated.resources.edit_profile_change_photo
 import aura.feature.home.presentation.generated.resources.edit_profile_company
 import aura.feature.home.presentation.generated.resources.edit_profile_company_placeholder
+import aura.feature.home.presentation.generated.resources.edit_profile_delete_photo
 import aura.feature.home.presentation.generated.resources.edit_profile_drinking
+import aura.feature.home.presentation.generated.resources.edit_profile_drinking_never
+import aura.feature.home.presentation.generated.resources.edit_profile_drinking_regularly
+import aura.feature.home.presentation.generated.resources.edit_profile_drinking_socially
 import aura.feature.home.presentation.generated.resources.edit_profile_education
 import aura.feature.home.presentation.generated.resources.edit_profile_education_placeholder
-import aura.feature.home.presentation.generated.resources.edit_profile_gender
 import aura.feature.home.presentation.generated.resources.edit_profile_gender_female
 import aura.feature.home.presentation.generated.resources.edit_profile_gender_male
 import aura.feature.home.presentation.generated.resources.edit_profile_gender_other
 import aura.feature.home.presentation.generated.resources.edit_profile_height
+import aura.feature.home.presentation.generated.resources.edit_profile_height_add
+import aura.feature.home.presentation.generated.resources.edit_profile_height_clear
+import aura.feature.home.presentation.generated.resources.edit_profile_ideal_date
+import aura.feature.home.presentation.generated.resources.edit_profile_ideal_date_adventure
+import aura.feature.home.presentation.generated.resources.edit_profile_ideal_date_beach
+import aura.feature.home.presentation.generated.resources.edit_profile_ideal_date_cinema
+import aura.feature.home.presentation.generated.resources.edit_profile_ideal_date_coffee
+import aura.feature.home.presentation.generated.resources.edit_profile_ideal_date_concert
+import aura.feature.home.presentation.generated.resources.edit_profile_ideal_date_cooking
+import aura.feature.home.presentation.generated.resources.edit_profile_ideal_date_dinner
+import aura.feature.home.presentation.generated.resources.edit_profile_ideal_date_museum
+import aura.feature.home.presentation.generated.resources.edit_profile_ideal_date_picnic
+import aura.feature.home.presentation.generated.resources.edit_profile_ideal_date_travel
+import aura.feature.home.presentation.generated.resources.edit_profile_interested_in
+import aura.feature.home.presentation.generated.resources.edit_profile_interested_in_everyone
+import aura.feature.home.presentation.generated.resources.edit_profile_interested_in_men
+import aura.feature.home.presentation.generated.resources.edit_profile_interested_in_women
 import aura.feature.home.presentation.generated.resources.edit_profile_interests
 import aura.feature.home.presentation.generated.resources.edit_profile_job
 import aura.feature.home.presentation.generated.resources.edit_profile_job_placeholder
+import aura.feature.home.presentation.generated.resources.edit_profile_lifestyle
+import aura.feature.home.presentation.generated.resources.edit_profile_looking_for
+import aura.feature.home.presentation.generated.resources.edit_profile_looking_for_casual
+import aura.feature.home.presentation.generated.resources.edit_profile_looking_for_friends
+import aura.feature.home.presentation.generated.resources.edit_profile_looking_for_hookup
+import aura.feature.home.presentation.generated.resources.edit_profile_looking_for_long_term
+import aura.feature.home.presentation.generated.resources.edit_profile_looking_for_open
+import aura.feature.home.presentation.generated.resources.edit_profile_looking_for_short_term
+import aura.feature.home.presentation.generated.resources.edit_profile_my_preferences
+import aura.feature.home.presentation.generated.resources.edit_profile_not_set
+import aura.feature.home.presentation.generated.resources.edit_profile_personal_info
+import aura.feature.home.presentation.generated.resources.edit_profile_personal_info_note
 import aura.feature.home.presentation.generated.resources.edit_profile_photos
 import aura.feature.home.presentation.generated.resources.edit_profile_save_success
 import aura.feature.home.presentation.generated.resources.edit_profile_smoking
+import aura.feature.home.presentation.generated.resources.edit_profile_smoking_never
+import aura.feature.home.presentation.generated.resources.edit_profile_smoking_regularly
+import aura.feature.home.presentation.generated.resources.edit_profile_smoking_sometimes
 import aura.feature.home.presentation.generated.resources.edit_profile_title
+import aura.feature.home.presentation.generated.resources.edit_profile_work_education
 import aura.feature.home.presentation.generated.resources.edit_profile_zodiac
 import aura.feature.home.presentation.generated.resources.profile_image
-import aura.feature.home.presentation.generated.resources.remove
-import aura.feature.home.presentation.generated.resources.save
 import coil3.compose.AsyncImage
 import com.dating.core.designsystem.components.chips.ChirpChip
 import com.dating.core.designsystem.components.dialogs.DestructiveConfirmationDialog
@@ -120,18 +149,16 @@ import com.dating.home.domain.upload.PhotoUploadManager
 import com.dating.home.domain.upload.PhotoUploadRequest
 import com.dating.home.presentation.profile.mediapicker.rememberImagePickerLauncher
 import com.dating.home.presentation.profile.mediapicker.rememberMultiImagePickerLauncher
-import org.koin.compose.koinInject
+import kotlin.math.roundToInt
 import kotlin.time.Clock.System.now
-import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.atStartOfDayIn
-import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun EditProfileScreen(
     onBack: () -> Unit,
@@ -146,11 +173,9 @@ fun EditProfileScreen(
 
     val allUploadingSlots = state.uploadingSlots + pendingSlots
 
-    // Track which slot the user intends to fill — set before launching picker
     var pendingSlotIndex by remember { mutableStateOf<Int?>(null) }
     var showPhotoOptionsDialog by remember { mutableStateOf(false) }
 
-    // Listen for background upload events
     LaunchedEffect(Unit) {
         uploadManager.events.collect { event ->
             when (event) {
@@ -164,7 +189,6 @@ fun EditProfileScreen(
         }
     }
 
-    // Single picker for replacing an existing photo
     val singleLauncher = rememberImagePickerLauncher { pickedImageData ->
         pendingSlotIndex?.let { index ->
             viewModel.onAction(
@@ -174,7 +198,6 @@ fun EditProfileScreen(
         pendingSlotIndex = null
     }
 
-    // Multi picker for empty slots
     val emptySlots = (0 until 6).filter { state.photos[it] == null && it !in allUploadingSlots }
     val multiLauncher = rememberMultiImagePickerLauncher(
         maxSelection = emptySlots.size.coerceAtLeast(2)
@@ -205,17 +228,59 @@ fun EditProfileScreen(
         }
     }
 
-    val maxBirthDateMillis = now().toEpochMilliseconds() - 18L * 365L * 24L * 3600L * 1000L
-    val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = state.birthDate?.toDateMillis(),
-        selectableDates = object : SelectableDates {
-            override fun isSelectableDate(utcTimeMillis: Long) = utcTimeMillis <= maxBirthDateMillis
-        }
+    // String resources for options
+    val genderMale = stringResource(Res.string.edit_profile_gender_male)
+    val genderFemale = stringResource(Res.string.edit_profile_gender_female)
+    val genderOther = stringResource(Res.string.edit_profile_gender_other)
+
+    val interestedInOptions = listOf(
+        "MALE" to stringResource(Res.string.edit_profile_interested_in_men),
+        "FEMALE" to stringResource(Res.string.edit_profile_interested_in_women),
+        "EVERYONE" to stringResource(Res.string.edit_profile_interested_in_everyone)
     )
-    LaunchedEffect(state.birthDate) {
-        state.birthDate?.toDateMillis()?.let { datePickerState.selectedDateMillis = it }
-    }
-    var showDatePicker by remember { mutableStateOf(false) }
+
+    val lookingForOptions = listOf(
+        "LONG_TERM" to stringResource(Res.string.edit_profile_looking_for_long_term),
+        "SHORT_TERM" to stringResource(Res.string.edit_profile_looking_for_short_term),
+        "CASUAL_DATES" to stringResource(Res.string.edit_profile_looking_for_casual),
+        "HOOKUP" to stringResource(Res.string.edit_profile_looking_for_hookup),
+        "FRIENDS" to stringResource(Res.string.edit_profile_looking_for_friends),
+        "OPEN_TO_ANYTHING" to stringResource(Res.string.edit_profile_looking_for_open)
+    )
+
+    val idealDateOptions = listOf(
+        "DINNER" to stringResource(Res.string.edit_profile_ideal_date_dinner),
+        "COFFEE" to stringResource(Res.string.edit_profile_ideal_date_coffee),
+        "ADVENTURE" to stringResource(Res.string.edit_profile_ideal_date_adventure),
+        "CINEMA" to stringResource(Res.string.edit_profile_ideal_date_cinema),
+        "PICNIC" to stringResource(Res.string.edit_profile_ideal_date_picnic),
+        "TRAVEL" to stringResource(Res.string.edit_profile_ideal_date_travel),
+        "CONCERT" to stringResource(Res.string.edit_profile_ideal_date_concert),
+        "MUSEUM" to stringResource(Res.string.edit_profile_ideal_date_museum),
+        "BEACH" to stringResource(Res.string.edit_profile_ideal_date_beach),
+        "COOKING" to stringResource(Res.string.edit_profile_ideal_date_cooking)
+    )
+
+    val zodiacOptions = listOf(
+        "ARIES", "TAURUS", "GEMINI", "CANCER", "LEO", "VIRGO",
+        "LIBRA", "SCORPIO", "SAGITTARIUS", "CAPRICORN", "AQUARIUS", "PISCES"
+    )
+
+    val smokingOptions = listOf(
+        "NEVER" to stringResource(Res.string.edit_profile_smoking_never),
+        "SOMETIMES" to stringResource(Res.string.edit_profile_smoking_sometimes),
+        "REGULARLY" to stringResource(Res.string.edit_profile_smoking_regularly)
+    )
+
+    val drinkingOptions = listOf(
+        "NEVER" to stringResource(Res.string.edit_profile_drinking_never),
+        "SOCIALLY" to stringResource(Res.string.edit_profile_drinking_socially),
+        "REGULARLY" to stringResource(Res.string.edit_profile_drinking_regularly)
+    )
+
+    val notSetLabel = stringResource(Res.string.edit_profile_not_set)
+    val heightAddLabel = stringResource(Res.string.edit_profile_height_add)
+    val heightClearLabel = stringResource(Res.string.edit_profile_height_clear)
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -227,26 +292,40 @@ fun EditProfileScreen(
             )
         },
         bottomBar = {
-            Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp)) {
-                val saveError = state.saveError
-                if (saveError != null) {
-                    Text(
-                        text = saveError.asString(),
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                }
-                Button(
-                    onClick = { viewModel.onAction(EditProfileAction.OnSaveProfile) },
-                    enabled = !state.isSavingProfile,
-                    modifier = Modifier.fillMaxWidth()
+            Surface(shadowElevation = 8.dp) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp)
                 ) {
-                    if (state.isSavingProfile) {
-                        CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.onPrimary)
-                        Spacer(Modifier.width(8.dp))
+                    val saveError = state.saveError
+                    if (saveError != null) {
+                        Text(
+                            text = saveError.asString(),
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
                     }
-                    Text(stringResource(Res.string.save))
+                    Button(
+                        onClick = { viewModel.onAction(EditProfileAction.OnSaveProfile) },
+                        enabled = !state.isSavingProfile,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        if (state.isSavingProfile) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(18.dp),
+                                strokeWidth = 2.dp,
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
+                            Spacer(Modifier.width(8.dp))
+                        }
+                        Text(
+                            text = if (state.isSavingProfile) "Saving..." else "Save Changes",
+                            style = MaterialTheme.typography.labelLarge
+                        )
+                    }
                 }
             }
         }
@@ -257,225 +336,338 @@ fun EditProfileScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp)
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Photos
-            SectionTitle(stringResource(Res.string.edit_profile_photos))
-            Spacer(Modifier.height(12.dp))
-            PhotoGrid(
-                photos = state.photos,
-                uploadingSlots = allUploadingSlots,
-                deletingSlots = state.deletingSlots,
-                onPhotoSlotClicked = { index -> onPhotoSlotClicked(index) },
-                onPhotosReordered = { newPhotos -> viewModel.onAction(EditProfileAction.OnPhotosReordered(newPhotos)) }
-            )
-            val imageError = state.imageError
-            if (imageError != null) {
-                Text(
-                    text = imageError.asString(),
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(top = 4.dp)
+            // ── Photos ──────────────────────────────────────────────────────
+            EditSection(title = stringResource(Res.string.edit_profile_photos)) {
+                PhotoGrid(
+                    photos = state.photos,
+                    uploadingSlots = allUploadingSlots,
+                    deletingSlots = state.deletingSlots,
+                    onPhotoSlotClicked = { index -> onPhotoSlotClicked(index) },
+                    onPhotosReordered = { newPhotos ->
+                        viewModel.onAction(EditProfileAction.OnPhotosReordered(newPhotos))
+                    }
                 )
-            }
-            Spacer(Modifier.height(24.dp))
-
-            // Bio
-            SectionTitle(stringResource(Res.string.edit_profile_about_me))
-            Spacer(Modifier.height(12.dp))
-            val bioLength = state.bioTextState.text.length
-            ChirpTextField(
-                state = state.bioTextState,
-                placeholder = stringResource(Res.string.edit_profile_about_me_placeholder),
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = false,
-                minLines = 5
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                val bioError = state.bioError
-                if (bioError != null) {
-                    Text(text = bioError, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
-                } else {
-                    Spacer(Modifier.weight(1f))
-                }
-                Text(
-                    text = stringResource(Res.string.edit_profile_bio_counter, bioLength),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = if (bioLength > 500) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            Spacer(Modifier.height(24.dp))
-
-            // Gender
-            SectionTitle(stringResource(Res.string.edit_profile_gender))
-            Spacer(Modifier.height(12.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                listOf("MALE" to stringResource(Res.string.edit_profile_gender_male),
-                    "FEMALE" to stringResource(Res.string.edit_profile_gender_female),
-                    "OTHER" to stringResource(Res.string.edit_profile_gender_other)
-                ).forEach { (value, label) ->
-                    FilterChip(
-                        selected = state.gender == value,
-                        onClick = {
-                            viewModel.onAction(
-                                EditProfileAction.OnGenderChanged(if (state.gender == value) null else value)
-                            )
-                        },
-                        label = { Text(label) }
+                val imageError = state.imageError
+                if (imageError != null) {
+                    Text(
+                        text = imageError.asString(),
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(top = 6.dp)
                     )
                 }
             }
-            Spacer(Modifier.height(24.dp))
 
-            // Birth Date
-            SectionTitle(stringResource(Res.string.edit_profile_birth_date))
-            Spacer(Modifier.height(12.dp))
-            OutlinedButton(
-                onClick = { showDatePicker = true },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Icon(Icons.Default.CalendarMonth, contentDescription = null, modifier = Modifier.size(18.dp))
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    text = state.birthDate?.toDisplayDate()
-                        ?: stringResource(Res.string.edit_profile_birth_date_select)
-                )
-            }
-            val birthDateError = state.birthDateError
-            if (birthDateError != null) {
-                Text(text = birthDateError, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 4.dp))
-            }
-            Spacer(Modifier.height(24.dp))
+            SectionDivider()
 
-            // Interests
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                SectionTitle(stringResource(Res.string.edit_profile_interests))
-                Text(
-                    text = "${state.selectedInterests.size}/10",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            Spacer(Modifier.height(12.dp))
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                state.availableInterests.forEach { interest ->
-                    ChirpChip(
-                        text = interestDisplayName(interest),
-                        isSelected = state.selectedInterests.contains(interest),
-                        onClick = { viewModel.onAction(EditProfileAction.OnInterestToggled(interest)) }
-                    )
-                }
-            }
-            val interestsError = state.interestsError
-            if (interestsError != null) {
-                Text(
-                    text = interestsError,
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(top = 4.dp)
-                )
-            }
-            Spacer(Modifier.height(24.dp))
-
-            // Job / Company / Education
-            SectionTitle(stringResource(Res.string.edit_profile_job))
-            Spacer(Modifier.height(12.dp))
-            ChirpTextField(state = state.jobTitleTextState, placeholder = stringResource(Res.string.edit_profile_job_placeholder))
-            Spacer(Modifier.height(16.dp))
-            SectionTitle(stringResource(Res.string.edit_profile_company))
-            Spacer(Modifier.height(12.dp))
-            ChirpTextField(state = state.companyTextState, placeholder = stringResource(Res.string.edit_profile_company_placeholder))
-            Spacer(Modifier.height(16.dp))
-            SectionTitle(stringResource(Res.string.edit_profile_education))
-            Spacer(Modifier.height(12.dp))
-            ChirpTextField(state = state.educationTextState, placeholder = stringResource(Res.string.edit_profile_education_placeholder))
-            Spacer(Modifier.height(24.dp))
-
-            // Height
-            SectionTitle(stringResource(Res.string.edit_profile_height))
-            Spacer(Modifier.height(12.dp))
-            val height = state.height
-            if (height == null) {
-                OutlinedButton(
-                    onClick = { viewModel.onAction(EditProfileAction.OnHeightChanged(170)) },
+            // ── About Me ─────────────────────────────────────────────────────
+            EditSection(title = stringResource(Res.string.edit_profile_about_me)) {
+                val bioLength = state.bioTextState.text.length
+                ChirpTextField(
+                    state = state.bioTextState,
+                    placeholder = stringResource(Res.string.edit_profile_about_me_placeholder),
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp)
-                ) { Text("Añadir altura") }
-            } else {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Slider(
-                        value = height.toFloat(),
-                        onValueChange = { viewModel.onAction(EditProfileAction.OnHeightChanged(it.toInt())) },
-                        valueRange = 100f..250f,
-                        modifier = Modifier.weight(1f)
+                    singleLine = false,
+                    minLines = 4
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    val bioError = state.bioError
+                    if (bioError != null) {
+                        Text(
+                            text = bioError,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    } else {
+                        Spacer(Modifier.weight(1f))
+                    }
+                    Text(
+                        text = stringResource(Res.string.edit_profile_bio_counter, bioLength),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (bioLength > 500) MaterialTheme.colorScheme.error
+                        else MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    Spacer(Modifier.width(8.dp))
-                    Text("$height cm", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.width(52.dp))
-                    IconButton(onClick = { viewModel.onAction(EditProfileAction.OnHeightChanged(null)) }) {
-                        Icon(Icons.Default.Close, contentDescription = "Limpiar altura")
+                }
+            }
+
+            SectionDivider()
+
+            // ── Personal Info (read-only) ─────────────────────────────────────
+            EditSection(
+                title = stringResource(Res.string.edit_profile_personal_info),
+                subtitle = stringResource(Res.string.edit_profile_personal_info_note)
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    // Gender badge
+                    val genderLabel = when (state.gender) {
+                        "MALE" -> genderMale
+                        "FEMALE" -> genderFemale
+                        "OTHER" -> genderOther
+                        else -> notSetLabel
+                    }
+                    InfoBadge(label = genderLabel)
+
+                    // Age badge
+                    val age = state.birthDate?.toAge()
+                    if (age != null) {
+                        InfoBadge(label = stringResource(Res.string.edit_profile_age_format, age))
+                    } else {
+                        InfoBadge(label = notSetLabel)
                     }
                 }
             }
-            val heightError = state.heightError
-            if (heightError != null) {
-                Text(text = heightError, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
-            }
-            Spacer(Modifier.height(24.dp))
 
-            // Zodiac
-            SectionTitle(stringResource(Res.string.edit_profile_zodiac))
-            Spacer(Modifier.height(12.dp))
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                listOf("ARIES","TAURUS","GEMINI","CANCER","LEO","VIRGO","LIBRA","SCORPIO","SAGITTARIUS","CAPRICORN","AQUARIUS","PISCES").forEach { zodiac ->
-                    FilterChip(
-                        selected = state.zodiac == zodiac,
-                        onClick = { viewModel.onAction(EditProfileAction.OnZodiacChanged(if (state.zodiac == zodiac) null else zodiac)) },
-                        label = { Text(zodiac.lowercase().replaceFirstChar { it.uppercase() }) }
+            SectionDivider()
+
+            // ── Interests ────────────────────────────────────────────────────
+            EditSection(
+                title = stringResource(Res.string.edit_profile_interests),
+                trailing = {
+                    Text(
+                        text = "${state.selectedInterests.size}/10",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            ) {
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    state.availableInterests.forEach { interest ->
+                        ChirpChip(
+                            text = interestDisplayName(interest),
+                            isSelected = state.selectedInterests.contains(interest),
+                            onClick = { viewModel.onAction(EditProfileAction.OnInterestToggled(interest)) }
+                        )
+                    }
+                }
+                val interestsError = state.interestsError
+                if (interestsError != null) {
+                    Text(
+                        text = interestsError,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(top = 4.dp)
                     )
                 }
             }
-            Spacer(Modifier.height(24.dp))
 
-            // Smoking
-            SectionTitle(stringResource(Res.string.edit_profile_smoking))
-            Spacer(Modifier.height(12.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                listOf("NEVER" to "Nunca", "SOMETIMES" to "A veces", "REGULARLY" to "Regularmente").forEach { (value, label) ->
-                    FilterChip(
-                        selected = state.smoking == value,
-                        onClick = { viewModel.onAction(EditProfileAction.OnSmokingChanged(if (state.smoking == value) null else value)) },
-                        label = { Text(label) }
-                    )
+            SectionDivider()
+
+            // ── My Preferences ───────────────────────────────────────────────
+            EditSection(title = stringResource(Res.string.edit_profile_my_preferences)) {
+
+                // Interested In
+                SubSectionTitle(stringResource(Res.string.edit_profile_interested_in))
+                Spacer(Modifier.height(8.dp))
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    interestedInOptions.forEach { (value, label) ->
+                        ChirpChip(
+                            text = label,
+                            isSelected = state.interestedIn == value,
+                            onClick = {
+                                viewModel.onAction(
+                                    EditProfileAction.OnInterestedInChanged(
+                                        if (state.interestedIn == value) null else value
+                                    )
+                                )
+                            }
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(20.dp))
+
+                // Looking For
+                SubSectionTitle(stringResource(Res.string.edit_profile_looking_for))
+                Spacer(Modifier.height(8.dp))
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    lookingForOptions.forEach { (value, label) ->
+                        ChirpChip(
+                            text = label,
+                            isSelected = state.lookingFor == value,
+                            onClick = {
+                                viewModel.onAction(
+                                    EditProfileAction.OnLookingForChanged(
+                                        if (state.lookingFor == value) null else value
+                                    )
+                                )
+                            }
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(20.dp))
+
+                // Ideal Date
+                SubSectionTitle(stringResource(Res.string.edit_profile_ideal_date))
+                Spacer(Modifier.height(8.dp))
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    idealDateOptions.forEach { (value, label) ->
+                        ChirpChip(
+                            text = label,
+                            isSelected = state.idealDate == value,
+                            onClick = {
+                                viewModel.onAction(
+                                    EditProfileAction.OnIdealDateChanged(
+                                        if (state.idealDate == value) null else value
+                                    )
+                                )
+                            }
+                        )
+                    }
                 }
             }
-            Spacer(Modifier.height(24.dp))
 
-            // Drinking
-            SectionTitle(stringResource(Res.string.edit_profile_drinking))
-            Spacer(Modifier.height(12.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                listOf("NEVER" to "Nunca", "SOCIALLY" to "Socialmente", "REGULARLY" to "Regularmente").forEach { (value, label) ->
-                    FilterChip(
-                        selected = state.drinking == value,
-                        onClick = { viewModel.onAction(EditProfileAction.OnDrinkingChanged(if (state.drinking == value) null else value)) },
-                        label = { Text(label) }
+            SectionDivider()
+
+            // ── Work & Education ─────────────────────────────────────────────
+            EditSection(title = stringResource(Res.string.edit_profile_work_education)) {
+                SubSectionTitle(stringResource(Res.string.edit_profile_job))
+                Spacer(Modifier.height(8.dp))
+                ChirpTextField(
+                    state = state.jobTitleTextState,
+                    placeholder = stringResource(Res.string.edit_profile_job_placeholder),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(Modifier.height(16.dp))
+                SubSectionTitle(stringResource(Res.string.edit_profile_company))
+                Spacer(Modifier.height(8.dp))
+                ChirpTextField(
+                    state = state.companyTextState,
+                    placeholder = stringResource(Res.string.edit_profile_company_placeholder),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(Modifier.height(16.dp))
+                SubSectionTitle(stringResource(Res.string.edit_profile_education))
+                Spacer(Modifier.height(8.dp))
+                ChirpTextField(
+                    state = state.educationTextState,
+                    placeholder = stringResource(Res.string.edit_profile_education_placeholder),
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            SectionDivider()
+
+            // ── Lifestyle ────────────────────────────────────────────────────
+            EditSection(title = stringResource(Res.string.edit_profile_lifestyle)) {
+
+                // Height
+                SubSectionTitle(stringResource(Res.string.edit_profile_height))
+                Spacer(Modifier.height(8.dp))
+                HeightSelector(
+                    height = state.height,
+                    addLabel = heightAddLabel,
+                    clearLabel = heightClearLabel,
+                    onHeightChanged = { viewModel.onAction(EditProfileAction.OnHeightChanged(it)) }
+                )
+                val heightError = state.heightError
+                if (heightError != null) {
+                    Text(
+                        text = heightError,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(top = 4.dp)
                     )
                 }
+
+                Spacer(Modifier.height(20.dp))
+
+                // Zodiac
+                SubSectionTitle(stringResource(Res.string.edit_profile_zodiac))
+                Spacer(Modifier.height(8.dp))
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    zodiacOptions.forEach { zodiac ->
+                        ChirpChip(
+                            text = zodiac.lowercase().replaceFirstChar { it.uppercase() },
+                            isSelected = state.zodiac == zodiac,
+                            onClick = {
+                                viewModel.onAction(
+                                    EditProfileAction.OnZodiacChanged(
+                                        if (state.zodiac == zodiac) null else zodiac
+                                    )
+                                )
+                            }
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(20.dp))
+
+                // Smoking
+                SubSectionTitle(stringResource(Res.string.edit_profile_smoking))
+                Spacer(Modifier.height(8.dp))
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    smokingOptions.forEach { (value, label) ->
+                        ChirpChip(
+                            text = label,
+                            isSelected = state.smoking == value,
+                            onClick = {
+                                viewModel.onAction(
+                                    EditProfileAction.OnSmokingChanged(
+                                        if (state.smoking == value) null else value
+                                    )
+                                )
+                            }
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(20.dp))
+
+                // Drinking
+                SubSectionTitle(stringResource(Res.string.edit_profile_drinking))
+                Spacer(Modifier.height(8.dp))
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    drinkingOptions.forEach { (value, label) ->
+                        ChirpChip(
+                            text = label,
+                            isSelected = state.drinking == value,
+                            onClick = {
+                                viewModel.onAction(
+                                    EditProfileAction.OnDrinkingChanged(
+                                        if (state.drinking == value) null else value
+                                    )
+                                )
+                            }
+                        )
+                    }
+                }
             }
-            Spacer(Modifier.height(100.dp))
+
+            Spacer(Modifier.height(32.dp))
         }
 
-        // Photo options dialog: change or delete for a filled slot
+        // Photo options dialog
         if (showPhotoOptionsDialog) {
             AlertDialog(
                 onDismissRequest = {
@@ -492,7 +684,10 @@ fun EditProfileScreen(
                             },
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text("Cambiar foto", modifier = Modifier.fillMaxWidth())
+                            Text(
+                                stringResource(Res.string.edit_profile_change_photo),
+                                modifier = Modifier.fillMaxWidth()
+                            )
                         }
                         TextButton(
                             onClick = {
@@ -505,7 +700,7 @@ fun EditProfileScreen(
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text(
-                                text = "Eliminar foto",
+                                text = stringResource(Res.string.edit_profile_delete_photo),
                                 color = MaterialTheme.colorScheme.error,
                                 modifier = Modifier.fillMaxWidth()
                             )
@@ -536,32 +731,196 @@ fun EditProfileScreen(
                 onDismiss = { viewModel.onAction(EditProfileAction.OnDismissDeleteConfirmationDialogClick) }
             )
         }
+    }
+}
 
-        // Date picker dialog
-        if (showDatePicker) {
-            DatePickerDialog(
-                onDismissRequest = { showDatePicker = false },
-                confirmButton = {
-                    TextButton(onClick = {
-                        datePickerState.selectedDateMillis?.let { millis ->
-                            viewModel.onAction(EditProfileAction.OnBirthDateChanged(millis.toIsoDate()))
-                        }
-                        showDatePicker = false
-                    }) { Text("OK") }
-                },
-                dismissButton = {
-                    TextButton(onClick = { showDatePicker = false }) {
-                        Text(stringResource(Res.string.cancel))
+// ── Height selector ───────────────────────────────────────────────────────────
+
+@Composable
+private fun HeightSelector(
+    height: Int?,
+    addLabel: String,
+    clearLabel: String,
+    onHeightChanged: (Int?) -> Unit
+) {
+    if (height == null) {
+        // Empty state — tap to initialise at 170 cm
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onHeightChanged(170) },
+            shape = RoundedCornerShape(16.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+            border = BorderStroke(
+                width = 1.5.dp,
+                color = MaterialTheme.colorScheme.outlineVariant
+            )
+        ) {
+            Row(
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 18.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Icon(
+                    Icons.Default.Add,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text = addLabel,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    } else {
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+            border = BorderStroke(
+                width = 1.5.dp,
+                color = MaterialTheme.colorScheme.outlineVariant
+            )
+        ) {
+            Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)) {
+                // Top row: value + clear button
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(verticalAlignment = Alignment.Bottom) {
+                        Text(
+                            text = "$height",
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Spacer(Modifier.width(4.dp))
+                        Text(
+                            text = "cm",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(bottom = 4.dp)
+                        )
+                    }
+                    TextButton(
+                        onClick = { onHeightChanged(null) },
+                        contentPadding = PaddingValues(
+                            horizontal = 8.dp,
+                            vertical = 4.dp
+                        )
+                    ) {
+                        Text(
+                            text = clearLabel,
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                 }
-            ) {
-                DatePicker(state = datePickerState)
+                Spacer(Modifier.height(4.dp))
+                // Slider
+                Slider(
+                    value = height.toFloat(),
+                    onValueChange = { onHeightChanged(it.toInt()) },
+                    valueRange = 100f..250f,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                // Range labels
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "100 cm",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = "250 cm",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
         }
     }
 }
 
-// --- Interest helpers ---
+// ── Section layout helpers ────────────────────────────────────────────────────
+
+@Composable
+private fun EditSection(
+    title: String,
+    subtitle: String? = null,
+    trailing: @Composable (() -> Unit)? = null,
+    content: @Composable () -> Unit
+) {
+    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 20.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            trailing?.invoke()
+        }
+        if (subtitle != null) {
+            Spacer(Modifier.height(2.dp))
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        Spacer(Modifier.height(12.dp))
+        content()
+    }
+}
+
+@Composable
+private fun SectionDivider() {
+    HorizontalDivider(
+        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
+        thickness = 1.dp
+    )
+}
+
+@Composable
+private fun SubSectionTitle(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodyMedium,
+        fontWeight = FontWeight.Medium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
+    )
+}
+
+@Composable
+private fun InfoBadge(label: String) {
+    Surface(
+        shape = RoundedCornerShape(20.dp),
+        color = MaterialTheme.colorScheme.secondaryContainer,
+        tonalElevation = 0.dp
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSecondaryContainer,
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp)
+        )
+    }
+}
+
+// ── Interest helpers ──────────────────────────────────────────────────────────
 
 private fun interestDisplayName(key: String): String = when (key) {
     "photography" -> "Photography"
@@ -587,30 +946,31 @@ private fun interestDisplayName(key: String): String = when (key) {
     else -> key.replaceFirstChar { it.uppercase() }
 }
 
-// --- Date helpers ---
+// ── Date helpers ──────────────────────────────────────────────────────────────
 
-private fun String.toDateMillis(): Long? = try {
+private fun String.toAge(): Int? = try {
     val date = LocalDate.parse(this)
-    date.atStartOfDayIn(TimeZone.UTC).toEpochMilliseconds()
+    val today = now().toLocalDateTime(TimeZone.UTC).date
+    var age = today.year - date.year
+    if (today.monthNumber < date.monthNumber ||
+        (today.monthNumber == date.monthNumber && today.dayOfMonth < date.dayOfMonth)
+    ) age--
+    age
 } catch (_: Exception) { null }
 
-private fun Long.toIsoDate(): String {
-    val date = Instant.fromEpochMilliseconds(this).toLocalDateTime(TimeZone.UTC).date
-    return "${date.year}-${date.month.number.toString().padStart(2, '0')}-${date.day.toString().padStart(2, '0')}"
-}
-
-private fun String.toDisplayDate(): String = try {
-    val date = LocalDate.parse(this)
-    "${date.day} ${date.month.name.lowercase().replaceFirstChar { it.uppercase() }.take(3)} ${date.year}"
-} catch (_: Exception) { this }
-
-// --- Reusable components ---
+// ── Reusable photo components ─────────────────────────────────────────────────
 
 @Composable
 fun SectionTitle(title: String) {
-    Text(text = title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
+    Text(
+        text = title,
+        style = MaterialTheme.typography.titleMedium,
+        fontWeight = FontWeight.SemiBold,
+        color = MaterialTheme.colorScheme.onSurface
+    )
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun PhotoGrid(
     photos: List<String?>,
@@ -696,7 +1056,7 @@ fun PhotoGrid(
             }
         }
 
-        // Floating drag item that follows the finger
+        // Floating drag item
         val currentDragIndex = dragIndex
         if (currentDragIndex != null) {
             val photo = photos.getOrNull(currentDragIndex)
@@ -765,7 +1125,6 @@ fun PhotoSlot(
             .clickable(enabled = !isLoading && !isDragging, onClick = onSlotClicked),
         contentAlignment = Alignment.Center
     ) {
-        // Dashed placeholder shown when the slot is the drag origin
         if (isDragging) {
             Box(
                 modifier = Modifier
@@ -780,7 +1139,6 @@ fun PhotoSlot(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
-            // Edit indicator in bottom-right corner (only when not loading)
             if (!isLoading) {
                 Box(
                     modifier = Modifier
@@ -807,7 +1165,6 @@ fun PhotoSlot(
             )
         }
 
-        // Loading overlay
         if (isLoading) {
             Box(
                 modifier = Modifier

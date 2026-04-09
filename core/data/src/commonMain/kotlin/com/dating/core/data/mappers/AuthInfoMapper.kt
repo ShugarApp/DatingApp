@@ -43,7 +43,9 @@ fun UserSerializable.toDomain(): User {
         smoking = smoking,
         drinking = drinking,
         interests = interests,
-        idealDate = idealDate
+        idealDate = idealDate,
+        interestedIn = interestedIn,
+        lookingFor = lookingFor
     )
 }
 
@@ -71,7 +73,9 @@ fun User.toSerializable(): UserSerializable {
         smoking = smoking,
         drinking = drinking,
         interests = interests,
-        idealDate = idealDate
+        idealDate = idealDate,
+        interestedIn = interestedIn,
+        lookingFor = lookingFor
     )
 }
 

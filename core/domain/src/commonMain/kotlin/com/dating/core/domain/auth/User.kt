@@ -31,7 +31,9 @@ data class User(
     val smoking: String? = null,
     val drinking: String? = null,
     val interests: List<String> = emptyList(),
-    val idealDate: String? = null
+    val idealDate: String? = null,
+    val interestedIn: String? = null,
+    val lookingFor: String? = null
 ) {
     val profilePictureUrl: String? get() = photos.firstOrNull()
 }

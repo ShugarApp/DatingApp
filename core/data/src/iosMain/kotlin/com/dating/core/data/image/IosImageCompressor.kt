@@ -65,15 +65,14 @@ class IosImageCompressor : ImageCompressor {
             originalWidth, originalHeight, maxWidthPx, maxHeightPx
         )
 
-        val resizedImage = if (newWidth != originalWidth || newHeight != originalHeight) {
+        // Always redraw into a context so EXIF orientation is normalized to UIImageOrientationUp
+        val resizedImage = run {
             val newSize = CGSizeMake(newWidth.toDouble(), newHeight.toDouble())
             UIGraphicsBeginImageContextWithOptions(newSize, false, 1.0)
             originalImage.drawInRect(CGRectMake(0.0, 0.0, newWidth.toDouble(), newHeight.toDouble()))
             val result = UIGraphicsGetImageFromCurrentImageContext()
             UIGraphicsEndImageContext()
             result ?: originalImage
-        } else {
-            originalImage
         }
 
         val compressionQuality = quality / 100.0

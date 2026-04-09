@@ -4,8 +4,11 @@ import com.dating.core.presentation.util.UiText
 
 enum class MatchesTab { MATCHES, LIKES }
 
+enum class MatchesViewMode { GRID, LIST }
+
 data class MatchesState(
     val selectedTab: MatchesTab = MatchesTab.MATCHES,
+    val viewMode: MatchesViewMode = MatchesViewMode.GRID,
     val isLoading: Boolean = false,
     val isCreatingChat: Boolean = false,
     val matches: List<Match> = emptyList(),
@@ -22,7 +25,8 @@ data class Match(
     val profilePictureUrl: String?,
     val photos: List<String> = emptyList(),
     val city: String?,
-    val country: String?
+    val country: String?,
+    val age: Int? = null
 )
 
 sealed interface MatchesAction {
@@ -36,6 +40,7 @@ sealed interface MatchesAction {
     data class OnDeleteMatchClick(val match: Match) : MatchesAction
     data object OnConfirmDeleteMatch : MatchesAction
     data object OnDismissDeleteMatchDialog : MatchesAction
+    data object OnToggleViewMode : MatchesAction
 }
 
 sealed interface MatchesEvent {

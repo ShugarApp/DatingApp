@@ -7,7 +7,6 @@ data class EditProfileState(
     // Per-slot loading: which photo indices are being uploaded or deleted
     val uploadingSlots: Set<Int> = emptySet(),
     val deletingSlots: Set<Int> = emptySet(),
-    // Which slot the pending delete confirmation is targeting (null = no dialog)
     val pendingDeleteSlot: Int? = null,
     val imageError: UiText? = null,
 
@@ -20,14 +19,16 @@ data class EditProfileState(
     val heightError: String? = null,
     val interestsError: String? = null,
 
-    // Profile Fields
+    // Read-only personal info (set at registration, not editable)
     val gender: String? = null,
     val birthDate: String? = null,
+
+    // Editable profile fields
     val bioTextState: TextFieldState = TextFieldState(),
     val jobTitleTextState: TextFieldState = TextFieldState(),
     val companyTextState: TextFieldState = TextFieldState(),
     val educationTextState: TextFieldState = TextFieldState(),
-    val height: Int? = null, // 100–250 cm
+    val height: Int? = null,
     val zodiac: String? = null,
     val smoking: String? = null,
     val drinking: String? = null,
@@ -38,6 +39,11 @@ data class EditProfileState(
         "yoga", "movies", "sports", "technology", "fashion",
         "food", "coffee", "pets", "nature", "volunteering"
     ),
+
+    // Preferences (from registration, now editable)
+    val interestedIn: String? = null,
+    val lookingFor: String? = null,
+    val idealDate: String? = null,
 
     // 6 photo slots; null = empty
     val photos: List<String?> = List(6) { null }

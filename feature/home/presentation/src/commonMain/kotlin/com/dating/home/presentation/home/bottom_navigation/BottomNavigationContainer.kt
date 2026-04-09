@@ -61,6 +61,9 @@ fun BottomNavigationContainer(
     onSettings: () -> Unit,
     onVerification: () -> Unit,
     onSubscriptions: () -> Unit,
+    onSafetyCenter: () -> Unit = {},
+    onDateSafetyTips: () -> Unit = {},
+    onDateSafetyChecklist: () -> Unit = {},
     initialSection: BottomNavSection = BottomNavSection.FEED,
     swipedUserId: String? = null,
     swipedIsDislike: Boolean = false,
@@ -94,7 +97,10 @@ fun BottomNavigationContainer(
     val userStatus = authInfo?.user?.status
     var selectedSection by rememberSaveable { mutableStateOf(initialSection) }
     val datesCount = datesState.dates.size
-    val hasAcceptedDates = datesCount > 0
+    // Persisted across recompositions so the Dates tab doesn't disappear while the flow
+    // reloads (e.g. after the app returns from background and WhileSubscribed resets state).
+    // Only updated once loading completes to avoid flickering on the initial value.
+    var hasAcceptedDates by rememberSaveable { mutableStateOf(false) }
     val visibleSections = remember(hasAcceptedDates) {
         if (hasAcceptedDates) BottomNavSection.entries.toList()
         else BottomNavSection.entries.filter { it != BottomNavSection.DATES }
@@ -106,6 +112,9 @@ fun BottomNavigationContainer(
         // Wait until the initial fetch completes before tracking changes
         if (datesState.isLoading) return@LaunchedEffect
 
+        // Once a date has been created, never hide the tab again
+        if (datesCount > 0) hasAcceptedDates = true
+
         if (prevDatesCount == -1) {
             // Establish baseline after first load — do not navigate
             prevDatesCount = datesCount
@@ -115,9 +124,6 @@ fun BottomNavigationContainer(
         if (datesCount == 1 && prevDatesCount == 0) {
             // First date just got accepted this session — jump to the Dates tab
             selectedSection = BottomNavSection.DATES
-        }
-        if (!hasAcceptedDates && selectedSection == BottomNavSection.DATES) {
-            selectedSection = BottomNavSection.MESSAGES
         }
         prevDatesCount = datesCount
     }
@@ -292,7 +298,12 @@ fun BottomNavigationContainer(
                         onSettings = onSettings,
                         onVerification = onVerification,
                         onSubscriptions = onSubscriptions,
-                        onNavigateToProfile = onNavigateToOwnProfile
+                        onSafetyCenter = onSafetyCenter,
+                        onDateSafetyTips = onDateSafetyTips,
+                        onDateSafetyChecklist = onDateSafetyChecklist,
+                        onNavigateToProfile = onNavigateToOwnProfile,
+                        showSosButton = showPanicButton,
+                        onSosTrigger = { emergencyViewModel.onAction(EmergencyContactsAction.OnSosTrigger) }
                     )
                 }
             }

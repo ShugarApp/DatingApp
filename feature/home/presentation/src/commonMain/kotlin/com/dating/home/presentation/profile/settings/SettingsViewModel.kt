@@ -52,6 +52,7 @@ class SettingsViewModel(
             showMe = discovery.showMe,
             minAge = discovery.minAge,
             maxAge = discovery.maxAge,
+            verifiedProfilesOnly = discovery.verifiedProfilesOnly,
             themePreference = theme,
             isEmergencyEnabled = emergency.isEnabled
         )
@@ -97,6 +98,9 @@ class SettingsViewModel(
             is SettingsAction.OnAgeRangeChanged -> {
                 viewModelScope.launch { discoveryPreferences.updateAgeRange(action.minAge, action.maxAge) }
                 _state.update { it.copy(showAgeRangeDialog = false) }
+            }
+            is SettingsAction.OnVerifiedProfilesOnlyChanged -> {
+                viewModelScope.launch { discoveryPreferences.updateVerifiedProfilesOnly(action.enabled) }
             }
 
             SettingsAction.OnDismissError -> _state.update { it.copy(errorMessage = null) }

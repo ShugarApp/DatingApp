@@ -17,8 +17,8 @@ fun User.profileCompletion(): Int {
     if (jobTitle != null || company != null || education != null) score += 10
     if (height != null) score += 10
     if (zodiac != null) score += 10
-    if (smoking != null) score += 10
-    if (drinking != null) score += 10
+    if (smoking != null || drinking != null) score += 10
+    if (verificationStatus == VerificationStatus.VERIFIED) score += 10
     return score
 }
 
@@ -35,6 +35,6 @@ fun User.missingProfileFields(): List<String> = buildList {
     if (jobTitle == null && company == null && education == null) add("work")
     if (height == null) add("height")
     if (zodiac == null) add("zodiac")
-    if (smoking == null) add("smoking")
-    if (drinking == null) add("drinking")
+    if (smoking == null && drinking == null) add("lifestyle")
+    if (verificationStatus != VerificationStatus.VERIFIED) add("verification")
 }

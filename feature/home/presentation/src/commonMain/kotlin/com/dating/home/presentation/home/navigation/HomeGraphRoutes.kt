@@ -50,4 +50,25 @@ sealed interface HomeGraphRoutes {
 
     @Serializable
     data object DateSafetyTipsRoute : HomeGraphRoutes
+
+    @Serializable
+    data object DateSafetyChecklistRoute : HomeGraphRoutes
+
+    @Serializable
+    data object SafetyCenterRoute : HomeGraphRoutes
+
+    @Serializable
+    data object DiscoverySettingsRoute : HomeGraphRoutes
+
+    @Serializable
+    data object LegalAccountRoute : HomeGraphRoutes
+
+    @Serializable
+    data object SecuritySettingsRoute : HomeGraphRoutes
+
+    @Serializable
+    data object PrivacySettingsRoute : HomeGraphRoutes
+
+    @Serializable
+    data object SafeDateRoute : HomeGraphRoutes
 }

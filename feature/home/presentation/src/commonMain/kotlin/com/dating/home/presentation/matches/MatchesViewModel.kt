@@ -8,8 +8,12 @@ import com.dating.core.presentation.util.toUiText
 import com.dating.home.domain.chat.ChatRepository
 import com.dating.home.domain.matching.MatchingService
 import com.dating.home.domain.matching.SwipeAction
+import kotlin.time.Clock.System.now
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -57,6 +61,13 @@ class MatchesViewModel(
             MatchesAction.OnDismissDeleteMatchDialog -> {
                 _state.update { it.copy(showDeleteMatchDialog = false, matchToDelete = null) }
             }
+            MatchesAction.OnToggleViewMode -> {
+                _state.update {
+                    it.copy(
+                        viewMode = if (it.viewMode == MatchesViewMode.GRID) MatchesViewMode.LIST else MatchesViewMode.GRID
+                    )
+                }
+            }
         }
     }
 
@@ -102,7 +113,8 @@ class MatchesViewModel(
         profilePictureUrl = profilePictureUrl,
         photos = photos,
         city = city,
-        country = country
+        country = country,
+        age = birthDate?.let { calculateAge(it) }
     )
 
     private fun confirmDeleteMatch() {
@@ -148,6 +160,21 @@ class MatchesViewModel(
                     loadData()
                 }
         }
+    }
+
+    private fun calculateAge(birthDate: String): Int? {
+        val parts = birthDate.split("-")
+        if (parts.size != 3) return null
+        val birth = try {
+            LocalDate(parts[0].toInt(), parts[1].toInt(), parts[2].toInt())
+        } catch (e: Exception) {
+            return null
+        }
+        val today = now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+        val age = today.year - birth.year
+        val hasHadBirthday = today.monthNumber > birth.monthNumber ||
+            (today.monthNumber == birth.monthNumber && today.dayOfMonth >= birth.dayOfMonth)
+        return if (hasHadBirthday) age else age - 1
     }
 
     private fun startChat(matchId: String) {

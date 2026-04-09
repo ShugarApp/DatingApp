@@ -53,7 +53,10 @@ class KtorUserService(
         zodiac: String?,
         smoking: String?,
         drinking: String?,
-        interests: List<String>?
+        interests: List<String>?,
+        idealDate: String?,
+        interestedIn: String?,
+        lookingFor: String?
     ): Result<User, DataError.Remote> {
         return httpClient.put<UpdateProfileRequest, UserSerializable>(
             route = "/users/profile",
@@ -68,7 +71,10 @@ class KtorUserService(
                 zodiac = zodiac,
                 smoking = smoking,
                 drinking = drinking,
-                interests = interests
+                interests = interests,
+                idealDate = idealDate,
+                interestedIn = interestedIn,
+                lookingFor = lookingFor
             )
         ).map { it.toDomain() }
     }

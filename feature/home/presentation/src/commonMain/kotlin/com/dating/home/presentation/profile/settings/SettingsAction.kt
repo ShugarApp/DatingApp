@@ -25,6 +25,7 @@ sealed interface SettingsAction {
     data class OnMaxDistanceChanged(val distance: Double?) : SettingsAction
     data class OnShowMeChanged(val gender: Gender) : SettingsAction
     data class OnAgeRangeChanged(val minAge: Int, val maxAge: Int) : SettingsAction
+    data class OnVerifiedProfilesOnlyChanged(val enabled: Boolean) : SettingsAction
 
     // Theme
     data object OnThemeClick : SettingsAction

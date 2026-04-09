@@ -23,7 +23,8 @@ data class FeedState(
     val isUndoing: Boolean = false,
     val isAccountPaused: Boolean = false,
     val isResumingAccount: Boolean = false,
-    val isIncognitoActive: Boolean = false
+    val isIncognitoActive: Boolean = false,
+    val showVerifiedOnly: Boolean = false
 )
 
 data class FeedItem(
@@ -43,7 +44,8 @@ sealed interface FeedAction {
         val distance: Double?,
         val gender: Gender,
         val minAge: Int,
-        val maxAge: Int
+        val maxAge: Int,
+        val showVerifiedOnly: Boolean = false
     ) : FeedAction
     data object OnDismissMatchDialog : FeedAction
     data object OnMatchSendMessage : FeedAction

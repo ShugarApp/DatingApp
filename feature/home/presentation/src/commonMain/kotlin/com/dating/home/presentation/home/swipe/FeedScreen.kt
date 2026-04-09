@@ -16,17 +16,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.Cake
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Tune
-import androidx.compose.material.icons.filled.Undo
+import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -35,18 +35,19 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.RangeSlider
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -65,21 +66,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import aura.feature.home.presentation.generated.resources.Res
-import aura.feature.home.presentation.generated.resources.feed_incognito_banner
-import aura.feature.home.presentation.generated.resources.feed_paused_activate
-import aura.feature.home.presentation.generated.resources.feed_paused_desc
-import aura.feature.home.presentation.generated.resources.feed_paused_title
 import aura.feature.home.presentation.generated.resources.app_name_feed
 import aura.feature.home.presentation.generated.resources.empty_feed
 import aura.feature.home.presentation.generated.resources.error_connection
+import aura.feature.home.presentation.generated.resources.feed_complete_profile_confirm
+import aura.feature.home.presentation.generated.resources.feed_complete_profile_dismiss
+import aura.feature.home.presentation.generated.resources.feed_complete_profile_later_hint
+import aura.feature.home.presentation.generated.resources.feed_complete_profile_message
+import aura.feature.home.presentation.generated.resources.feed_complete_profile_title
 import aura.feature.home.presentation.generated.resources.feed_empty_state_button
 import aura.feature.home.presentation.generated.resources.feed_empty_state_desc
 import aura.feature.home.presentation.generated.resources.feed_empty_state_refresh
-import aura.feature.home.presentation.generated.resources.feed_searching_title
-import aura.feature.home.presentation.generated.resources.feed_searching_desc
 import aura.feature.home.presentation.generated.resources.feed_empty_state_title
+import aura.feature.home.presentation.generated.resources.feed_error_desc
+import aura.feature.home.presentation.generated.resources.feed_error_retry
+import aura.feature.home.presentation.generated.resources.feed_error_title
 import aura.feature.home.presentation.generated.resources.feed_filter_age_range
-import aura.feature.home.presentation.generated.resources.feed_filter_age_value
 import aura.feature.home.presentation.generated.resources.feed_filter_apply
 import aura.feature.home.presentation.generated.resources.feed_filter_distance_value
 import aura.feature.home.presentation.generated.resources.feed_filter_gender_everyone
@@ -87,17 +89,17 @@ import aura.feature.home.presentation.generated.resources.feed_filter_gender_men
 import aura.feature.home.presentation.generated.resources.feed_filter_gender_women
 import aura.feature.home.presentation.generated.resources.feed_filter_max_distance
 import aura.feature.home.presentation.generated.resources.feed_filter_no_limit
-import aura.feature.home.presentation.generated.resources.feed_error_desc
-import aura.feature.home.presentation.generated.resources.feed_error_retry
-import aura.feature.home.presentation.generated.resources.feed_error_title
 import aura.feature.home.presentation.generated.resources.feed_filter_reset
 import aura.feature.home.presentation.generated.resources.feed_filter_show_me
 import aura.feature.home.presentation.generated.resources.feed_filter_title
-import aura.feature.home.presentation.generated.resources.feed_complete_profile_confirm
-import aura.feature.home.presentation.generated.resources.feed_complete_profile_dismiss
-import aura.feature.home.presentation.generated.resources.feed_complete_profile_later_hint
-import aura.feature.home.presentation.generated.resources.feed_complete_profile_message
-import aura.feature.home.presentation.generated.resources.feed_complete_profile_title
+import aura.feature.home.presentation.generated.resources.feed_filter_verified_only
+import aura.feature.home.presentation.generated.resources.feed_filter_verified_only_desc
+import aura.feature.home.presentation.generated.resources.feed_incognito_banner
+import aura.feature.home.presentation.generated.resources.feed_paused_activate
+import aura.feature.home.presentation.generated.resources.feed_paused_desc
+import aura.feature.home.presentation.generated.resources.feed_paused_title
+import aura.feature.home.presentation.generated.resources.feed_searching_desc
+import aura.feature.home.presentation.generated.resources.feed_searching_title
 import aura.feature.home.presentation.generated.resources.feed_undo_swipe
 import coil3.compose.AsyncImage
 import com.dating.core.designsystem.components.header.MainTopAppBar
@@ -105,9 +107,9 @@ import com.dating.core.domain.discovery.Gender
 import com.dating.home.presentation.home.swipe.components.MatchCelebrationOverlay
 import com.dating.home.presentation.home.swipe.components.RadarSearchAnimation
 import com.dating.home.presentation.home.swipe.components.SwipeableCard
+import kotlin.math.roundToInt
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -257,15 +259,18 @@ fun FeedScreen(
     if (showFilterSheet) {
         ModalBottomSheet(
             onDismissRequest = { showFilterSheet = false },
-            sheetState = filterSheetState
+            sheetState = filterSheetState,
+            containerColor = MaterialTheme.colorScheme.surface,
+            tonalElevation = 0.dp
         ) {
             FilterBottomSheet(
                 currentMaxDistance = state.maxDistance,
                 currentShowMe = state.showMe,
                 currentMinAge = state.minAge,
                 currentMaxAge = state.maxAge,
-                onApply = { distance, showMe, minAge, maxAge ->
-                    onAction(FeedAction.OnFiltersApplied(distance, showMe, minAge, maxAge))
+                currentShowVerifiedOnly = state.showVerifiedOnly,
+                onApply = { distance, showMe, minAge, maxAge, verifiedOnly ->
+                    onAction(FeedAction.OnFiltersApplied(distance, showMe, minAge, maxAge, verifiedOnly))
                     showFilterSheet = false
                 }
             )
@@ -407,207 +412,316 @@ private fun FilterBottomSheet(
     currentShowMe: Gender,
     currentMinAge: Int,
     currentMaxAge: Int,
-    onApply: (Double?, Gender, Int, Int) -> Unit
+    currentShowVerifiedOnly: Boolean,
+    onApply: (Double?, Gender, Int, Int, Boolean) -> Unit
 ) {
     var distanceValue by remember { mutableFloatStateOf(currentMaxDistance?.toFloat() ?: 0f) }
     var showMe by remember { mutableStateOf(currentShowMe) }
     var ageRange by remember { mutableStateOf(currentMinAge.toFloat()..currentMaxAge.toFloat()) }
+    var showVerifiedOnly by remember { mutableStateOf(currentShowVerifiedOnly) }
     val isNoLimit = distanceValue == 0f
 
-    // Count active (non-default) filters for badge
     val activeFilters = listOf(
         !isNoLimit,
         showMe != Gender.EVERYONE,
-        ageRange.start.roundToInt() != 18 || ageRange.endInclusive.roundToInt() != 50
+        ageRange.start.roundToInt() != 18 || ageRange.endInclusive.roundToInt() != 50,
+        showVerifiedOnly
     ).count { it }
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 20.dp)
+            .padding(bottom = 28.dp)
     ) {
         // ── Header ────────────────────────────────────────────────────
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 24.dp, end = 12.dp, top = 4.dp, bottom = 16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = stringResource(Res.string.feed_filter_title),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
+            Column {
+                Text(
+                    text = stringResource(Res.string.feed_filter_title),
+                    style = MaterialTheme.typography.headlineLarge,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                if (activeFilters > 0) {
+                    Text(
+                        text = "$activeFilters active",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            }
             TextButton(
                 onClick = {
                     distanceValue = 0f
                     showMe = Gender.EVERYONE
                     ageRange = 18f..50f
+                    showVerifiedOnly = false
                 }
             ) {
                 Text(
                     text = stringResource(Res.string.feed_filter_reset),
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Medium
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontWeight = FontWeight.Medium,
+                    style = MaterialTheme.typography.bodyLarge
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
-
         // ── Distance ──────────────────────────────────────────────────
-        FilterSectionLabel(
-            icon = Icons.Default.Tune,
-            title = stringResource(Res.string.feed_filter_max_distance)
-        )
-        Spacer(modifier = Modifier.height(10.dp))
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp))
-                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.08f))
-                .padding(vertical = 10.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = if (isNoLimit) stringResource(Res.string.feed_filter_no_limit)
-                       else stringResource(Res.string.feed_filter_distance_value, distanceValue.roundToInt()),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            )
-        }
-
-        Slider(
-            value = distanceValue,
-            onValueChange = { distanceValue = it },
-            valueRange = 0f..500f,
-            colors = SliderDefaults.colors(
-                thumbColor = MaterialTheme.colorScheme.primary,
-                activeTrackColor = MaterialTheme.colorScheme.primary,
-                inactiveTrackColor = MaterialTheme.colorScheme.surfaceVariant
-            )
-        )
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = stringResource(Res.string.feed_filter_no_limit),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Text(
-                text = "500 km",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // ── Show Me ───────────────────────────────────────────────────
-        FilterSectionLabel(
-            icon = Icons.Default.Groups,
-            title = stringResource(Res.string.feed_filter_show_me)
-        )
-        Spacer(modifier = Modifier.height(10.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Gender.entries.forEach { gender ->
-                val isSelected = showMe == gender
-                val bgColor by animateColorAsState(
-                    targetValue = if (isSelected) MaterialTheme.colorScheme.primary
-                    else MaterialTheme.colorScheme.surfaceVariant
+        FilterCard(modifier = Modifier.padding(horizontal = 16.dp)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 16.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    FilterSectionLabel(
+                        icon = Icons.Default.LocationOn,
+                        title = stringResource(Res.string.feed_filter_max_distance)
+                    )
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(50.dp))
+                            .background(MaterialTheme.colorScheme.primaryContainer)
+                            .padding(horizontal = 14.dp, vertical = 6.dp)
+                    ) {
+                        Text(
+                            text = if (isNoLimit) stringResource(Res.string.feed_filter_no_limit)
+                                   else stringResource(Res.string.feed_filter_distance_value, distanceValue.roundToInt()),
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
+                }
+                Slider(
+                    value = distanceValue,
+                    onValueChange = { distanceValue = it },
+                    valueRange = 0f..500f,
+                    colors = SliderDefaults.colors(
+                        thumbColor = MaterialTheme.colorScheme.primary,
+                        activeTrackColor = MaterialTheme.colorScheme.primary,
+                        inactiveTrackColor = MaterialTheme.colorScheme.outlineVariant
+                    )
                 )
-                val textColor by animateColorAsState(
-                    targetValue = if (isSelected) MaterialTheme.colorScheme.onPrimary
-                    else MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(bgColor)
-                        .clickable { showMe = gender }
-                        .padding(vertical = 10.dp),
-                    contentAlignment = Alignment.Center
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = when (gender) {
-                            Gender.MEN -> stringResource(Res.string.feed_filter_gender_men)
-                            Gender.WOMEN -> stringResource(Res.string.feed_filter_gender_women)
-                            Gender.EVERYONE -> stringResource(Res.string.feed_filter_gender_everyone)
-                        },
-                        style = MaterialTheme.typography.labelLarge,
-                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                        color = textColor
+                        text = stringResource(Res.string.feed_filter_no_limit),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = "500 km",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // ── Age Range ─────────────────────────────────────────────────
-        FilterSectionLabel(
-            icon = Icons.Default.Cake,
-            title = stringResource(Res.string.feed_filter_age_range)
-        )
         Spacer(modifier = Modifier.height(10.dp))
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            FilterAgeBox(
-                label = "Min",
-                value = ageRange.start.roundToInt().toString(),
-                modifier = Modifier.weight(1f)
-            )
-            FilterAgeBox(
-                label = "Max",
-                value = ageRange.endInclusive.roundToInt().toString(),
-                modifier = Modifier.weight(1f)
-            )
+        // ── Show Me ───────────────────────────────────────────────────
+        FilterCard(modifier = Modifier.padding(horizontal = 16.dp)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 18.dp)
+            ) {
+                FilterSectionLabel(
+                    icon = Icons.Default.Groups,
+                    title = stringResource(Res.string.feed_filter_show_me)
+                )
+                Spacer(modifier = Modifier.height(14.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Gender.entries.forEach { gender ->
+                        val isSelected = showMe == gender
+                        val bgColor by animateColorAsState(
+                            targetValue = if (isSelected) MaterialTheme.colorScheme.primary
+                            else MaterialTheme.colorScheme.surfaceVariant
+                        )
+                        val textColor by animateColorAsState(
+                            targetValue = if (isSelected) MaterialTheme.colorScheme.onPrimary
+                            else MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(bgColor)
+                                .clickable { showMe = gender }
+                                .padding(vertical = 14.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = when (gender) {
+                                    Gender.MEN -> stringResource(Res.string.feed_filter_gender_men)
+                                    Gender.WOMEN -> stringResource(Res.string.feed_filter_gender_women)
+                                    Gender.EVERYONE -> stringResource(Res.string.feed_filter_gender_everyone)
+                                },
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                color = textColor
+                            )
+                        }
+                    }
+                }
+            }
         }
 
-        RangeSlider(
-            value = ageRange,
-            onValueChange = { ageRange = it },
-            valueRange = 18f..80f,
-            colors = SliderDefaults.colors(
-                thumbColor = MaterialTheme.colorScheme.primary,
-                activeTrackColor = MaterialTheme.colorScheme.primary,
-                inactiveTrackColor = MaterialTheme.colorScheme.surfaceVariant
-            )
-        )
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = "18",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Text(
-                text = "80",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // ── Age Range ─────────────────────────────────────────────────
+        FilterCard(modifier = Modifier.padding(horizontal = 16.dp)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 16.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    FilterSectionLabel(
+                        icon = Icons.Default.Cake,
+                        title = stringResource(Res.string.feed_filter_age_range)
+                    )
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(50.dp))
+                            .background(MaterialTheme.colorScheme.primaryContainer)
+                            .padding(horizontal = 14.dp, vertical = 6.dp)
+                    ) {
+                        Text(
+                            text = "${ageRange.start.roundToInt()} – ${ageRange.endInclusive.roundToInt()}",
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(10.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    FilterAgeBox(
+                        label = "Min",
+                        value = ageRange.start.roundToInt().toString(),
+                        modifier = Modifier.weight(1f)
+                    )
+                    FilterAgeBox(
+                        label = "Max",
+                        value = ageRange.endInclusive.roundToInt().toString(),
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                RangeSlider(
+                    value = ageRange,
+                    onValueChange = { ageRange = it },
+                    valueRange = 18f..80f,
+                    colors = SliderDefaults.colors(
+                        thumbColor = MaterialTheme.colorScheme.primary,
+                        activeTrackColor = MaterialTheme.colorScheme.primary,
+                        inactiveTrackColor = MaterialTheme.colorScheme.outlineVariant
+                    )
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "18",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = "80",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // ── Verified Only ─────────────────────────────────────────────
+        FilterCard(modifier = Modifier.padding(horizontal = 16.dp)) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { showVerifiedOnly = !showVerifiedOnly }
+                    .padding(horizontal = 20.dp, vertical = 18.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
+                val iconBg by animateColorAsState(
+                    if (showVerifiedOnly) MaterialTheme.colorScheme.primaryContainer
+                    else MaterialTheme.colorScheme.surfaceVariant
+                )
+                val iconTint by animateColorAsState(
+                    if (showVerifiedOnly) MaterialTheme.colorScheme.onPrimaryContainer
+                    else MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Box(
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(CircleShape)
+                        .background(iconBg),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.VerifiedUser,
+                        contentDescription = null,
+                        modifier = Modifier.size(22.dp),
+                        tint = iconTint
+                    )
+                }
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(Res.string.feed_filter_verified_only),
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = stringResource(Res.string.feed_filter_verified_only_desc),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Switch(
+                    checked = showVerifiedOnly,
+                    onCheckedChange = { showVerifiedOnly = it },
+                    colors = SwitchDefaults.colors(
+                        checkedTrackColor = MaterialTheme.colorScheme.primary,
+                        uncheckedBorderColor = MaterialTheme.colorScheme.outline
+                    )
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
 
         // ── Apply button ──────────────────────────────────────────────
         Button(
@@ -616,13 +730,15 @@ private fun FilterBottomSheet(
                     if (!isNoLimit) distanceValue.toDouble() else null,
                     showMe,
                     ageRange.start.roundToInt(),
-                    ageRange.endInclusive.roundToInt()
+                    ageRange.endInclusive.roundToInt(),
+                    showVerifiedOnly
                 )
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(48.dp),
-            shape = RoundedCornerShape(14.dp),
+                .padding(horizontal = 16.dp)
+                .height(52.dp),
+            shape = RoundedCornerShape(16.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary
             )
@@ -632,11 +748,27 @@ private fun FilterBottomSheet(
                     "${stringResource(Res.string.feed_filter_apply)} ($activeFilters)"
                 else
                     stringResource(Res.string.feed_filter_apply),
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.SemiBold
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
             )
         }
-        Spacer(modifier = Modifier.height(16.dp))
+    }
+}
+
+@Composable
+private fun FilterCard(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+    ) {
+        content()
     }
 }
 
@@ -649,25 +781,25 @@ private fun FilterSectionLabel(
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         Box(
             modifier = Modifier
-                .size(28.dp)
-                .clip(RoundedCornerShape(8.dp))
+                .size(34.dp)
+                .clip(RoundedCornerShape(10.dp))
                 .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                modifier = Modifier.size(16.dp),
+                modifier = Modifier.size(18.dp),
                 tint = MaterialTheme.colorScheme.primary
             )
         }
         Text(
             text = title,
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.onSurface
         )
@@ -680,21 +812,22 @@ private fun FilterAgeBox(
     value: String,
     modifier: Modifier = Modifier
 ) {
-    Column(
+    Row(
         modifier = modifier
-            .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f))
-            .padding(vertical = 10.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .clip(RoundedCornerShape(10.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         Text(
             text = label,
-            style = MaterialTheme.typography.labelSmall,
+            style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Text(
             text = value,
-            style = MaterialTheme.typography.titleLarge,
+            style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary
         )

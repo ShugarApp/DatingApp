@@ -5,10 +5,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,13 +26,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Cake
 import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.Cake
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.HeartBroken
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocalBar
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.SmokingRooms
@@ -44,20 +42,20 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Straighten
 import androidx.compose.material.icons.filled.Work
 import androidx.compose.material.icons.outlined.LocationOn
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -67,50 +65,83 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import aura.feature.home.presentation.generated.resources.Res
-import com.dating.home.presentation.home.swipe.components.MatchCelebrationOverlay
-import aura.feature.home.presentation.generated.resources.go_back
-import aura.feature.home.presentation.generated.resources.profile_about_me
-import aura.feature.home.presentation.generated.resources.profile_basic_info
-import aura.feature.home.presentation.generated.resources.profile_interests
-import aura.feature.home.presentation.generated.resources.profile_like
-import aura.feature.home.presentation.generated.resources.profile_pass
-import aura.feature.home.presentation.generated.resources.profile_work_education
-import androidx.compose.material3.Button
-import aura.feature.home.presentation.generated.resources.block_user
-import aura.feature.home.presentation.generated.resources.block_user_title
-import aura.feature.home.presentation.generated.resources.block_user_desc
-import aura.feature.home.presentation.generated.resources.cancel
-import aura.feature.home.presentation.generated.resources.delete_match
-import aura.feature.home.presentation.generated.resources.delete_match_title
-import aura.feature.home.presentation.generated.resources.delete_match_desc
-import aura.feature.home.presentation.generated.resources.report_user
-import aura.feature.home.presentation.generated.resources.report_success
+import aura.feature.home.presentation.generated.resources.action_block_desc
+import aura.feature.home.presentation.generated.resources.action_delete_match_desc
+import aura.feature.home.presentation.generated.resources.action_report_desc
 import aura.feature.home.presentation.generated.resources.block_after_report_confirm
 import aura.feature.home.presentation.generated.resources.block_after_report_desc
 import aura.feature.home.presentation.generated.resources.block_after_report_dismiss
 import aura.feature.home.presentation.generated.resources.block_after_report_title
+import aura.feature.home.presentation.generated.resources.block_user
+import aura.feature.home.presentation.generated.resources.block_user_desc
+import aura.feature.home.presentation.generated.resources.block_user_title
+import aura.feature.home.presentation.generated.resources.cancel
+import aura.feature.home.presentation.generated.resources.delete_match
+import aura.feature.home.presentation.generated.resources.delete_match_desc
+import aura.feature.home.presentation.generated.resources.delete_match_title
+import aura.feature.home.presentation.generated.resources.go_back
+import aura.feature.home.presentation.generated.resources.edit_profile_drinking_never
+import aura.feature.home.presentation.generated.resources.edit_profile_drinking_regularly
+import aura.feature.home.presentation.generated.resources.edit_profile_drinking_socially
+import aura.feature.home.presentation.generated.resources.edit_profile_gender_female
+import aura.feature.home.presentation.generated.resources.edit_profile_gender_male
+import aura.feature.home.presentation.generated.resources.edit_profile_gender_other
+import aura.feature.home.presentation.generated.resources.edit_profile_ideal_date_adventure
+import aura.feature.home.presentation.generated.resources.edit_profile_ideal_date_beach
+import aura.feature.home.presentation.generated.resources.edit_profile_ideal_date_cinema
+import aura.feature.home.presentation.generated.resources.edit_profile_ideal_date_coffee
+import aura.feature.home.presentation.generated.resources.edit_profile_ideal_date_concert
+import aura.feature.home.presentation.generated.resources.edit_profile_ideal_date_cooking
+import aura.feature.home.presentation.generated.resources.edit_profile_ideal_date_dinner
+import aura.feature.home.presentation.generated.resources.edit_profile_ideal_date_museum
+import aura.feature.home.presentation.generated.resources.edit_profile_ideal_date_picnic
+import aura.feature.home.presentation.generated.resources.edit_profile_ideal_date_travel
+import aura.feature.home.presentation.generated.resources.edit_profile_looking_for_casual
+import aura.feature.home.presentation.generated.resources.edit_profile_looking_for_friends
+import aura.feature.home.presentation.generated.resources.edit_profile_looking_for_hookup
+import aura.feature.home.presentation.generated.resources.edit_profile_looking_for_long_term
+import aura.feature.home.presentation.generated.resources.edit_profile_looking_for_open
+import aura.feature.home.presentation.generated.resources.edit_profile_looking_for_short_term
+import aura.feature.home.presentation.generated.resources.edit_profile_smoking_never
+import aura.feature.home.presentation.generated.resources.edit_profile_smoking_regularly
+import aura.feature.home.presentation.generated.resources.edit_profile_smoking_sometimes
+import aura.feature.home.presentation.generated.resources.profile_about_me
+import aura.feature.home.presentation.generated.resources.profile_basic_info
+import aura.feature.home.presentation.generated.resources.profile_ideal_date
+import aura.feature.home.presentation.generated.resources.profile_looking_for
+import aura.feature.home.presentation.generated.resources.profile_interests
+import aura.feature.home.presentation.generated.resources.profile_like
+import aura.feature.home.presentation.generated.resources.profile_pass
+import aura.feature.home.presentation.generated.resources.profile_verified
+import aura.feature.home.presentation.generated.resources.profile_work_education
 import aura.feature.home.presentation.generated.resources.report_duplicate
-import androidx.compose.material.icons.filled.HeartBroken
+import aura.feature.home.presentation.generated.resources.report_success
+import aura.feature.home.presentation.generated.resources.report_user
 import coil3.compose.AsyncImage
 import com.dating.core.designsystem.components.dialogs.DestructiveConfirmationDialog
 import com.dating.core.designsystem.theme.extended
 import com.dating.core.domain.auth.User
 import com.dating.core.presentation.util.ObserveAsEvents
+import com.dating.home.presentation.home.swipe.components.MatchCelebrationOverlay
 import com.dating.home.presentation.report.ReportUserBottomSheet
+import kotlin.time.Clock
 import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
-import kotlin.time.Clock
 import kotlinx.datetime.number
+import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -301,7 +332,7 @@ fun ProfileDetailScreen(
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun ProfileDetailContent(
     user: User,
@@ -322,7 +353,44 @@ private fun ProfileDetailContent(
     val location = listOfNotNull(user.city, user.country).joinToString(", ")
     val age = user.birthDate?.let { calculateAge(it) }
     val scope = rememberCoroutineScope()
+
+    val genderLabels = mapOf(
+        "MALE" to stringResource(Res.string.edit_profile_gender_male),
+        "FEMALE" to stringResource(Res.string.edit_profile_gender_female),
+        "OTHER" to stringResource(Res.string.edit_profile_gender_other)
+    )
+    val smokingLabels = mapOf(
+        "NEVER" to stringResource(Res.string.edit_profile_smoking_never),
+        "SOMETIMES" to stringResource(Res.string.edit_profile_smoking_sometimes),
+        "REGULARLY" to stringResource(Res.string.edit_profile_smoking_regularly)
+    )
+    val drinkingLabels = mapOf(
+        "NEVER" to stringResource(Res.string.edit_profile_drinking_never),
+        "SOCIALLY" to stringResource(Res.string.edit_profile_drinking_socially),
+        "REGULARLY" to stringResource(Res.string.edit_profile_drinking_regularly)
+    )
+    val lookingForLabels = mapOf(
+        "LONG_TERM" to stringResource(Res.string.edit_profile_looking_for_long_term),
+        "SHORT_TERM" to stringResource(Res.string.edit_profile_looking_for_short_term),
+        "CASUAL_DATES" to stringResource(Res.string.edit_profile_looking_for_casual),
+        "HOOKUP" to stringResource(Res.string.edit_profile_looking_for_hookup),
+        "FRIENDS" to stringResource(Res.string.edit_profile_looking_for_friends),
+        "OPEN_TO_ANYTHING" to stringResource(Res.string.edit_profile_looking_for_open)
+    )
+    val idealDateLabels = mapOf(
+        "DINNER" to stringResource(Res.string.edit_profile_ideal_date_dinner),
+        "COFFEE" to stringResource(Res.string.edit_profile_ideal_date_coffee),
+        "ADVENTURE" to stringResource(Res.string.edit_profile_ideal_date_adventure),
+        "CINEMA" to stringResource(Res.string.edit_profile_ideal_date_cinema),
+        "PICNIC" to stringResource(Res.string.edit_profile_ideal_date_picnic),
+        "TRAVEL" to stringResource(Res.string.edit_profile_ideal_date_travel),
+        "CONCERT" to stringResource(Res.string.edit_profile_ideal_date_concert),
+        "MUSEUM" to stringResource(Res.string.edit_profile_ideal_date_museum),
+        "BEACH" to stringResource(Res.string.edit_profile_ideal_date_beach),
+        "COOKING" to stringResource(Res.string.edit_profile_ideal_date_cooking)
+    )
     var showFullscreenPreview by remember { mutableStateOf(false) }
+    var showActionsSheet by remember { mutableStateOf(false) }
 
     val swipeOffsetX = remember { Animatable(0f) }
     val swipeRotation = remember { Animatable(0f) }
@@ -442,7 +510,8 @@ private fun ProfileDetailContent(
                 Column(
                     modifier = Modifier
                         .align(Alignment.BottomStart)
-                        .padding(16.dp)
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
@@ -451,11 +520,27 @@ private fun ProfileDetailContent(
                             color = Color.White
                         )
                         if (user.verificationStatus == com.dating.core.domain.auth.VerificationStatus.VERIFIED) {
-                            Spacer(Modifier.width(6.dp))
-                            com.dating.home.presentation.components.VerifiedBadge(
-                                size = 22.dp,
-                                tint = com.dating.home.presentation.components.VerifiedBlue
-                            )
+                            Spacer(Modifier.width(8.dp))
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .background(
+                                        com.dating.home.presentation.components.VerifiedBlue,
+                                        RoundedCornerShape(20.dp)
+                                    )
+                                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                            ) {
+                                com.dating.home.presentation.components.VerifiedBadge(
+                                    size = 13.dp,
+                                    tint = Color.White
+                                )
+                                Spacer(Modifier.width(4.dp))
+                                Text(
+                                    text = stringResource(Res.string.profile_verified),
+                                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                                    color = Color.White
+                                )
+                            }
                         }
                     }
                     if (location.isNotEmpty()) {
@@ -491,56 +576,21 @@ private fun ProfileDetailContent(
                     )
                 }
 
-                // Action buttons (top-right)
+                // More options button (top-right)
                 if (showBlockButton || showDeleteMatchButton || showReportButton) {
-                    Row(
+                    IconButton(
+                        onClick = { showActionsSheet = true },
                         modifier = Modifier
                             .align(Alignment.TopEnd)
-                            .padding(top = 48.dp, end = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            .padding(top = 48.dp, end = 16.dp)
+                            .background(Color.Black.copy(alpha = 0.4f), CircleShape)
+                            .size(40.dp)
                     ) {
-                        if (showDeleteMatchButton) {
-                            IconButton(
-                                onClick = onDeleteMatchClick,
-                                modifier = Modifier
-                                    .background(Color.Black.copy(alpha = 0.3f), CircleShape)
-                                    .size(40.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.HeartBroken,
-                                    contentDescription = stringResource(Res.string.delete_match),
-                                    tint = Color.White
-                                )
-                            }
-                        }
-                        if (showReportButton) {
-                            IconButton(
-                                onClick = onReportClick,
-                                modifier = Modifier
-                                    .background(Color.Black.copy(alpha = 0.3f), CircleShape)
-                                    .size(40.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Flag,
-                                    contentDescription = stringResource(Res.string.report_user),
-                                    tint = Color.White
-                                )
-                            }
-                        }
-                        if (showBlockButton) {
-                            IconButton(
-                                onClick = onBlockClick,
-                                modifier = Modifier
-                                    .background(Color.Black.copy(alpha = 0.3f), CircleShape)
-                                    .size(40.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Block,
-                                    contentDescription = stringResource(Res.string.block_user),
-                                    tint = Color.White
-                                )
-                            }
-                        }
+                        Icon(
+                            imageVector = Icons.Default.MoreVert,
+                            contentDescription = "More options",
+                            tint = Color.White
+                        )
                     }
                 }
             }
@@ -549,63 +599,69 @@ private fun ProfileDetailContent(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(24.dp)
+                    .padding(horizontal = 16.dp, vertical = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 // About me
                 val bio = user.bio
                 if (!bio.isNullOrBlank()) {
-                    SectionTitle(stringResource(Res.string.profile_about_me))
-                    Text(
-                        text = bio,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.extended.textPrimary
-                    )
+                    ProfileSection {
+                        SectionTitle(stringResource(Res.string.profile_about_me))
+                        Text(
+                            text = bio,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.extended.textPrimary
+                        )
+                    }
                 }
 
                 // Basic info chips
                 val basicInfoItems = buildList {
                     if (age != null) add(Pair(Icons.Default.Cake, "$age años"))
-                    user.gender?.let { add(Pair(Icons.Default.Person, it)) }
+                    user.gender?.let { add(Pair(Icons.Default.Person, genderLabels[it] ?: it.lowercase().replaceFirstChar { c -> c.uppercase() })) }
                     user.height?.let { add(Pair(Icons.Default.Straighten, "$it cm")) }
-                    user.zodiac?.let { add(Pair(Icons.Default.Star, it)) }
-                    user.smoking?.let { add(Pair(Icons.Default.SmokingRooms, it)) }
-                    user.drinking?.let { add(Pair(Icons.Default.LocalBar, it)) }
+                    user.zodiac?.let { add(Pair(Icons.Default.Star, it.lowercase().replaceFirstChar { c -> c.uppercase() })) }
+                    user.smoking?.let { add(Pair(Icons.Default.SmokingRooms, smokingLabels[it] ?: it.lowercase().replaceFirstChar { c -> c.uppercase() })) }
+                    user.drinking?.let { add(Pair(Icons.Default.LocalBar, drinkingLabels[it] ?: it.lowercase().replaceFirstChar { c -> c.uppercase() })) }
                 }
                 if (basicInfoItems.isNotEmpty()) {
-                    SectionTitle(stringResource(Res.string.profile_basic_info))
-                    FlowRow(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        basicInfoItems.forEach { (icon, label) ->
-                            SuggestionChip(
-                                onClick = {},
-                                label = { Text(label) },
-                                icon = {
-                                    Icon(
-                                        imageVector = icon,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(16.dp)
-                                    )
-                                }
-                            )
+                    ProfileSection {
+                        SectionTitle(stringResource(Res.string.profile_basic_info))
+                        FlowRow(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            basicInfoItems.forEach { (icon, label) ->
+                                SuggestionChip(
+                                    onClick = {},
+                                    label = { Text(label) },
+                                    icon = {
+                                        Icon(
+                                            imageVector = icon,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                    }
+                                )
+                            }
                         }
                     }
                 }
 
                 // Interests
                 if (user.interests.isNotEmpty()) {
-                    SectionTitle(stringResource(Res.string.profile_interests))
-                    FlowRow(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        user.interests.forEach { interest ->
-                            SuggestionChip(
-                                onClick = {},
-                                label = { Text(interest) }
-                            )
+                    ProfileSection {
+                        SectionTitle(stringResource(Res.string.profile_interests))
+                        FlowRow(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            user.interests.forEach { interest ->
+                                SuggestionChip(
+                                    onClick = {},
+                                    label = { Text(interest) }
+                                )
+                            }
                         }
                     }
                 }
@@ -621,11 +677,39 @@ private fun ProfileDetailContent(
                     }
                 }
                 if (workItems.isNotEmpty()) {
-                    SectionTitle(stringResource(Res.string.profile_work_education))
-                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        workItems.forEach { (icon, text) ->
-                            ProfileDetailItem(icon = icon, text = text)
+                    ProfileSection {
+                        SectionTitle(stringResource(Res.string.profile_work_education))
+                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                            workItems.forEach { (icon, text) ->
+                                ProfileDetailItem(icon = icon, text = text)
+                            }
                         }
+                    }
+                }
+
+                // Looking For
+                val lookingForLabel = user.lookingFor?.let { lookingForLabels[it] ?: it.lowercase().replaceFirstChar { c -> c.uppercase() } }
+                if (!lookingForLabel.isNullOrBlank()) {
+                    ProfileSection {
+                        SectionTitle(stringResource(Res.string.profile_looking_for))
+                        Text(
+                            text = lookingForLabel,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.extended.textPrimary
+                        )
+                    }
+                }
+
+                // Ideal Date
+                val idealDateLabel = user.idealDate?.let { idealDateLabels[it] ?: it.lowercase().replaceFirstChar { c -> c.uppercase() } }
+                if (!idealDateLabel.isNullOrBlank()) {
+                    ProfileSection {
+                        SectionTitle(stringResource(Res.string.profile_ideal_date))
+                        Text(
+                            text = idealDateLabel,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.extended.textPrimary
+                        )
                     }
                 }
             }
@@ -758,6 +842,33 @@ private fun ProfileDetailContent(
             )
         }
     }
+
+    // ── Actions bottom sheet ──────────────────────────────────────
+    if (showActionsSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showActionsSheet = false },
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+            containerColor = MaterialTheme.colorScheme.surface
+        ) {
+            ProfileActionsSheet(
+                showDeleteMatchButton = showDeleteMatchButton,
+                showReportButton = showReportButton,
+                showBlockButton = showBlockButton,
+                onDeleteMatchClick = {
+                    showActionsSheet = false
+                    onDeleteMatchClick()
+                },
+                onReportClick = {
+                    showActionsSheet = false
+                    onReportClick()
+                },
+                onBlockClick = {
+                    showActionsSheet = false
+                    onBlockClick()
+                }
+            )
+        }
+    }
 }
 
 @Composable
@@ -853,6 +964,130 @@ private fun FullscreenPhotoPreview(
                 contentDescription = null,
                 tint = Color.White
             )
+        }
+    }
+}
+
+@Composable
+private fun ProfileActionsSheet(
+    showDeleteMatchButton: Boolean,
+    showReportButton: Boolean,
+    showBlockButton: Boolean,
+    onDeleteMatchClick: () -> Unit,
+    onReportClick: () -> Unit,
+    onBlockClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp)
+            .padding(bottom = 40.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            text = "Options",
+            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp)
+        )
+        if (showReportButton) {
+            ProfileActionItem(
+                icon = Icons.Default.Flag,
+                iconBgColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.6f),
+                iconTint = MaterialTheme.colorScheme.onErrorContainer,
+                title = stringResource(Res.string.report_user),
+                subtitle = stringResource(Res.string.action_report_desc),
+                onClick = onReportClick
+            )
+        }
+        if (showBlockButton) {
+            ProfileActionItem(
+                icon = Icons.Default.Block,
+                iconBgColor = MaterialTheme.colorScheme.errorContainer,
+                iconTint = MaterialTheme.colorScheme.error,
+                title = stringResource(Res.string.block_user),
+                subtitle = stringResource(Res.string.action_block_desc),
+                titleColor = MaterialTheme.colorScheme.error,
+                onClick = onBlockClick
+            )
+        }
+        if (showDeleteMatchButton) {
+            ProfileActionItem(
+                icon = Icons.Default.HeartBroken,
+                iconBgColor = MaterialTheme.colorScheme.errorContainer,
+                iconTint = MaterialTheme.colorScheme.error,
+                title = stringResource(Res.string.delete_match),
+                subtitle = stringResource(Res.string.action_delete_match_desc),
+                titleColor = MaterialTheme.colorScheme.error,
+                onClick = onDeleteMatchClick
+            )
+        }
+    }
+}
+
+@Composable
+private fun ProfileActionItem(
+    icon: ImageVector,
+    iconBgColor: Color,
+    iconTint: Color,
+    title: String,
+    subtitle: String,
+    titleColor: Color? = null,
+    onClick: () -> Unit
+) {
+    Surface(
+        onClick = onClick,
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = iconBgColor,
+                modifier = Modifier.size(46.dp)
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        tint = iconTint,
+                        modifier = Modifier.size(22.dp)
+                    )
+                }
+            }
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
+                    color = titleColor ?: MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ProfileSection(content: @Composable () -> Unit) {
+    Surface(
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            content()
         }
     }
 }

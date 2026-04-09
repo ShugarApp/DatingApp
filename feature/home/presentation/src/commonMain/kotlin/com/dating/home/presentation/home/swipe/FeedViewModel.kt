@@ -47,6 +47,7 @@ class FeedViewModel(
                     maxAge = prefs.maxAge,
                     maxDistance = prefs.maxDistance,
                     showMe = prefs.showMe,
+                    showVerifiedOnly = prefs.verifiedProfilesOnly,
                     currentUserPhotoUrl = authInfo?.user?.profilePictureUrl
                 )
             }
@@ -111,6 +112,7 @@ class FeedViewModel(
                         showMe = action.gender,
                         minAge = action.minAge,
                         maxAge = action.maxAge,
+                        showVerifiedOnly = action.showVerifiedOnly,
                         feedItems = emptyList(),
                         currentPage = 0,
                         hasMore = true
@@ -120,6 +122,7 @@ class FeedViewModel(
                     discoveryPreferences.updateMaxDistance(action.distance)
                     discoveryPreferences.updateShowMe(action.gender)
                     discoveryPreferences.updateAgeRange(action.minAge, action.maxAge)
+                    discoveryPreferences.updateVerifiedProfilesOnly(action.showVerifiedOnly)
                 }
                 loadFeed(page = 0, isInitialLoad = true)
             }
@@ -187,7 +190,8 @@ class FeedViewModel(
             if (prefs.minAge != current.minAge ||
                 prefs.maxAge != current.maxAge ||
                 prefs.maxDistance != current.maxDistance ||
-                prefs.showMe != current.showMe
+                prefs.showMe != current.showMe ||
+                prefs.verifiedProfilesOnly != current.showVerifiedOnly
             ) {
                 _state.update {
                     it.copy(
@@ -195,6 +199,7 @@ class FeedViewModel(
                         maxAge = prefs.maxAge,
                         maxDistance = prefs.maxDistance,
                         showMe = prefs.showMe,
+                        showVerifiedOnly = prefs.verifiedProfilesOnly,
                         feedItems = emptyList(),
                         currentPage = 0,
                         hasMore = true

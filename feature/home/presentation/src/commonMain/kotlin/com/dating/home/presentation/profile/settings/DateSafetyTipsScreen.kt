@@ -80,20 +80,20 @@ import com.dating.core.designsystem.components.header.AppCenterTopBar
 import com.dating.core.designsystem.theme.extended
 import org.jetbrains.compose.resources.stringResource
 
+// ─────────────────────────────────────────────
+// Screen 1: Consejos de seguridad
+// ─────────────────────────────────────────────
+
 @Composable
-fun DateSafetyTipsScreen(
+fun SafetyTipsScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val checklist = remember { mutableStateListOf(false, false, false, false, false) }
-    val completedCount = checklist.count { it }
-    val allDone = completedCount == checklist.size
-
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
             AppCenterTopBar(
-                title = stringResource(Res.string.date_safety_tips_title),
+                title = stringResource(Res.string.date_safety_tips_section),
                 onBack = onBack
             )
         }
@@ -135,7 +135,7 @@ fun DateSafetyTipsScreen(
                     }
                     Column {
                         Text(
-                            text = stringResource(Res.string.date_safety_tips_title),
+                            text = stringResource(Res.string.date_safety_tips_section),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -150,6 +150,74 @@ fun DateSafetyTipsScreen(
                 }
             }
 
+            Spacer(modifier = Modifier.height(16.dp))
+
+            AccessCardList(title = stringResource(Res.string.date_safety_tips_section)) {
+                SafetyTipRow(
+                    icon = Icons.Default.LocationOn,
+                    title = stringResource(Res.string.date_safety_tip_1_title),
+                    desc = stringResource(Res.string.date_safety_tip_1_desc)
+                )
+                SafetyTipRow(
+                    icon = Icons.Default.Groups,
+                    title = stringResource(Res.string.date_safety_tip_2_title),
+                    desc = stringResource(Res.string.date_safety_tip_2_desc)
+                )
+                SafetyTipRow(
+                    icon = Icons.Default.DirectionsCar,
+                    title = stringResource(Res.string.date_safety_tip_3_title),
+                    desc = stringResource(Res.string.date_safety_tip_3_desc)
+                )
+                SafetyTipRow(
+                    icon = Icons.Default.Favorite,
+                    title = stringResource(Res.string.date_safety_tip_4_title),
+                    desc = stringResource(Res.string.date_safety_tip_4_desc)
+                )
+                SafetyTipRow(
+                    icon = Icons.Default.Lock,
+                    title = stringResource(Res.string.date_safety_tip_5_title),
+                    desc = stringResource(Res.string.date_safety_tip_5_desc)
+                )
+                SafetyTipRow(
+                    icon = Icons.Default.PrivacyTip,
+                    title = stringResource(Res.string.date_safety_tip_6_title),
+                    desc = stringResource(Res.string.date_safety_tip_6_desc)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+        }
+    }
+}
+
+// ─────────────────────────────────────────────
+// Screen 2: Checklist antes de salir
+// ─────────────────────────────────────────────
+
+@Composable
+fun DateSafetyChecklistScreen(
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val checklist = remember { mutableStateListOf(false, false, false, false, false) }
+    val completedCount = checklist.count { it }
+    val allDone = completedCount == checklist.size
+
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        topBar = {
+            AppCenterTopBar(
+                title = stringResource(Res.string.date_safety_checklist_section),
+                onBack = onBack
+            )
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
+        ) {
             Spacer(modifier = Modifier.height(16.dp))
 
             // Progress bar
@@ -167,7 +235,11 @@ fun DateSafetyTipsScreen(
                         text = if (allDone) {
                             stringResource(Res.string.date_safety_all_set)
                         } else {
-                            stringResource(Res.string.date_safety_checklist_progress, completedCount, checklist.size)
+                            stringResource(
+                                Res.string.date_safety_checklist_progress,
+                                completedCount,
+                                checklist.size
+                            )
                         },
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.Medium,
@@ -197,7 +269,6 @@ fun DateSafetyTipsScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Checklist
             AccessCardList(title = stringResource(Res.string.date_safety_checklist_section)) {
                 ChecklistRow(
                     checked = checklist[0],
@@ -236,46 +307,14 @@ fun DateSafetyTipsScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Safety tips
-            AccessCardList(title = stringResource(Res.string.date_safety_tips_section)) {
-                SafetyTipRow(
-                    icon = Icons.Default.LocationOn,
-                    title = stringResource(Res.string.date_safety_tip_1_title),
-                    desc = stringResource(Res.string.date_safety_tip_1_desc)
-                )
-                SafetyTipRow(
-                    icon = Icons.Default.Groups,
-                    title = stringResource(Res.string.date_safety_tip_2_title),
-                    desc = stringResource(Res.string.date_safety_tip_2_desc)
-                )
-                SafetyTipRow(
-                    icon = Icons.Default.DirectionsCar,
-                    title = stringResource(Res.string.date_safety_tip_3_title),
-                    desc = stringResource(Res.string.date_safety_tip_3_desc)
-                )
-                SafetyTipRow(
-                    icon = Icons.Default.Favorite,
-                    title = stringResource(Res.string.date_safety_tip_4_title),
-                    desc = stringResource(Res.string.date_safety_tip_4_desc)
-                )
-                SafetyTipRow(
-                    icon = Icons.Default.Lock,
-                    title = stringResource(Res.string.date_safety_tip_5_title),
-                    desc = stringResource(Res.string.date_safety_tip_5_desc)
-                )
-                SafetyTipRow(
-                    icon = Icons.Default.PrivacyTip,
-                    title = stringResource(Res.string.date_safety_tip_6_title),
-                    desc = stringResource(Res.string.date_safety_tip_6_desc)
-                )
-            }
-
             Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }
+
+// ─────────────────────────────────────────────
+// Shared private composables
+// ─────────────────────────────────────────────
 
 @Composable
 private fun ChecklistRow(

@@ -24,5 +24,6 @@ data class SettingsState(
     val errorMessage: UiText? = null,
     val showDeleteSurveyDialog: Boolean = false,
     val selectedDeleteReason: DeleteAccountReason? = null,
-    val isEmergencyEnabled: Boolean = false
+    val isEmergencyEnabled: Boolean = false,
+    val verifiedProfilesOnly: Boolean = false
 )

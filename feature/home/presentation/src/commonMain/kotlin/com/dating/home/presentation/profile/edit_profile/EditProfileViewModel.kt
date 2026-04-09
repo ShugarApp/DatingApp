@@ -11,7 +11,6 @@ import com.dating.core.domain.util.onSuccess
 import com.dating.core.presentation.util.UiText
 import com.dating.core.presentation.util.toUiText
 import com.dating.home.domain.user.UserService
-import kotlin.time.Clock
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.firstOrNull
@@ -19,10 +18,6 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.number
-import kotlinx.datetime.toLocalDateTime
 
 class EditProfileViewModel(
     private val sessionStorage: SessionStorage,
@@ -47,11 +42,14 @@ class EditProfileViewModel(
             is EditProfileAction.OnInterestToggled -> toggleInterest(action.interest)
             is EditProfileAction.OnSaveProfile -> saveProfile()
             is EditProfileAction.OnGenderChanged -> _state.update { it.copy(gender = action.gender) }
-            is EditProfileAction.OnBirthDateChanged -> _state.update { it.copy(birthDate = action.birthDate, birthDateError = null) }
+            is EditProfileAction.OnBirthDateChanged -> _state.update { it.copy(birthDate = action.birthDate) }
             is EditProfileAction.OnHeightChanged -> _state.update { it.copy(height = action.height, heightError = null) }
             is EditProfileAction.OnZodiacChanged -> _state.update { it.copy(zodiac = action.zodiac) }
             is EditProfileAction.OnSmokingChanged -> _state.update { it.copy(smoking = action.smoking) }
             is EditProfileAction.OnDrinkingChanged -> _state.update { it.copy(drinking = action.drinking) }
+            is EditProfileAction.OnInterestedInChanged -> _state.update { it.copy(interestedIn = action.interestedIn) }
+            is EditProfileAction.OnLookingForChanged -> _state.update { it.copy(lookingFor = action.lookingFor) }
+            is EditProfileAction.OnIdealDateChanged -> _state.update { it.copy(idealDate = action.idealDate) }
             is EditProfileAction.OnPhotosReordered -> reorderPhotos(action.newPhotos)
             is EditProfileAction.OnDismissSuccessMessage -> _state.update { it.copy(showSuccessMessage = false) }
             is EditProfileAction.OnPhotoUploaded -> onPhotoUploaded(action.slotIndex, action.publicUrl)
@@ -76,7 +74,10 @@ class EditProfileViewModel(
                             zodiac = user.zodiac,
                             smoking = user.smoking,
                             drinking = user.drinking,
-                            selectedInterests = user.interests
+                            selectedInterests = user.interests,
+                            interestedIn = user.interestedIn,
+                            lookingFor = user.lookingFor,
+                            idealDate = user.idealDate
                         )
                     }
                 }
@@ -88,41 +89,20 @@ class EditProfileViewModel(
 
         val bio = _state.value.bioTextState.text.toString().ifBlank { null }
         if (bio != null && bio.length > 500) {
-            _state.update { it.copy(bioError = "La bio no puede superar los 500 caracteres") }
+            _state.update { it.copy(bioError = "Bio cannot exceed 500 characters") }
             return
         }
 
         val height = _state.value.height
         if (height != null && (height < 100 || height > 250)) {
-            _state.update { it.copy(heightError = "La altura debe estar entre 100 y 250 cm") }
+            _state.update { it.copy(heightError = "Height must be between 100 and 250 cm") }
             return
         }
 
         val interests = _state.value.selectedInterests
         if (interests.size > 10) {
-            _state.update { it.copy(interestsError = "Máximo 10 intereses") }
+            _state.update { it.copy(interestsError = "Maximum 10 interests") }
             return
-        }
-
-        val birthDate = _state.value.birthDate
-        if (birthDate != null) {
-            val today = Clock.System.now().toLocalDateTime(TimeZone.UTC).date
-            val selected = try { LocalDate.parse(birthDate) } catch (_: Exception) { null }
-            if (selected != null) {
-                if (selected > today) {
-                    _state.update { it.copy(birthDateError = "La fecha de nacimiento no puede ser en el futuro") }
-                    return
-                }
-                val eighteenYearsAgo = try {
-                    LocalDate(today.year - 18, today.month.number, today.day)
-                } catch (_: Exception) {
-                    LocalDate(today.year - 18, today.month.number, 28)
-                }
-                if (selected > eighteenYearsAgo) {
-                    _state.update { it.copy(birthDateError = "Debes tener al menos 18 años") }
-                    return
-                }
-            }
         }
 
         _state.update {
@@ -130,7 +110,6 @@ class EditProfileViewModel(
                 isSavingProfile = true,
                 saveError = null,
                 bioError = null,
-                birthDateError = null,
                 heightError = null,
                 interestsError = null
             )
@@ -148,18 +127,22 @@ class EditProfileViewModel(
                 zodiac = _state.value.zodiac,
                 smoking = _state.value.smoking,
                 drinking = _state.value.drinking,
-                interests = _state.value.selectedInterests.ifEmpty { null }
+                interests = _state.value.selectedInterests.ifEmpty { null },
+                idealDate = _state.value.idealDate,
+                interestedIn = _state.value.interestedIn,
+                lookingFor = _state.value.lookingFor
             ).onSuccess { user ->
                 _state.update {
                     it.copy(
                         isSavingProfile = false,
-                        gender = user.gender,
-                        birthDate = user.birthDate,
                         height = user.height,
                         zodiac = user.zodiac,
                         smoking = user.smoking,
                         drinking = user.drinking,
                         selectedInterests = user.interests,
+                        interestedIn = user.interestedIn,
+                        lookingFor = user.lookingFor,
+                        idealDate = user.idealDate,
                         showSuccessMessage = true
                     )
                 }
@@ -180,7 +163,7 @@ class EditProfileViewModel(
                 it.copy(selectedInterests = current, interestsError = null)
             } else {
                 if (current.size >= 10) {
-                    it.copy(interestsError = "Máximo 10 intereses")
+                    it.copy(interestsError = "Maximum 10 interests")
                 } else {
                     current.add(interest)
                     it.copy(selectedInterests = current, interestsError = null)
@@ -209,7 +192,6 @@ class EditProfileViewModel(
         viewModelScope.launch {
             userService.deletePhoto(slotIndex)
                 .onSuccess {
-                    // Backend compacts the array — mirror that locally
                     val compacted = _state.value.photos.filterNotNull().toMutableList()
                     if (slotIndex < compacted.size) compacted.removeAt(slotIndex)
                     val updatedPhotos = List(6) { i -> compacted.getOrNull(i) }
@@ -247,7 +229,6 @@ class EditProfileViewModel(
         viewModelScope.launch {
             userService.uploadPhoto(imageBytes = bytes, mimeType = mimeType, index = slotIndex)
                 .onSuccess { publicUrl ->
-                    // Place the confirmed URL at the target slot
                     val updatedPhotos = _state.value.photos.toMutableList()
                     updatedPhotos[slotIndex] = publicUrl
                     _state.update {
@@ -292,7 +273,6 @@ class EditProfileViewModel(
 
     private fun reorderPhotos(newPhotos: List<String?>) {
         val previousPhotos = _state.value.photos
-        // Optimistic update — apply immediately, revert on failure
         _state.update { it.copy(photos = newPhotos) }
         val realPhotos = newPhotos.filterNotNull()
         viewModelScope.launch {
