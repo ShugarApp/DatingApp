@@ -1,5 +1,12 @@
 package com.dating.home.presentation.profile.profile
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -22,9 +29,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.HourglassEmpty
 import androidx.compose.material.icons.filled.Info
@@ -32,16 +40,7 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Verified
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.LocationOn
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
-import androidx.compose.ui.draw.scale
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -63,39 +62,39 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.foundation.border
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import aura.feature.home.presentation.generated.resources.Res
+import aura.feature.home.presentation.generated.resources.date_safety_checklist_section
+import aura.feature.home.presentation.generated.resources.date_safety_tips_section
 import aura.feature.home.presentation.generated.resources.profile_completion_cta
 import aura.feature.home.presentation.generated.resources.profile_completion_hint
 import aura.feature.home.presentation.generated.resources.profile_completion_percent
 import aura.feature.home.presentation.generated.resources.profile_completion_title
 import aura.feature.home.presentation.generated.resources.profile_edit
 import aura.feature.home.presentation.generated.resources.profile_header_info_format
-import aura.feature.home.presentation.generated.resources.profile_sos_button
-import aura.feature.home.presentation.generated.resources.date_safety_checklist_section
-import aura.feature.home.presentation.generated.resources.date_safety_tips_section
 import aura.feature.home.presentation.generated.resources.profile_safety_center
 import aura.feature.home.presentation.generated.resources.profile_safety_section
 import aura.feature.home.presentation.generated.resources.profile_settings_dashboard
-import aura.feature.home.presentation.generated.resources.profile_verify
+import aura.feature.home.presentation.generated.resources.profile_sos_button
+import aura.feature.home.presentation.generated.resources.safe_date_title
 import coil3.compose.AsyncImage
 import com.dating.core.designsystem.components.avatar.AvatarSize
 import com.dating.core.designsystem.components.avatar.ChirpAvatarPhoto
 import com.dating.core.designsystem.components.cards.AccessCardItem
 import com.dating.core.designsystem.components.cards.AccessCardList
+import com.dating.core.designsystem.components.chips.ChirpChip
+import com.dating.core.designsystem.theme.extended
 import com.dating.core.domain.auth.VerificationStatus
 import com.dating.home.presentation.components.VerifiedBadge
 import com.dating.home.presentation.components.VerifiedBlue
-import com.dating.core.designsystem.components.chips.ChirpChip
-import com.dating.core.designsystem.theme.extended
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -109,6 +108,7 @@ fun ProfileScreen(
     onSafetyCenter: () -> Unit,
     onDateSafetyTips: () -> Unit,
     onDateSafetyChecklist: () -> Unit,
+    onSafeDate: () -> Unit,
     showSosButton: Boolean,
     onSosTrigger: () -> Unit,
     onNavigateToProfile: (String, String?) -> Unit,
@@ -236,6 +236,11 @@ fun ProfileScreen(
                     icon = Icons.Default.CheckCircle,
                     title = stringResource(Res.string.date_safety_checklist_section),
                     onClick = onDateSafetyChecklist
+                )
+                AccessCardItem(
+                    icon = Icons.Default.DateRange,
+                    title = stringResource(Res.string.safe_date_title),
+                    onClick = onSafeDate
                 )
             }
 

@@ -81,6 +81,8 @@
     <string name="settings_title">Settings</string>
     <string name="settings_discovery">Discovery Settings</string>
     <string name="settings_location">Location</string>
+    <string name="settings_update_location">Update Location</string>
+    <string name="settings_location_updated">Location updated successfully</string>
     <string name="settings_current_location">My Current Location</string>
     <string name="settings_max_distance">Maximum Distance</string>
     <string name="settings_100_km">100 km</string>

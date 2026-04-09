@@ -155,11 +155,10 @@ class SettingsViewModel(
             val location = locationProvider.getLastKnownLocation()
             if (location != null) {
                 val result = userService.updateLocation(location.latitude, location.longitude)
-                _state.update {
-                    it.copy(
-                        isUpdatingLocation = false,
-                        locationUpdateSuccess = result is Result.Success
-                    )
+                val success = result is Result.Success
+                _state.update { it.copy(isUpdatingLocation = false, locationUpdateSuccess = success) }
+                if (success) {
+                    _events.send(SettingsEvent.OnLocationUpdated)
                 }
             } else {
                 _state.update { it.copy(isUpdatingLocation = false, locationUpdateSuccess = false) }

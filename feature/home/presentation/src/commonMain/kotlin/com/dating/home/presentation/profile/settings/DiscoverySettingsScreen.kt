@@ -24,7 +24,6 @@ import androidx.compose.material.icons.filled.Cake
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Groups
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.material3.AlertDialog
@@ -62,9 +61,7 @@ import aura.feature.home.presentation.generated.resources.network_error
 import aura.feature.home.presentation.generated.resources.save
 import aura.feature.home.presentation.generated.resources.settings_100_km
 import aura.feature.home.presentation.generated.resources.settings_age_range
-import aura.feature.home.presentation.generated.resources.settings_current_location
 import aura.feature.home.presentation.generated.resources.settings_discovery
-import aura.feature.home.presentation.generated.resources.settings_location
 import aura.feature.home.presentation.generated.resources.settings_max_distance
 import aura.feature.home.presentation.generated.resources.settings_show_me
 import com.dating.core.designsystem.components.buttons.AppButtonStyle
@@ -107,16 +104,6 @@ fun DiscoverySettingsScreen(
             AccessCardList(
                 title = stringResource(Res.string.settings_discovery)
             ) {
-                AccessCardItem(
-                    icon = Icons.Default.LocationOn,
-                    title = stringResource(Res.string.settings_location),
-                    subtitle = if (state.isUpdatingLocation) {
-                        "Updating..."
-                    } else {
-                        stringResource(Res.string.settings_current_location)
-                    },
-                    onClick = { viewModel.onAction(SettingsAction.OnLocationClick) }
-                )
                 AccessCardItem(
                     icon = Icons.Default.Tune,
                     title = stringResource(Res.string.settings_max_distance),

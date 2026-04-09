@@ -1,8 +1,6 @@
 package com.dating.home.presentation.profile.settings
 
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,7 +17,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ContactPhone
 import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.Favorite
@@ -29,17 +26,11 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material.icons.filled.PrivacyTip
 import androidx.compose.material.icons.filled.Security
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,7 +38,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import aura.feature.home.presentation.generated.resources.Res
-import aura.feature.home.presentation.generated.resources.date_safety_all_set
 import aura.feature.home.presentation.generated.resources.date_safety_check_battery
 import aura.feature.home.presentation.generated.resources.date_safety_check_battery_desc
 import aura.feature.home.presentation.generated.resources.date_safety_check_public
@@ -58,7 +48,6 @@ import aura.feature.home.presentation.generated.resources.date_safety_check_sos
 import aura.feature.home.presentation.generated.resources.date_safety_check_sos_desc
 import aura.feature.home.presentation.generated.resources.date_safety_check_transport
 import aura.feature.home.presentation.generated.resources.date_safety_check_transport_desc
-import aura.feature.home.presentation.generated.resources.date_safety_checklist_progress
 import aura.feature.home.presentation.generated.resources.date_safety_checklist_section
 import aura.feature.home.presentation.generated.resources.date_safety_tip_1_desc
 import aura.feature.home.presentation.generated.resources.date_safety_tip_1_title
@@ -199,10 +188,6 @@ fun DateSafetyChecklistScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val checklist = remember { mutableStateListOf(false, false, false, false, false) }
-    val completedCount = checklist.count { it }
-    val allDone = completedCount == checklist.size
-
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
@@ -220,90 +205,31 @@ fun DateSafetyChecklistScreen(
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Progress bar
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = if (allDone) {
-                            stringResource(Res.string.date_safety_all_set)
-                        } else {
-                            stringResource(
-                                Res.string.date_safety_checklist_progress,
-                                completedCount,
-                                checklist.size
-                            )
-                        },
-                        style = MaterialTheme.typography.bodySmall,
-                        fontWeight = FontWeight.Medium,
-                        color = if (allDone) MaterialTheme.colorScheme.primary
-                        else MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    if (allDone) {
-                        Icon(
-                            imageVector = Icons.Default.CheckCircle,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(18.dp)
-                        )
-                    }
-                }
-                Spacer(modifier = Modifier.height(6.dp))
-                LinearProgressIndicator(
-                    progress = { completedCount.toFloat() / checklist.size },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(6.dp)
-                        .clip(RoundedCornerShape(3.dp)),
-                    color = MaterialTheme.colorScheme.primary,
-                    trackColor = MaterialTheme.colorScheme.surfaceVariant
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
             AccessCardList(title = stringResource(Res.string.date_safety_checklist_section)) {
-                ChecklistRow(
-                    checked = checklist[0],
-                    title = stringResource(Res.string.date_safety_check_public),
-                    subtitle = stringResource(Res.string.date_safety_check_public_desc),
+                SafetyTipRow(
                     icon = Icons.Default.LocationOn,
-                    onToggle = { checklist[0] = !checklist[0] }
+                    title = stringResource(Res.string.date_safety_check_public),
+                    desc = stringResource(Res.string.date_safety_check_public_desc)
                 )
-                ChecklistRow(
-                    checked = checklist[1],
-                    title = stringResource(Res.string.date_safety_check_someone_knows),
-                    subtitle = stringResource(Res.string.date_safety_check_someone_knows_desc),
+                SafetyTipRow(
                     icon = Icons.Default.ContactPhone,
-                    onToggle = { checklist[1] = !checklist[1] }
+                    title = stringResource(Res.string.date_safety_check_someone_knows),
+                    desc = stringResource(Res.string.date_safety_check_someone_knows_desc)
                 )
-                ChecklistRow(
-                    checked = checklist[2],
-                    title = stringResource(Res.string.date_safety_check_battery),
-                    subtitle = stringResource(Res.string.date_safety_check_battery_desc),
+                SafetyTipRow(
                     icon = Icons.Default.PhoneAndroid,
-                    onToggle = { checklist[2] = !checklist[2] }
+                    title = stringResource(Res.string.date_safety_check_battery),
+                    desc = stringResource(Res.string.date_safety_check_battery_desc)
                 )
-                ChecklistRow(
-                    checked = checklist[3],
-                    title = stringResource(Res.string.date_safety_check_transport),
-                    subtitle = stringResource(Res.string.date_safety_check_transport_desc),
+                SafetyTipRow(
                     icon = Icons.Default.DirectionsCar,
-                    onToggle = { checklist[3] = !checklist[3] }
+                    title = stringResource(Res.string.date_safety_check_transport),
+                    desc = stringResource(Res.string.date_safety_check_transport_desc)
                 )
-                ChecklistRow(
-                    checked = checklist[4],
-                    title = stringResource(Res.string.date_safety_check_sos),
-                    subtitle = stringResource(Res.string.date_safety_check_sos_desc),
+                SafetyTipRow(
                     icon = Icons.Default.Security,
-                    onToggle = { checklist[4] = !checklist[4] }
+                    title = stringResource(Res.string.date_safety_check_sos),
+                    desc = stringResource(Res.string.date_safety_check_sos_desc)
                 )
             }
 
@@ -315,73 +241,6 @@ fun DateSafetyChecklistScreen(
 // ─────────────────────────────────────────────
 // Shared private composables
 // ─────────────────────────────────────────────
-
-@Composable
-private fun ChecklistRow(
-    checked: Boolean,
-    title: String,
-    subtitle: String,
-    icon: ImageVector,
-    onToggle: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val backgroundColor by animateColorAsState(
-        targetValue = if (checked) MaterialTheme.colorScheme.primary.copy(alpha = 0.07f)
-        else MaterialTheme.colorScheme.surface
-    )
-
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .background(backgroundColor)
-            .clickable(onClick = onToggle)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
-            modifier = Modifier
-                .size(36.dp)
-                .clip(CircleShape)
-                .background(
-                    if (checked) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
-                    else MaterialTheme.colorScheme.surfaceVariant
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                modifier = Modifier.size(20.dp),
-                tint = if (checked) MaterialTheme.colorScheme.primary
-                else MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-        Spacer(modifier = Modifier.width(12.dp))
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Medium,
-                color = if (checked) MaterialTheme.colorScheme.primary
-                else MaterialTheme.colorScheme.extended.textPrimary
-            )
-            Text(
-                text = subtitle,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-        Spacer(modifier = Modifier.width(8.dp))
-        Checkbox(
-            checked = checked,
-            onCheckedChange = { onToggle() },
-            colors = CheckboxDefaults.colors(
-                checkedColor = MaterialTheme.colorScheme.primary
-            )
-        )
-    }
-}
 
 @Composable
 private fun SafetyTipRow(

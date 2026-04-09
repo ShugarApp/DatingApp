@@ -113,6 +113,9 @@ fun NavGraphBuilder.homeGraph(
                 },
                 onDateSafetyChecklist = {
                     navController.navigate(HomeGraphRoutes.DateSafetyChecklistRoute)
+                },
+                onSafeDate = {
+                    navController.navigate(HomeGraphRoutes.SafeDateRoute)
                 }
             )
         }

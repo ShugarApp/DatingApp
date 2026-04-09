@@ -64,6 +64,7 @@ fun BottomNavigationContainer(
     onSafetyCenter: () -> Unit = {},
     onDateSafetyTips: () -> Unit = {},
     onDateSafetyChecklist: () -> Unit = {},
+    onSafeDate: () -> Unit = {},
     initialSection: BottomNavSection = BottomNavSection.FEED,
     swipedUserId: String? = null,
     swipedIsDislike: Boolean = false,
@@ -301,6 +302,7 @@ fun BottomNavigationContainer(
                         onSafetyCenter = onSafetyCenter,
                         onDateSafetyTips = onDateSafetyTips,
                         onDateSafetyChecklist = onDateSafetyChecklist,
+                        onSafeDate = onSafeDate,
                         onNavigateToProfile = onNavigateToOwnProfile,
                         showSosButton = showPanicButton,
                         onSosTrigger = { emergencyViewModel.onAction(EmergencyContactsAction.OnSosTrigger) }

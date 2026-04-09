@@ -8,4 +8,5 @@ sealed interface SettingsEvent {
     data object OnSurveyCompleted : SettingsEvent
     data object OnNavigateToEmergencyContacts : SettingsEvent
     data object OnNavigateToEmergencyTutorial : SettingsEvent
+    data object OnLocationUpdated : SettingsEvent
 }
