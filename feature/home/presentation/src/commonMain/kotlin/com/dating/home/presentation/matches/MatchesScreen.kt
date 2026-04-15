@@ -726,7 +726,8 @@ private fun EmptyMatchesState(modifier: Modifier = Modifier) {
                 text = stringResource(Res.string.matches_empty_title),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
@@ -760,7 +761,8 @@ private fun EmptyLikesState(modifier: Modifier = Modifier) {
                 text = stringResource(Res.string.likes_empty_title),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(

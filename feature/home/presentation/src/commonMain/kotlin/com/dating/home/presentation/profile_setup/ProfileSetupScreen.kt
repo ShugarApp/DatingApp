@@ -7,8 +7,11 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -21,13 +24,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
@@ -35,14 +35,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,20 +48,36 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import aura.feature.home.presentation.generated.resources.Res
-import aura.feature.home.presentation.generated.resources.cancel
-import aura.feature.home.presentation.generated.resources.profile_setup_basic_subtitle
-import aura.feature.home.presentation.generated.resources.profile_setup_basic_title
+import aura.feature.home.presentation.generated.resources.edit_profile_ideal_date
+import aura.feature.home.presentation.generated.resources.edit_profile_ideal_date_adventure
+import aura.feature.home.presentation.generated.resources.edit_profile_ideal_date_beach
+import aura.feature.home.presentation.generated.resources.edit_profile_ideal_date_cinema
+import aura.feature.home.presentation.generated.resources.edit_profile_ideal_date_coffee
+import aura.feature.home.presentation.generated.resources.edit_profile_ideal_date_concert
+import aura.feature.home.presentation.generated.resources.edit_profile_ideal_date_cooking
+import aura.feature.home.presentation.generated.resources.edit_profile_ideal_date_dinner
+import aura.feature.home.presentation.generated.resources.edit_profile_ideal_date_museum
+import aura.feature.home.presentation.generated.resources.edit_profile_ideal_date_picnic
+import aura.feature.home.presentation.generated.resources.edit_profile_ideal_date_travel
+import aura.feature.home.presentation.generated.resources.edit_profile_interested_in
+import aura.feature.home.presentation.generated.resources.edit_profile_interested_in_everyone
+import aura.feature.home.presentation.generated.resources.edit_profile_interested_in_men
+import aura.feature.home.presentation.generated.resources.edit_profile_interested_in_women
+import aura.feature.home.presentation.generated.resources.edit_profile_looking_for
+import aura.feature.home.presentation.generated.resources.edit_profile_looking_for_casual
+import aura.feature.home.presentation.generated.resources.edit_profile_looking_for_friends
+import aura.feature.home.presentation.generated.resources.edit_profile_looking_for_hookup
+import aura.feature.home.presentation.generated.resources.edit_profile_looking_for_long_term
+import aura.feature.home.presentation.generated.resources.edit_profile_looking_for_open
+import aura.feature.home.presentation.generated.resources.edit_profile_looking_for_short_term
 import aura.feature.home.presentation.generated.resources.profile_setup_bio_counter
 import aura.feature.home.presentation.generated.resources.profile_setup_bio_placeholder
 import aura.feature.home.presentation.generated.resources.profile_setup_bio_subtitle
 import aura.feature.home.presentation.generated.resources.profile_setup_bio_title
-import aura.feature.home.presentation.generated.resources.profile_setup_birthdate
-import aura.feature.home.presentation.generated.resources.profile_setup_birthdate_hint
 import aura.feature.home.presentation.generated.resources.profile_setup_company_hint
 import aura.feature.home.presentation.generated.resources.profile_setup_continue
 import aura.feature.home.presentation.generated.resources.profile_setup_drinking
@@ -72,10 +86,6 @@ import aura.feature.home.presentation.generated.resources.profile_setup_drinking
 import aura.feature.home.presentation.generated.resources.profile_setup_drinking_socially
 import aura.feature.home.presentation.generated.resources.profile_setup_education_hint
 import aura.feature.home.presentation.generated.resources.profile_setup_finish
-import aura.feature.home.presentation.generated.resources.profile_setup_gender
-import aura.feature.home.presentation.generated.resources.profile_setup_gender_female
-import aura.feature.home.presentation.generated.resources.profile_setup_gender_male
-import aura.feature.home.presentation.generated.resources.profile_setup_gender_other
 import aura.feature.home.presentation.generated.resources.profile_setup_height
 import aura.feature.home.presentation.generated.resources.profile_setup_height_add
 import aura.feature.home.presentation.generated.resources.profile_setup_height_value
@@ -85,6 +95,8 @@ import aura.feature.home.presentation.generated.resources.profile_setup_interest
 import aura.feature.home.presentation.generated.resources.profile_setup_job_hint
 import aura.feature.home.presentation.generated.resources.profile_setup_lifestyle_subtitle
 import aura.feature.home.presentation.generated.resources.profile_setup_lifestyle_title
+import aura.feature.home.presentation.generated.resources.profile_setup_preferences_subtitle
+import aura.feature.home.presentation.generated.resources.profile_setup_preferences_title
 import aura.feature.home.presentation.generated.resources.profile_setup_skip
 import aura.feature.home.presentation.generated.resources.profile_setup_smoking
 import aura.feature.home.presentation.generated.resources.profile_setup_smoking_never
@@ -98,22 +110,17 @@ import com.dating.core.designsystem.components.buttons.AppButtonStyle
 import com.dating.core.designsystem.components.buttons.ChirpButton
 import com.dating.core.designsystem.components.chips.ChirpChip
 import com.dating.core.designsystem.components.textfields.ChirpTextField
+import com.dating.core.designsystem.theme.ChirpBase200
+import com.dating.core.designsystem.theme.ChirpBase700
 import com.dating.core.designsystem.theme.extended
 import com.dating.core.presentation.util.clearFocusOnTap
 import com.dating.home.presentation.profile.edit_profile.EditProfileAction
 import com.dating.home.presentation.profile.edit_profile.EditProfileViewModel
-import kotlin.time.Clock.System.now
-import kotlin.time.Instant
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.atStartOfDayIn
-import kotlinx.datetime.number
-import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 private enum class ProfileSetupStep {
-    BIO, INTERESTS, BASIC_INFO, WORK, LIFESTYLE;
+    BIO, INTERESTS, WORK, LIFESTYLE, PREFERENCES;
 
     val index get() = ordinal
     val total get() = entries.size
@@ -121,7 +128,7 @@ private enum class ProfileSetupStep {
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun ProfileSetupScreen(
+fun ProfileSetupFastScreen(
     onComplete: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EditProfileViewModel = koinViewModel()
@@ -130,17 +137,6 @@ fun ProfileSetupScreen(
     var currentStep by remember { mutableStateOf(ProfileSetupStep.BIO) }
     var stepForward by remember { mutableStateOf(true) }
 
-    val maxBirthDateMillis = now().toEpochMilliseconds() - 18L * 365L * 24L * 3600L * 1000L
-    val datePickerState = androidx.compose.material3.rememberDatePickerState(
-        initialSelectedDateMillis = state.birthDate?.toDateMillis(),
-        selectableDates = object : SelectableDates {
-            override fun isSelectableDate(utcTimeMillis: Long) = utcTimeMillis <= maxBirthDateMillis
-        }
-    )
-    LaunchedEffect(state.birthDate) {
-        state.birthDate?.toDateMillis()?.let { datePickerState.selectedDateMillis = it }
-    }
-    var showDatePicker by remember { mutableStateOf(false) }
 
     fun goNext() {
         stepForward = true
@@ -153,6 +149,12 @@ fun ProfileSetupScreen(
         }
     }
 
+    fun goBack() {
+        stepForward = false
+        val prev = ProfileSetupStep.entries.getOrNull(currentStep.index - 1)
+        if (prev != null) currentStep = prev
+    }
+
     fun skipAll() {
         onComplete()
     }
@@ -160,15 +162,29 @@ fun ProfileSetupScreen(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            Column(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
+            ) {
                 // Progress bar + step counter
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 24.dp, vertical = 16.dp),
+                        .padding(horizontal = 8.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
+                    if (currentStep.index > 0) {
+                        IconButton(onClick = ::goBack) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.extended.textSecondary
+                            )
+                        }
+                    } else {
+                        Spacer(modifier = Modifier.size(48.dp))
+                    }
                     Text(
                         text = stringResource(
                             Res.string.profile_setup_step_of,
@@ -202,7 +218,7 @@ fun ProfileSetupScreen(
                     .padding(horizontal = 24.dp, vertical = 20.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                val isLast = currentStep == ProfileSetupStep.LIFESTYLE
+                val isLast = currentStep == ProfileSetupStep.PREFERENCES
                 ChirpButton(
                     text = if (isLast) {
                         stringResource(Res.string.profile_setup_finish)
@@ -210,7 +226,7 @@ fun ProfileSetupScreen(
                         stringResource(Res.string.profile_setup_continue)
                     },
                     onClick = ::goNext,
-                    style = AppButtonStyle.PRIMARY_PURPLE,
+                    style = AppButtonStyle.PRIMARY,
                     isLoading = state.isSavingProfile,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -250,15 +266,9 @@ fun ProfileSetupScreen(
                 when (step) {
                     ProfileSetupStep.BIO -> BioStep(state, viewModel)
                     ProfileSetupStep.INTERESTS -> InterestsStep(state, viewModel)
-                    ProfileSetupStep.BASIC_INFO -> {
-                        BasicInfoStep(
-                            state = state,
-                            viewModel = viewModel,
-                            onOpenDatePicker = { showDatePicker = true }
-                        )
-                    }
                     ProfileSetupStep.WORK -> WorkStep(state, viewModel)
                     ProfileSetupStep.LIFESTYLE -> LifestyleStep(state, viewModel)
+                    ProfileSetupStep.PREFERENCES -> PreferencesStep(state, viewModel)
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -266,26 +276,6 @@ fun ProfileSetupScreen(
         }
     }
 
-    if (showDatePicker) {
-        DatePickerDialog(
-            onDismissRequest = { showDatePicker = false },
-            confirmButton = {
-                TextButton(onClick = {
-                    datePickerState.selectedDateMillis?.let { millis ->
-                        viewModel.onAction(EditProfileAction.OnBirthDateChanged(millis.toIsoDate()))
-                    }
-                    showDatePicker = false
-                }) { Text("OK") }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDatePicker = false }) {
-                    Text(stringResource(Res.string.cancel))
-                }
-            }
-        ) {
-            DatePicker(state = datePickerState)
-        }
-    }
 }
 
 // ────────────────────────────────────────────────
@@ -395,79 +385,7 @@ private fun InterestsStep(
 }
 
 // ────────────────────────────────────────────────
-// Step 3: Basic info (gender + birthdate)
-// ────────────────────────────────────────────────
-
-@Composable
-private fun BasicInfoStep(
-    state: com.dating.home.presentation.profile.edit_profile.EditProfileState,
-    viewModel: EditProfileViewModel,
-    onOpenDatePicker: () -> Unit
-) {
-    StepHeader(
-        title = stringResource(Res.string.profile_setup_basic_title),
-        subtitle = stringResource(Res.string.profile_setup_basic_subtitle)
-    )
-    Spacer(modifier = Modifier.height(28.dp))
-
-    // Gender
-    SetupSectionLabel(stringResource(Res.string.profile_setup_gender))
-    Spacer(modifier = Modifier.height(12.dp))
-    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-        listOf(
-            "MALE" to stringResource(Res.string.profile_setup_gender_male),
-            "FEMALE" to stringResource(Res.string.profile_setup_gender_female),
-            "OTHER" to stringResource(Res.string.profile_setup_gender_other)
-        ).forEach { (value, label) ->
-            SetupChip(
-                label = label,
-                selected = state.gender == value,
-                onClick = {
-                    viewModel.onAction(
-                        EditProfileAction.OnGenderChanged(
-                            if (state.gender == value) null else value
-                        )
-                    )
-                }
-            )
-        }
-    }
-
-    Spacer(modifier = Modifier.height(28.dp))
-
-    // Birthdate
-    SetupSectionLabel(stringResource(Res.string.profile_setup_birthdate))
-    Spacer(modifier = Modifier.height(12.dp))
-    OutlinedButton(
-        onClick = onOpenDatePicker,
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp)
-    ) {
-        Icon(
-            Icons.Default.CalendarMonth,
-            contentDescription = null,
-            modifier = Modifier.size(18.dp)
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            text = state.birthDate?.toDisplayDate()
-                ?: stringResource(Res.string.profile_setup_birthdate_hint)
-        )
-    }
-
-    val birthDateError = state.birthDateError
-    if (birthDateError != null) {
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = birthDateError,
-            color = MaterialTheme.colorScheme.error,
-            style = MaterialTheme.typography.bodySmall
-        )
-    }
-}
-
-// ────────────────────────────────────────────────
-// Step 4: Work & education
+// Step 3: Work & education
 // ────────────────────────────────────────────────
 
 @Composable
@@ -501,7 +419,7 @@ private fun WorkStep(
 }
 
 // ────────────────────────────────────────────────
-// Step 5: Lifestyle
+// Step 4: Lifestyle
 // ────────────────────────────────────────────────
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -521,25 +439,30 @@ private fun LifestyleStep(
     Spacer(modifier = Modifier.height(12.dp))
     val height = state.height
     if (height == null) {
-        OutlinedButton(
+        ChirpButton(
+            text = stringResource(Res.string.profile_setup_height_add),
             onClick = { viewModel.onAction(EditProfileAction.OnHeightChanged(170)) },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp)
-        ) {
-            Text(stringResource(Res.string.profile_setup_height_add))
-        }
+            style = AppButtonStyle.SECONDARY,
+            modifier = Modifier.fillMaxWidth()
+        )
     } else {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Slider(
                 value = height.toFloat(),
                 onValueChange = { viewModel.onAction(EditProfileAction.OnHeightChanged(it.toInt())) },
                 valueRange = 100f..250f,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                colors = SliderDefaults.colors(
+                    thumbColor = MaterialTheme.colorScheme.primary,
+                    activeTrackColor = MaterialTheme.colorScheme.primary,
+                    inactiveTrackColor = if (isSystemInDarkTheme()) ChirpBase700 else ChirpBase200
+                )
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = stringResource(Res.string.profile_setup_height_value, height),
                 style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.extended.textPrimary,
                 modifier = Modifier.width(56.dp)
             )
             IconButton(onClick = { viewModel.onAction(EditProfileAction.OnHeightChanged(null)) }) {
@@ -627,6 +550,112 @@ private fun LifestyleStep(
 }
 
 // ────────────────────────────────────────────────
+// Step 5: Preferences
+// ────────────────────────────────────────────────
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun PreferencesStep(
+    state: com.dating.home.presentation.profile.edit_profile.EditProfileState,
+    viewModel: EditProfileViewModel
+) {
+    StepHeader(
+        title = stringResource(Res.string.profile_setup_preferences_title),
+        subtitle = stringResource(Res.string.profile_setup_preferences_subtitle)
+    )
+    Spacer(modifier = Modifier.height(28.dp))
+
+    // Interested In
+    SetupSectionLabel(stringResource(Res.string.edit_profile_interested_in))
+    Spacer(modifier = Modifier.height(12.dp))
+    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        listOf(
+            "MALE" to stringResource(Res.string.edit_profile_interested_in_men),
+            "FEMALE" to stringResource(Res.string.edit_profile_interested_in_women),
+            "EVERYONE" to stringResource(Res.string.edit_profile_interested_in_everyone)
+        ).forEach { (value, label) ->
+            SetupChip(
+                label = label,
+                selected = state.interestedIn == value,
+                onClick = {
+                    viewModel.onAction(
+                        EditProfileAction.OnInterestedInChanged(
+                            if (state.interestedIn == value) null else value
+                        )
+                    )
+                }
+            )
+        }
+    }
+
+    Spacer(modifier = Modifier.height(24.dp))
+
+    // Looking For
+    SetupSectionLabel(stringResource(Res.string.edit_profile_looking_for))
+    Spacer(modifier = Modifier.height(12.dp))
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        listOf(
+            "Long term" to stringResource(Res.string.edit_profile_looking_for_long_term),
+            "Short term" to stringResource(Res.string.edit_profile_looking_for_short_term),
+            "Casual dates" to stringResource(Res.string.edit_profile_looking_for_casual),
+            "Hookup" to stringResource(Res.string.edit_profile_looking_for_hookup),
+            "Friends" to stringResource(Res.string.edit_profile_looking_for_friends),
+            "Open to anything" to stringResource(Res.string.edit_profile_looking_for_open)
+        ).forEach { (value, label) ->
+            SetupChip(
+                label = label,
+                selected = state.lookingFor == value,
+                onClick = {
+                    viewModel.onAction(
+                        EditProfileAction.OnLookingForChanged(
+                            if (state.lookingFor == value) null else value
+                        )
+                    )
+                }
+            )
+        }
+    }
+
+    Spacer(modifier = Modifier.height(24.dp))
+
+    // Ideal Date
+    SetupSectionLabel(stringResource(Res.string.edit_profile_ideal_date))
+    Spacer(modifier = Modifier.height(12.dp))
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        listOf(
+            "DINNER" to stringResource(Res.string.edit_profile_ideal_date_dinner),
+            "COFFEE" to stringResource(Res.string.edit_profile_ideal_date_coffee),
+            "ADVENTURE" to stringResource(Res.string.edit_profile_ideal_date_adventure),
+            "CINEMA" to stringResource(Res.string.edit_profile_ideal_date_cinema),
+            "PICNIC" to stringResource(Res.string.edit_profile_ideal_date_picnic),
+            "TRAVEL" to stringResource(Res.string.edit_profile_ideal_date_travel),
+            "CONCERT" to stringResource(Res.string.edit_profile_ideal_date_concert),
+            "MUSEUM" to stringResource(Res.string.edit_profile_ideal_date_museum),
+            "BEACH" to stringResource(Res.string.edit_profile_ideal_date_beach),
+            "COOKING" to stringResource(Res.string.edit_profile_ideal_date_cooking)
+        ).forEach { (value, label) ->
+            SetupChip(
+                label = label,
+                selected = state.idealDate == value,
+                onClick = {
+                    viewModel.onAction(
+                        EditProfileAction.OnIdealDateChanged(
+                            if (state.idealDate == value) null else value
+                        )
+                    )
+                }
+            )
+        }
+    }
+}
+
+// ────────────────────────────────────────────────
 // Shared components
 // ────────────────────────────────────────────────
 
@@ -670,25 +699,6 @@ private fun SetupChip(label: String, selected: Boolean, onClick: () -> Unit) {
         )
     )
 }
-
-// ────────────────────────────────────────────────
-// Date helpers (mirrors EditProfileScreen)
-// ────────────────────────────────────────────────
-
-private fun String.toDateMillis(): Long? = try {
-    val date = LocalDate.parse(this)
-    date.atStartOfDayIn(TimeZone.UTC).toEpochMilliseconds()
-} catch (_: Exception) { null }
-
-private fun Long.toIsoDate(): String {
-    val date = Instant.fromEpochMilliseconds(this).toLocalDateTime(TimeZone.UTC).date
-    return "${date.year}-${date.month.number.toString().padStart(2, '0')}-${date.day.toString().padStart(2, '0')}"
-}
-
-private fun String.toDisplayDate(): String = try {
-    val date = LocalDate.parse(this)
-    "${date.day} ${date.month.name.lowercase().replaceFirstChar { it.uppercase() }.take(3)} ${date.year}"
-} catch (_: Exception) { this }
 
 private fun interestDisplayName(key: String): String = when (key) {
     "photography" -> "Photography"

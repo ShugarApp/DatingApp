@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -73,22 +72,18 @@ import androidx.compose.ui.window.DialogProperties
 import com.dating.home.domain.models.DateProposalLocation
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
-import kotlinx.coroutines.launch
 import platform.CoreLocation.CLGeocoder
 import platform.CoreLocation.CLLocation
 import platform.CoreLocation.CLLocationCoordinate2DMake
 import platform.CoreLocation.CLLocationManager
 import platform.CoreLocation.kCLLocationAccuracyBest
-import platform.Foundation.NSError
 import platform.MapKit.MKCoordinateRegionMakeWithDistance
 import platform.MapKit.MKLocalSearch
 import platform.MapKit.MKLocalSearchRequest
+import platform.MapKit.MKMapItem
 import platform.MapKit.MKMapView
 import platform.MapKit.MKPointAnnotation
 import platform.UIKit.UIGestureRecognizer
-import platform.UIKit.UIGestureRecognizerStateBegan
-import platform.UIKit.UIGestureRecognizerStateEnded
-import platform.UIKit.UILongPressGestureRecognizer
 import platform.UIKit.UITapGestureRecognizer
 import platform.darwin.NSObject
 
@@ -110,6 +105,7 @@ private class MapTapHandler : NSObject() {
     var onTap: ((Double, Double) -> Unit)? = null
 
     @Suppress("unused")
+    @OptIn(ExperimentalForeignApi::class)
     fun handleTap(sender: UIGestureRecognizer) {
         val mapView = sender.view as? MKMapView ?: return
         val point = sender.locationInView(mapView)
@@ -196,13 +192,13 @@ actual fun PlatformLocationPicker(
         }
         val search = MKLocalSearch(request)
         search.startWithCompletionHandler { response, _ ->
-            searchResults = response?.mapItems?.mapNotNull { item ->
-                val coord = item.placemark.coordinate
+            searchResults = response?.mapItems?.filterIsInstance<MKMapItem>()?.mapNotNull { item ->
+                val (lat, lng) = item.placemark.coordinate.useContents { latitude to longitude }
                 DateProposalLocation(
                     name = item.name ?: return@mapNotNull null,
                     address = listOfNotNull(item.placemark.thoroughfare, item.placemark.locality).joinToString(", "),
-                    latitude = coord.useContents { latitude },
-                    longitude = coord.useContents { longitude }
+                    latitude = lat,
+                    longitude = lng
                 )
             } ?: emptyList()
             isSearchLoading = false
@@ -220,13 +216,13 @@ actual fun PlatformLocationPicker(
         request.setRegion(MKCoordinateRegionMakeWithDistance(coord, 1500.0, 1500.0))
         val search = MKLocalSearch(request)
         search.startWithCompletionHandler { response, _ ->
-            nearbyPlaces = response?.mapItems?.take(10)?.mapNotNull { item ->
-                val c = item.placemark.coordinate
+            nearbyPlaces = response?.mapItems?.filterIsInstance<MKMapItem>()?.take(10)?.mapNotNull { item ->
+                val (lat, lng) = item.placemark.coordinate.useContents { latitude to longitude }
                 DateProposalLocation(
                     name = item.name ?: return@mapNotNull null,
                     address = listOfNotNull(item.placemark.thoroughfare, item.placemark.locality).joinToString(", "),
-                    latitude = c.useContents { latitude },
-                    longitude = c.useContents { longitude }
+                    latitude = lat,
+                    longitude = lng
                 )
             } ?: emptyList()
             isLoadingNearby = false

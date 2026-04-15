@@ -12,6 +12,7 @@ import androidx.compose.ui.interop.UIKitView
 import com.dating.home.domain.models.DateProposalLocation
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
+import kotlinx.cinterop.ObjCSignatureOverride
 import platform.CoreLocation.CLGeocoder
 import platform.CoreLocation.CLLocation
 import platform.CoreLocation.CLLocationCoordinate2DMake
@@ -28,12 +29,14 @@ private class MapRegionDelegate : NSObject(), MKMapViewDelegateProtocol {
     var onRegionWillChange: (() -> Unit)? = null
     var onRegionDidChange: ((Double, Double) -> Unit)? = null
 
+    @ObjCSignatureOverride
     override fun mapView(mapView: MKMapView, regionWillChangeAnimated: Boolean) {
         onRegionWillChange?.invoke()
     }
 
+    @ObjCSignatureOverride
     override fun mapView(mapView: MKMapView, regionDidChangeAnimated: Boolean) {
-        mapView.region.center.useContents { onRegionDidChange?.invoke(latitude, longitude) }
+        mapView.region.useContents { onRegionDidChange?.invoke(center.latitude, center.longitude) }
     }
 }
 
@@ -103,7 +106,7 @@ actual fun PlatformLocationMap(
         onLocationChanged(
             DateProposalLocation(
                 name = "Selected location",
-                address = "%.5f, %.5f".format(lat, lng),
+                address = "$lat, $lng",
                 latitude = lat,
                 longitude = lng
             )
@@ -121,7 +124,7 @@ actual fun PlatformLocationMap(
                     placemark.locality,
                     placemark.administrativeArea
                 )
-                val address = addressParts.joinToString(", ").ifBlank { "%.5f, %.5f".format(lat, lng) }
+                val address = addressParts.joinToString(", ").ifBlank { "$lat, $lng" }
                 onLocationChanged(
                     DateProposalLocation(
                         name = name,

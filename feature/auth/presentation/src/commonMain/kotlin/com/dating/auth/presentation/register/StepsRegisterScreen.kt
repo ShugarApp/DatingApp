@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -37,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -146,7 +146,6 @@ fun StepsRegisterScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .imePadding()
         ) {
             AnimatedContent(
                 targetState = state.currentStep,
@@ -252,6 +251,8 @@ private fun BasicInfoStep(
             supportingText = state.usernameError?.asString()
                 ?: stringResource(Res.string.name_appearance_disclaimer),
             isError = state.usernameError != null,
+            singleLine = true,
+            imeAction = ImeAction.Done,
             focusRequester = focusRequester,
             onFocusChanged = { onAction(StepsRegisterAction.OnInputTextFocusGain) },
             modifier = Modifier.fillMaxWidth()
@@ -285,6 +286,8 @@ private fun BirthDateStep(
             title = stringResource(Res.string.birth_date),
             inputTransformation = DateInputTransformation,
             keyboardType = KeyboardType.Number,
+            imeAction = ImeAction.Done,
+            singleLine = true,
             supportingText = state.birthDateError?.asString(),
             isError = state.birthDateError != null,
             focusRequester = focusRequester,

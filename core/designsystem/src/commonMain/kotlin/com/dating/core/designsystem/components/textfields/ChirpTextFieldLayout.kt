@@ -2,6 +2,7 @@ package com.dating.core.designsystem.components.textfields
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Column
@@ -18,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.dating.core.designsystem.theme.ChirpBase0
 import com.dating.core.designsystem.theme.extended
 
 @Composable
@@ -39,28 +41,29 @@ fun ChirpTextFieldLayout(
         onFocusChanged(isFocused)
     }
 
+    val isDark = isSystemInDarkTheme()
+    val shape = RoundedCornerShape(14.dp)
+
     val textFieldStyleModifier = Modifier
         .fillMaxWidth()
         .background(
             color = when {
-                isFocused -> MaterialTheme.colorScheme.primary.copy(
-                    alpha = 0.05f
-                )
-                enabled -> MaterialTheme.colorScheme.surface
-                else -> MaterialTheme.colorScheme.extended.secondaryFill
+                isFocused -> if (isDark) MaterialTheme.colorScheme.primary.copy(alpha = 0.10f) else ChirpBase0
+                enabled -> if (isDark) MaterialTheme.colorScheme.surface else ChirpBase0
+                else -> if (isDark) MaterialTheme.colorScheme.extended.secondaryFill else ChirpBase0
             },
-            shape = RoundedCornerShape(8.dp)
+            shape = shape
         )
         .border(
-            width = 1.dp,
+            width = 1.5.dp,
             color = when {
                 isError -> MaterialTheme.colorScheme.error
                 isFocused -> MaterialTheme.colorScheme.primary
-                else -> MaterialTheme.colorScheme.outline
+                else -> MaterialTheme.colorScheme.outlineVariant
             },
-            shape = RoundedCornerShape(8.dp)
+            shape = shape
         )
-        .padding(12.dp)
+        .padding(horizontal = 16.dp, vertical = 14.dp)
 
     Column(
         modifier = modifier
@@ -69,7 +72,8 @@ fun ChirpTextFieldLayout(
             Text(
                 text = title,
                 style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.extended.textSecondary
+                color = if (isFocused) MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.extended.textSecondary
             )
             Spacer(modifier = Modifier.height(8.dp))
         }

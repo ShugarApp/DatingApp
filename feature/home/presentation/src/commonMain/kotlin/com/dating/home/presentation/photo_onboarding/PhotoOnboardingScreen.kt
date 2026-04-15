@@ -11,12 +11,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import com.dating.core.designsystem.components.buttons.ChirpButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -136,28 +136,16 @@ fun PhotoOnboardingScreen(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            Button(
+            ChirpButton(
+                text = stringResource(Res.string.photo_onboarding_continue),
                 onClick = { viewModel.onComplete() },
                 enabled = state.hasMinimumPhotos && !state.isCompleting,
+                isLoading = state.isCompleting,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 32.dp)
                     .height(52.dp)
-            ) {
-                if (state.isCompleting) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
-                        strokeWidth = 2.dp,
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-                } else {
-                    Text(
-                        text = stringResource(Res.string.photo_onboarding_continue),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
-            }
+            )
         }
     }
 }

@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.dating.core.designsystem.theme.AppTheme
@@ -38,6 +39,7 @@ fun ChirpTextField(
     enabled: Boolean = true,
     inputTransformation: InputTransformation? = null,
     keyboardType: KeyboardType = KeyboardType.Text,
+    imeAction: ImeAction = ImeAction.Default,
     onFocusChanged: (Boolean) -> Unit = {},
     focusRequester: FocusRequester? = null,
 ) {
@@ -69,7 +71,8 @@ fun ChirpTextField(
                 }
             ),
             keyboardOptions = KeyboardOptions(
-                keyboardType = keyboardType
+                keyboardType = keyboardType,
+                imeAction = imeAction
             ),
             cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
             interactionSource = interactionSource,

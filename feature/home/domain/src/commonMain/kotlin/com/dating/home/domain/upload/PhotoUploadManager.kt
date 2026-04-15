@@ -42,17 +42,22 @@ class PhotoUploadManager(
         appScope.launch {
             // Process sequentially so lower indices are confirmed before higher ones
             for (request in sorted) {
-                userService.uploadPhoto(
-                    imageBytes = request.bytes,
-                    mimeType = request.mimeType,
-                    index = request.slotIndex
-                ).onSuccess { publicUrl ->
-                    updateSessionPhoto(request.slotIndex, publicUrl)
-                    _events.emit(PhotoUploadEvent.Success(request.slotIndex, publicUrl))
-                }.onFailure {
+                try {
+                    userService.uploadPhoto(
+                        imageBytes = request.bytes,
+                        mimeType = request.mimeType,
+                        index = request.slotIndex
+                    ).onSuccess { publicUrl ->
+                        updateSessionPhoto(request.slotIndex, publicUrl)
+                        _events.emit(PhotoUploadEvent.Success(request.slotIndex, publicUrl))
+                    }.onFailure {
+                        _events.emit(PhotoUploadEvent.Failed(request.slotIndex))
+                    }
+                } catch (e: Exception) {
                     _events.emit(PhotoUploadEvent.Failed(request.slotIndex))
+                } finally {
+                    _pendingSlots.update { it - request.slotIndex }
                 }
-                _pendingSlots.update { it - request.slotIndex }
             }
         }
     }

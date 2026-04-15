@@ -67,6 +67,8 @@
     <!-- Onboarding -->
     <string name="onboarding_body">Find your perfect match today.</string>
     <string name="onboarding_terms">By continuing, you agree to our Terms of Service and Privacy Policy.</string>
+    <string name="onboarding_or">or</string>
+    <string name="continue_with_google">Continue with Google</string>
 
     <!-- Registration - Step 1 (Username) -->
     <string name="what_is_your_name">¿Cómo te llamas?</string>

@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import aura.core.designsystem.generated.resources.Res
@@ -45,6 +46,7 @@ fun ChirpPasswordTextField(
     supportingText: String? = null,
     isError: Boolean = false,
     enabled: Boolean = true,
+    imeAction: ImeAction = ImeAction.Done,
     onFocusChanged: (Boolean) -> Unit = {},
 ) {
     ChirpTextFieldLayout(
@@ -63,7 +65,8 @@ fun ChirpPasswordTextField(
                 TextObfuscationMode.Visible
             } else TextObfuscationMode.Hidden,
             keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password
+                keyboardType = KeyboardType.Password,
+                imeAction = imeAction
             ),
             textStyle = MaterialTheme.typography.bodyMedium.copy(
                 color = if(enabled) {

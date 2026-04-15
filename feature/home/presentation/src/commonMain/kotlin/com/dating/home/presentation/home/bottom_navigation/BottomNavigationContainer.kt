@@ -46,7 +46,7 @@ import com.dating.home.presentation.matches.MatchesRoot
 import com.dating.home.presentation.matches.MatchesViewModel
 import com.dating.home.presentation.photo_onboarding.PhotoOnboardingScreen
 import com.dating.home.presentation.profile.profile.ProfileScreen
-import com.dating.home.presentation.profile_setup.ProfileSetupScreen
+import com.dating.home.presentation.profile_setup.ProfileSetupFastScreen
 import kotlinx.coroutines.flow.collectLatest
 import org.jetbrains.compose.resources.getString
 import org.koin.compose.koinInject
@@ -236,7 +236,7 @@ fun BottomNavigationContainer(
 
     // Show profile setup wizard on the next app launch (not in the same session as features onboarding)
     if (hasSeenProfileSetup == false && !justCompletedFeaturesOnboarding) {
-        ProfileSetupScreen(
+        ProfileSetupFastScreen(
             onComplete = { hasSeenProfileSetup = true },
             modifier = modifier
         )

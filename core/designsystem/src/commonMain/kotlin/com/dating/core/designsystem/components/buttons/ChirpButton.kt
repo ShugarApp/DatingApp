@@ -1,6 +1,7 @@
 package com.dating.core.designsystem.components.buttons
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -19,6 +20,11 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.dating.core.designsystem.theme.AppTheme
+import com.dating.core.designsystem.theme.ChirpBase100
+import com.dating.core.designsystem.theme.ChirpBase400
+import com.dating.core.designsystem.theme.ChirpBase500
+import com.dating.core.designsystem.theme.ChirpBase700
+import com.dating.core.designsystem.theme.ChirpBase800
 import com.dating.core.designsystem.theme.extended
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -41,57 +47,62 @@ fun ChirpButton(
     isLoading: Boolean = false,
     leadingIcon: @Composable (() -> Unit)? = null
 ) {
+    val isDark = isSystemInDarkTheme()
+    val disabledContainer = if (isDark) ChirpBase800 else ChirpBase100
+    val disabledContent = if (isDark) ChirpBase500 else ChirpBase400
+
     val colors = when (style) {
         AppButtonStyle.PRIMARY -> ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.extended.textTertiary,
-            disabledContainerColor = MaterialTheme.colorScheme.extended.disabledFill,
-            disabledContentColor = MaterialTheme.colorScheme.extended.textDisabled
+            disabledContainerColor = disabledContainer,
+            disabledContentColor = disabledContent
         )
 
         AppButtonStyle.PRIMARY_PURPLE -> ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.extended.textPrimary,
-            disabledContainerColor = MaterialTheme.colorScheme.extended.disabledFill,
-            disabledContentColor = MaterialTheme.colorScheme.extended.textDisabled
+            disabledContainerColor = disabledContainer,
+            disabledContentColor = disabledContent
         )
 
         AppButtonStyle.DESTRUCTIVE_PRIMARY -> ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.error,
             contentColor = MaterialTheme.colorScheme.onError,
-            disabledContainerColor = MaterialTheme.colorScheme.extended.disabledFill,
-            disabledContentColor = MaterialTheme.colorScheme.extended.textDisabled
+            disabledContainerColor = disabledContainer,
+            disabledContentColor = disabledContent
         )
 
         AppButtonStyle.SECONDARY -> ButtonDefaults.buttonColors(
             containerColor = Color.Transparent,
             contentColor = MaterialTheme.colorScheme.extended.textSecondary,
             disabledContainerColor = Color.Transparent,
-            disabledContentColor = MaterialTheme.colorScheme.extended.textDisabled
+            disabledContentColor = disabledContent
         )
 
         AppButtonStyle.DESTRUCTIVE_SECONDARY -> ButtonDefaults.buttonColors(
             containerColor = Color.Transparent,
             contentColor = MaterialTheme.colorScheme.error,
             disabledContainerColor = Color.Transparent,
-            disabledContentColor = MaterialTheme.colorScheme.extended.textDisabled
+            disabledContentColor = disabledContent
         )
 
         AppButtonStyle.TEXT -> ButtonDefaults.buttonColors(
             containerColor = Color.Transparent,
             contentColor = MaterialTheme.colorScheme.tertiary,
             disabledContainerColor = Color.Transparent,
-            disabledContentColor = MaterialTheme.colorScheme.extended.textDisabled
+            disabledContentColor = disabledContent
         )
     }
 
+    val secondaryBorderColor = if (isDark) ChirpBase700 else MaterialTheme.colorScheme.extended.disabledOutline
     val defaultBorderStroke = BorderStroke(
         width = 1.dp,
         color = MaterialTheme.colorScheme.extended.disabledOutline
     )
     val border = when {
         style == AppButtonStyle.PRIMARY && !enabled -> defaultBorderStroke
-        style == AppButtonStyle.SECONDARY -> defaultBorderStroke
+        style == AppButtonStyle.SECONDARY -> BorderStroke(width = 1.dp, color = secondaryBorderColor)
         style == AppButtonStyle.DESTRUCTIVE_PRIMARY && !enabled -> defaultBorderStroke
         style == AppButtonStyle.DESTRUCTIVE_SECONDARY -> {
             val borderColor = if (enabled) {

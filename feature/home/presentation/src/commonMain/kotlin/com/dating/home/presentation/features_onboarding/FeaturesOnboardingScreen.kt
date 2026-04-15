@@ -205,7 +205,7 @@ fun FeaturesOnboardingScreen(
                         }
                     }
                 },
-                style = AppButtonStyle.PRIMARY_PURPLE,
+                style = AppButtonStyle.PRIMARY,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp)

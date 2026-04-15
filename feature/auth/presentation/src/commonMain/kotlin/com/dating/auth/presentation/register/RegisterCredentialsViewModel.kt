@@ -40,7 +40,7 @@ class RegisterCredentialsViewModel : ViewModel() {
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000L),
-            initialValue = RegisterCredentialsState()
+            initialValue = _state.value
         )
 
     private val isEmailValidFlow = snapshotFlow { state.value.emailTextState.text.toString() }

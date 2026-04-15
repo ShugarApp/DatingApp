@@ -371,6 +371,8 @@
 
     <string name="profile_setup_lifestyle_title">Your lifestyle</string>
     <string name="profile_setup_lifestyle_subtitle">Help others get to know you better.</string>
+    <string name="profile_setup_preferences_title">Your preferences</string>
+    <string name="profile_setup_preferences_subtitle">Let us know who you are looking for and what you have in mind.</string>
     <string name="profile_setup_height">Height</string>
     <string name="profile_setup_height_value">%1$d cm</string>
     <string name="profile_setup_height_add">Add height</string>

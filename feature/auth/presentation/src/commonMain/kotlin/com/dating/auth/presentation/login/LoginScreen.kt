@@ -8,9 +8,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -18,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -112,7 +114,7 @@ fun LoginScreen(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
                 .padding(horizontal = 24.dp)
-                .imePadding(),
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(32.dp))
@@ -134,6 +136,7 @@ fun LoginScreen(
                 state = state.emailTextFieldState,
                 placeholder = stringResource(Res.string.email_placeholder),
                 keyboardType = KeyboardType.Email,
+                imeAction = ImeAction.Next,
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.background),
                 title = stringResource(Res.string.email)
@@ -148,6 +151,7 @@ fun LoginScreen(
                 onToggleVisibilityClick = {
                     onAction(LoginAction.OnTogglePasswordVisibility)
                 },
+                imeAction = ImeAction.Done,
                 title = stringResource(Res.string.password),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -176,7 +180,7 @@ fun LoginScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.height(32.dp))
 
             ChirpButton(
                 text = stringResource(Res.string.login),

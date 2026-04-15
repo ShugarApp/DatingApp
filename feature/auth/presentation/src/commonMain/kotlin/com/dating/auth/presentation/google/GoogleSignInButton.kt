@@ -2,6 +2,7 @@ package com.dating.auth.presentation.google
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -10,8 +11,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.unit.dp
+import aura.feature.auth.presentation.generated.resources.Res
+import aura.feature.auth.presentation.generated.resources.continue_with_google
 import com.dating.core.designsystem.components.buttons.AppButtonStyle
 import com.dating.core.designsystem.components.buttons.ChirpButton
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun GoogleSignInButton(
@@ -21,7 +25,7 @@ fun GoogleSignInButton(
     isLoading: Boolean = false
 ) {
     ChirpButton(
-        text = "Continuar con Google",
+        text = stringResource(Res.string.continue_with_google),
         onClick = onClick,
         modifier = modifier,
         style = AppButtonStyle.SECONDARY,
@@ -35,12 +39,13 @@ fun GoogleSignInButton(
 
 @Composable
 private fun GoogleIcon(modifier: Modifier = Modifier) {
+    val surfaceColor = MaterialTheme.colorScheme.surface
     Canvas(modifier = modifier) {
-        drawGoogleG()
+        drawGoogleG(surfaceColor)
     }
 }
 
-private fun DrawScope.drawGoogleG() {
+private fun DrawScope.drawGoogleG(surfaceColor: Color) {
     val w = size.width
     val h = size.height
 
@@ -66,8 +71,8 @@ private fun DrawScope.drawGoogleG() {
     // Red arc: top (225 to 315 = -45)
     drawArc(color = red, startAngle = 225f, sweepAngle = 90f, useCenter = true, topLeft = arcTopLeft, size = arcSize)
 
-    // White center to make the ring
-    drawCircle(color = Color.White, radius = innerR, center = Offset(cx, cy))
+    // Center hole to make the ring
+    drawCircle(color = surfaceColor, radius = innerR, center = Offset(cx, cy))
 
     // Blue horizontal bar (right half of the G)
     val barH = outerR * 0.36f
@@ -85,5 +90,5 @@ private fun DrawScope.drawGoogleG() {
         lineTo(cx, cy - barH / 2f)
         close()
     }
-    drawPath(cutout, color = Color.White)
+    drawPath(cutout, color = surfaceColor)
 }

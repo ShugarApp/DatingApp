@@ -8,8 +8,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
@@ -19,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -102,7 +104,7 @@ fun RegisterScreen(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
                 .padding(horizontal = 24.dp)
-                .imePadding(),
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
@@ -127,10 +129,12 @@ fun RegisterScreen(
                 title = stringResource(Res.string.email),
                 supportingText = state.emailError?.asString(),
                 isError = state.emailError != null,
+                singleLine = true,
+                keyboardType = KeyboardType.Email,
+                imeAction = ImeAction.Next,
                 onFocusChanged = {
                     onAction(RegisterCredentialsAction.OnInputTextFocusGain)
                 },
-                keyboardType = KeyboardType.Email,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -142,6 +146,7 @@ fun RegisterScreen(
                 title = stringResource(Res.string.password),
                 supportingText = state.passwordError?.asString() ?: stringResource(Res.string.password_hint),
                 isError = state.passwordError != null,
+                imeAction = ImeAction.Done,
                 onFocusChanged = {
                     onAction(RegisterCredentialsAction.OnInputTextFocusGain)
                 },
@@ -152,7 +157,7 @@ fun RegisterScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.height(32.dp))
 
             ChirpButton(
                 text = stringResource(Res.string.next),
