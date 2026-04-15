@@ -3,14 +3,20 @@ package com.dating.home.presentation.home.swipe
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dating.core.domain.auth.SessionStorage
+import com.dating.core.domain.auth.VerificationStatus
 import com.dating.core.domain.auth.profileCompletion
 import com.dating.core.domain.discovery.DiscoveryPreferencesStorage
+import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import com.dating.core.domain.discovery.Gender
 import com.dating.core.domain.util.onFailure
 import com.dating.core.domain.util.onSuccess
 import com.dating.home.domain.matching.MatchingService
 import com.dating.home.domain.matching.SwipeAction
 import com.dating.home.domain.user.UserService
+import kotlin.time.Clock.System.now
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -250,8 +256,11 @@ class FeedViewModel(
                                 userId = user.id,
                                 username = user.username,
                                 profilePictureUrl = user.profilePictureUrl,
+                                photoUrls = user.photos,
                                 city = user.city,
-                                country = user.country
+                                country = user.country,
+                                age = calculateAge(user.birthDate),
+                                isVerified = user.verificationStatus == VerificationStatus.VERIFIED
                             )
                         }
                     _state.update {
@@ -335,5 +344,21 @@ class FeedViewModel(
     companion object {
         private const val PAGE_SIZE = 20
         private const val PREFETCH_THRESHOLD = 5
+    }
+}
+
+private fun calculateAge(birthDate: String?): Int? {
+    if (birthDate == null) return null
+    return try {
+        val birth = LocalDate.parse(birthDate.substring(0, 10))
+        val today = now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+        var age = today.year - birth.year
+        if (today.monthNumber < birth.monthNumber ||
+            (today.monthNumber == birth.monthNumber && today.dayOfMonth < birth.dayOfMonth)) {
+            age--
+        }
+        age
+    } catch (e: Exception) {
+        null
     }
 }

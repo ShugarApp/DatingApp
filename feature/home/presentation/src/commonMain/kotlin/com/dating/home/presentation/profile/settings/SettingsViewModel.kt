@@ -6,6 +6,7 @@ import com.dating.core.domain.auth.AuthService
 import com.dating.core.domain.auth.SessionStorage
 import com.dating.core.domain.discovery.DiscoveryPreferencesStorage
 import com.dating.core.domain.location.LocationProvider
+import com.dating.core.domain.preferences.OnboardingPreferences
 import com.dating.core.domain.preferences.ThemePreferences
 import com.dating.core.domain.util.Result
 import com.dating.core.domain.util.onFailure
@@ -30,7 +31,8 @@ class SettingsViewModel(
     private val discoveryPreferences: DiscoveryPreferencesStorage,
     private val locationProvider: LocationProvider,
     private val themePreferences: ThemePreferences,
-    private val emergencySettingsStorage: EmergencySettingsStorage
+    private val emergencySettingsStorage: EmergencySettingsStorage,
+    private val onboardingPreferences: OnboardingPreferences
 ) : ViewModel() {
 
     private val _events = Channel<SettingsEvent>()
@@ -140,7 +142,7 @@ class SettingsViewModel(
             }
             authService.logout(refreshToken)
                 .onSuccess {
-                    sessionStorage.set(null)
+                    clearLocalStorage()
                     _events.send(SettingsEvent.OnLogoutSuccess)
                 }
                 .onFailure { error ->
@@ -211,12 +213,19 @@ class SettingsViewModel(
             userService.deleteAccount(reason = reason)
                 .onSuccess {
                     _state.update { it.copy(isLoading = false) }
-                    sessionStorage.set(null)
+                    clearLocalStorage()
                     _events.send(SettingsEvent.OnDeleteAccountSuccess)
                 }
                 .onFailure { error ->
                     _state.update { it.copy(isLoading = false, errorMessage = error.toUiText()) }
                 }
         }
+    }
+
+    private suspend fun clearLocalStorage() {
+        sessionStorage.set(null)
+        discoveryPreferences.clear()
+        emergencySettingsStorage.clear()
+        onboardingPreferences.clear()
     }
 }

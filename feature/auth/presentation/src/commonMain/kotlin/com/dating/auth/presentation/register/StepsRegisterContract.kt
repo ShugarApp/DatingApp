@@ -28,6 +28,7 @@ data class StepsRegisterState(
     val currentStep: RegisterStep = RegisterStep.BasicInfo,
 
     // General
+    val registeredEmail: String = "",
     val registrationError: UiText? = null,
     val isRegistering: Boolean = false,
     val canRegister: Boolean = false,
@@ -39,6 +40,7 @@ sealed interface StepsRegisterAction {
     data object OnRegisterClick : StepsRegisterAction
     data object OnNextClick : StepsRegisterAction
     data object OnBackClick : StepsRegisterAction
+    data object OnContinueClick : StepsRegisterAction
     data class OnGenderSelect(val gender: String) : StepsRegisterAction
     data class OnInterestSelect(val interest: String) : StepsRegisterAction
     data class OnLookingForSelect(val lookingFor: String) : StepsRegisterAction

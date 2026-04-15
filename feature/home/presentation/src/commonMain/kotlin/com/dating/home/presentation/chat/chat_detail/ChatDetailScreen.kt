@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -523,53 +524,64 @@ fun ChatDetailScreen(
                                 modifier = Modifier.fillMaxWidth()
                             )
                         }
-                        MessageList(
-                            messages = state.messages,
-                            messageWithOpenMenu = state.messageWithOpenMenu,
-                            listState = messageListState,
-                            isPaginationLoading = state.isPaginationLoading,
-                            paginationError = state.paginationError?.asString(),
-                            highlightText = if (state.isSearchMode) state.messageSearchQuery else null,
-                            onMessageLongClick = { message ->
-                                onAction(ChatDetailAction.OnMessageLongClick(message))
-                            },
-                            onMessageRetryClick = { message ->
-                                onAction(ChatDetailAction.OnRetryClick(message))
-                            },
-                            onDismissMessageMenu = {
-                                onAction(ChatDetailAction.OnDismissMessageMenu)
-                            },
-                            onDeleteMessageClick = { message ->
-                                onAction(ChatDetailAction.OnDeleteMessageClick(message))
-                            },
-                            onRetryPaginationClick = {
-                                onAction(ChatDetailAction.OnRetryPaginationClick)
-                            },
-                            onCopyClick = { content ->
-                                onAction(ChatDetailAction.OnCopyMessage(content))
-                            },
-                            onReactionTapped = { messageId, emoji ->
-                                onAction(ChatDetailAction.OnReactToMessage(messageId, emoji))
-                            },
-                            onDoubleTapReact = { messageId ->
-                                onAction(ChatDetailAction.OnReactToMessage(messageId, "❤️"))
-                            },
-                            onAcceptProposal = { messageId ->
-                                onAction(ChatDetailAction.OnAcceptProposal(messageId))
-                            },
-                            onRejectProposal = { messageId ->
-                                onAction(ChatDetailAction.OnRejectProposal(messageId))
-                            },
-                            onCancelProposal = { messageId ->
-                                onAction(ChatDetailAction.OnCancelProposal(messageId))
-                            },
-                            onEditProposal = { messageId, dateTime, location: DateProposalLocation ->
-                                onAction(ChatDetailAction.OnEditProposal(messageId, dateTime, location))
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(1f)
-                        )
+                        if (state.isLoading && state.messages.isEmpty()) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(1f),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator()
+                            }
+                        } else {
+                            MessageList(
+                                messages = state.messages,
+                                messageWithOpenMenu = state.messageWithOpenMenu,
+                                listState = messageListState,
+                                isPaginationLoading = state.isPaginationLoading,
+                                paginationError = state.paginationError?.asString(),
+                                highlightText = if (state.isSearchMode) state.messageSearchQuery else null,
+                                onMessageLongClick = { message ->
+                                    onAction(ChatDetailAction.OnMessageLongClick(message))
+                                },
+                                onMessageRetryClick = { message ->
+                                    onAction(ChatDetailAction.OnRetryClick(message))
+                                },
+                                onDismissMessageMenu = {
+                                    onAction(ChatDetailAction.OnDismissMessageMenu)
+                                },
+                                onDeleteMessageClick = { message ->
+                                    onAction(ChatDetailAction.OnDeleteMessageClick(message))
+                                },
+                                onRetryPaginationClick = {
+                                    onAction(ChatDetailAction.OnRetryPaginationClick)
+                                },
+                                onCopyClick = { content ->
+                                    onAction(ChatDetailAction.OnCopyMessage(content))
+                                },
+                                onReactionTapped = { messageId, emoji ->
+                                    onAction(ChatDetailAction.OnReactToMessage(messageId, emoji))
+                                },
+                                onDoubleTapReact = { messageId ->
+                                    onAction(ChatDetailAction.OnReactToMessage(messageId, "❤️"))
+                                },
+                                onAcceptProposal = { messageId ->
+                                    onAction(ChatDetailAction.OnAcceptProposal(messageId))
+                                },
+                                onRejectProposal = { messageId ->
+                                    onAction(ChatDetailAction.OnRejectProposal(messageId))
+                                },
+                                onCancelProposal = { messageId ->
+                                    onAction(ChatDetailAction.OnCancelProposal(messageId))
+                                },
+                                onEditProposal = { messageId, dateTime, location: DateProposalLocation ->
+                                    onAction(ChatDetailAction.OnEditProposal(messageId, dateTime, location))
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(1f)
+                            )
+                        }
 
                         TypingIndicator(
                             typingUsernames = state.typingUsernames,

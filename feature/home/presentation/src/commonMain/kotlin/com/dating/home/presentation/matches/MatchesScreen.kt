@@ -334,7 +334,7 @@ private fun MatchPhotoCard(
                 Spacer(modifier = Modifier.width(8.dp))
                 Box(
                     modifier = Modifier
-                        .size(38.dp)
+                        .size(44.dp)
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.primary)
                         .clickable(enabled = !isChatLoading, onClick = onStartChat),
@@ -342,7 +342,7 @@ private fun MatchPhotoCard(
                 ) {
                     if (isChatLoading) {
                         CircularProgressIndicator(
-                            modifier = Modifier.size(18.dp),
+                            modifier = Modifier.size(20.dp),
                             strokeWidth = 2.dp,
                             color = Color.White
                         )
@@ -350,7 +350,7 @@ private fun MatchPhotoCard(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Send,
                             contentDescription = null,
-                            modifier = Modifier.size(18.dp),
+                            modifier = Modifier.size(20.dp),
                             tint = Color.White
                         )
                     }

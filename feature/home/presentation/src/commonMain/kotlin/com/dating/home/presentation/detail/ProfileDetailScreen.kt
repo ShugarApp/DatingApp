@@ -32,7 +32,6 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.HeartBroken
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocalBar
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
@@ -239,7 +238,7 @@ fun ProfileDetailScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Info,
+                            imageVector = Icons.Default.Person,
                             contentDescription = null,
                             modifier = Modifier.size(64.dp),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
@@ -370,12 +369,12 @@ private fun ProfileDetailContent(
         "REGULARLY" to stringResource(Res.string.edit_profile_drinking_regularly)
     )
     val lookingForLabels = mapOf(
-        "LONG_TERM" to stringResource(Res.string.edit_profile_looking_for_long_term),
-        "SHORT_TERM" to stringResource(Res.string.edit_profile_looking_for_short_term),
-        "CASUAL_DATES" to stringResource(Res.string.edit_profile_looking_for_casual),
-        "HOOKUP" to stringResource(Res.string.edit_profile_looking_for_hookup),
-        "FRIENDS" to stringResource(Res.string.edit_profile_looking_for_friends),
-        "OPEN_TO_ANYTHING" to stringResource(Res.string.edit_profile_looking_for_open)
+        "Long term" to stringResource(Res.string.edit_profile_looking_for_long_term),
+        "Short term" to stringResource(Res.string.edit_profile_looking_for_short_term),
+        "Casual dates" to stringResource(Res.string.edit_profile_looking_for_casual),
+        "Hookup" to stringResource(Res.string.edit_profile_looking_for_hookup),
+        "Friends" to stringResource(Res.string.edit_profile_looking_for_friends),
+        "Open to anything" to stringResource(Res.string.edit_profile_looking_for_open)
     )
     val idealDateLabels = mapOf(
         "DINNER" to stringResource(Res.string.edit_profile_ideal_date_dinner),
@@ -422,7 +421,7 @@ private fun ProfileDetailContent(
                 if (photos.isEmpty()) {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Icon(
-                            imageVector = Icons.Default.Info,
+                            imageVector = Icons.Default.Person,
                             contentDescription = null,
                             modifier = Modifier.size(64.dp),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
@@ -477,8 +476,12 @@ private fun ProfileDetailContent(
                         .fillMaxSize()
                         .background(
                             Brush.verticalGradient(
-                                colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.6f)),
-                                startY = 300f
+                                colorStops = arrayOf(
+                                    0.0f to Color.Transparent,
+                                    0.45f to Color.Transparent,
+                                    0.75f to Color.Black.copy(alpha = 0.55f),
+                                    1.0f to Color.Black.copy(alpha = 0.85f)
+                                )
                             )
                         )
                 )

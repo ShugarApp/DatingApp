@@ -21,6 +21,7 @@ data class ProfileState(
     val smoking: String? = null,
     val drinking: String? = null,
     val interests: List<String> = emptyList(),
+    val age: Int? = null,
     val isUpdatingLocation: Boolean = false,
     val locationError: String? = null,
     val showPreview: Boolean = false,

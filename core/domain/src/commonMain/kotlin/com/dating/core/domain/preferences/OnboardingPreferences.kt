@@ -5,4 +5,5 @@ interface OnboardingPreferences {
     suspend fun markFeaturesOnboardingSeen()
     suspend fun hasSeenProfileSetup(): Boolean
     suspend fun markProfileSetupSeen()
+    suspend fun clear()
 }

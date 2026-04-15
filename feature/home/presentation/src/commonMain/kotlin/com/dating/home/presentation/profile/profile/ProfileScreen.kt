@@ -29,6 +29,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
@@ -37,6 +38,7 @@ import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.HourglassEmpty
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Verified
@@ -85,6 +87,10 @@ import aura.feature.home.presentation.generated.resources.profile_safety_section
 import aura.feature.home.presentation.generated.resources.profile_settings_dashboard
 import aura.feature.home.presentation.generated.resources.profile_sos_button
 import aura.feature.home.presentation.generated.resources.safe_date_title
+import aura.feature.home.presentation.generated.resources.verification_status_pending
+import aura.feature.home.presentation.generated.resources.verification_status_rejected
+import aura.feature.home.presentation.generated.resources.verification_status_unverified
+import aura.feature.home.presentation.generated.resources.verification_status_verified
 import coil3.compose.AsyncImage
 import com.dating.core.designsystem.components.avatar.AvatarSize
 import com.dating.core.designsystem.components.avatar.ChirpAvatarPhoto
@@ -144,7 +150,7 @@ fun ProfileScreen(
 
             // 2. Name & Location
             Text(
-                text = stringResource(Res.string.profile_header_info_format, state.username, 26),
+                text = if (state.age != null) stringResource(Res.string.profile_header_info_format, state.username, state.age!!) else state.username,
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.extended.textPrimary
             )
@@ -355,28 +361,36 @@ fun VerificationStatusCard(
     onVerifyClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val verifiedText = stringResource(Res.string.verification_status_verified)
+    val pendingText = stringResource(Res.string.verification_status_pending)
+    val rejectedText = stringResource(Res.string.verification_status_rejected)
+    val unverifiedText = stringResource(Res.string.verification_status_unverified)
+
+    val successColor = MaterialTheme.colorScheme.extended.success
+    val warningColor = MaterialTheme.colorScheme.tertiary
+
     val (icon, text, tint, bgTint) = when (status) {
         VerificationStatus.VERIFIED -> Quadruple(
             Icons.Default.CheckCircle,
-            "Profile Verified",
-            Color(0xFF4CAF50),
-            Color(0xFF4CAF50).copy(alpha = 0.12f)
+            verifiedText,
+            successColor,
+            successColor.copy(alpha = 0.12f)
         )
         VerificationStatus.PENDING -> Quadruple(
             Icons.Default.HourglassEmpty,
-            "Verification pending...",
-            Color(0xFFFFA000),
-            Color(0xFFFFA000).copy(alpha = 0.12f)
+            pendingText,
+            warningColor,
+            warningColor.copy(alpha = 0.12f)
         )
         VerificationStatus.REJECTED -> Quadruple(
             Icons.Default.Error,
-            "Verification rejected — tap to retry",
+            rejectedText,
             MaterialTheme.colorScheme.error,
             MaterialTheme.colorScheme.error.copy(alpha = 0.12f)
         )
         VerificationStatus.UNVERIFIED -> Quadruple(
             Icons.Default.Verified,
-            "Verify your profile",
+            unverifiedText,
             MaterialTheme.colorScheme.primary,
             MaterialTheme.colorScheme.primary.copy(alpha = 0.08f)
         )
@@ -409,10 +423,11 @@ fun VerificationStatusCard(
             modifier = Modifier.weight(1f)
         )
         if (isClickable) {
-            Text(
-                text = "→",
-                style = MaterialTheme.typography.bodyLarge,
-                color = tint
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                contentDescription = null,
+                tint = tint,
+                modifier = Modifier.size(18.dp)
             )
         }
     }
@@ -568,7 +583,7 @@ private fun ProfilePreviewContent(
             if (photos.isEmpty()) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Icon(
-                        imageVector = Icons.Default.Info,
+                        imageVector = Icons.Default.Person,
                         contentDescription = null,
                         modifier = Modifier.size(64.dp),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant

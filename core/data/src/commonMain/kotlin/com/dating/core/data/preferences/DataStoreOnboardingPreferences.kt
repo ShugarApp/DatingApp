@@ -33,4 +33,11 @@ class DataStoreOnboardingPreferences(
             preferences[profileSetupSeenKey] = true
         }
     }
+
+    override suspend fun clear() {
+        dataStore.edit { preferences ->
+            preferences.remove(featuresOnboardingSeenKey)
+            preferences.remove(profileSetupSeenKey)
+        }
+    }
 }

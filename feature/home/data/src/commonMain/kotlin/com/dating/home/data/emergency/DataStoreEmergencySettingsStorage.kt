@@ -38,6 +38,14 @@ class DataStoreEmergencySettingsStorage(
         dataStore.edit { prefs -> prefs[onboardingSeenKey] = seen }
     }
 
+    override suspend fun clear() {
+        dataStore.edit { prefs ->
+            prefs.remove(enabledKey)
+            prefs.remove(autoCall911Key)
+            prefs.remove(onboardingSeenKey)
+        }
+    }
+
     private fun Preferences.toEmergencySettings(): EmergencySettings {
         return EmergencySettings(
             isEnabled = this[enabledKey] ?: false,

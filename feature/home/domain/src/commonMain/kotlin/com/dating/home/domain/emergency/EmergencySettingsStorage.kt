@@ -8,4 +8,5 @@ interface EmergencySettingsStorage {
     suspend fun setEnabled(enabled: Boolean)
     suspend fun setAutoCall911(autoCall: Boolean)
     suspend fun setOnboardingSeen(seen: Boolean)
+    suspend fun clear()
 }

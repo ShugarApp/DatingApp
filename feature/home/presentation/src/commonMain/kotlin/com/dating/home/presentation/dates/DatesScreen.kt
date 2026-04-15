@@ -39,6 +39,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.FilterChipDefaults.filterChipBorder
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -187,7 +188,7 @@ private fun FilterChipRow(
                     selectedContainerColor = statusColor(filter.chipStatus).copy(alpha = 0.18f),
                     selectedLabelColor = statusForegroundColor(filter.chipStatus)
                 ),
-                border = FilterChipDefaults.filterChipBorder(
+                border = filterChipBorder(
                     enabled = true,
                     selected = isSelected,
                     selectedBorderColor = statusForegroundColor(filter.chipStatus).copy(alpha = 0.4f),
@@ -605,8 +606,8 @@ private fun EmptyFilterState(filter: DateFilter, modifier: Modifier = Modifier) 
 
 @Composable
 private fun statusAccentColor(status: DateProposalStatus): Color = when (status) {
-    DateProposalStatus.PENDING -> Color(0xFFFFC107)
-    DateProposalStatus.ACCEPTED -> Color(0xFF4CAF50)
+    DateProposalStatus.PENDING -> MaterialTheme.colorScheme.tertiary
+    DateProposalStatus.ACCEPTED -> MaterialTheme.colorScheme.primary
     DateProposalStatus.CANCELLED -> MaterialTheme.colorScheme.error
     DateProposalStatus.REJECTED -> MaterialTheme.colorScheme.outline
     DateProposalStatus.EDITED -> MaterialTheme.colorScheme.secondary
@@ -614,21 +615,21 @@ private fun statusAccentColor(status: DateProposalStatus): Color = when (status)
 
 @Composable
 private fun statusColor(status: DateProposalStatus?): Color = when (status) {
-    DateProposalStatus.PENDING -> Color(0xFFFFF3CD)
-    DateProposalStatus.ACCEPTED -> Color(0xFFD4EDDA)
-    DateProposalStatus.CANCELLED -> Color(0xFFFFEBEE)
-    DateProposalStatus.REJECTED -> Color(0xFFEEEEEE)
-    DateProposalStatus.EDITED -> Color(0xFFEDE7F6)
+    DateProposalStatus.PENDING -> MaterialTheme.colorScheme.tertiaryContainer
+    DateProposalStatus.ACCEPTED -> MaterialTheme.colorScheme.primaryContainer
+    DateProposalStatus.CANCELLED -> MaterialTheme.colorScheme.errorContainer
+    DateProposalStatus.REJECTED -> MaterialTheme.colorScheme.surfaceVariant
+    DateProposalStatus.EDITED -> MaterialTheme.colorScheme.secondaryContainer
     null -> MaterialTheme.colorScheme.surfaceVariant
 }
 
 @Composable
 private fun statusForegroundColor(status: DateProposalStatus?): Color = when (status) {
-    DateProposalStatus.PENDING -> Color(0xFF856404)
-    DateProposalStatus.ACCEPTED -> Color(0xFF155724)
-    DateProposalStatus.CANCELLED -> Color(0xFFB71C1C)
-    DateProposalStatus.REJECTED -> Color(0xFF424242)
-    DateProposalStatus.EDITED -> Color(0xFF4527A0)
+    DateProposalStatus.PENDING -> MaterialTheme.colorScheme.onTertiaryContainer
+    DateProposalStatus.ACCEPTED -> MaterialTheme.colorScheme.onPrimaryContainer
+    DateProposalStatus.CANCELLED -> MaterialTheme.colorScheme.onErrorContainer
+    DateProposalStatus.REJECTED -> MaterialTheme.colorScheme.onSurfaceVariant
+    DateProposalStatus.EDITED -> MaterialTheme.colorScheme.onSecondaryContainer
     null -> MaterialTheme.colorScheme.onSurfaceVariant
 }
 

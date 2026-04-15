@@ -1,15 +1,21 @@
 package com.dating.home.presentation.chat.chat_list.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.SpanStyle
@@ -37,6 +43,9 @@ fun ChatListItemUi(
 ) {
     val isGroupChat = chat.otherParticipants.size > 1
     val chatName = chat.otherParticipants.joinToString(", ") { it.username }
+    val isUnread = chat.lastMessage != null
+        && chat.lastMessage.senderId != chat.localParticipant.id
+        && chat.lastMessage.deliveryStatus != ChatMessageDeliveryStatus.READ
     val lastMessagePreview = when {
         chat.lastMessage?.messageType == MessageType.IMAGE -> "\uD83D\uDCF7 Photo"
         chat.lastMessage?.messageType == MessageType.GIF -> "GIF"
@@ -76,26 +85,45 @@ fun ChatListItemUi(
             )
 
             if (chat.lastMessage != null) {
-                val previewMessage = buildAnnotatedString {
-                    withStyle(
-                        style = SpanStyle(
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.extended.textSecondary,
-                        )
-                    ) {
-                        if (chat.lastMessageSenderUsername != null) {
-                            append(chat.lastMessageSenderUsername + ": ")
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    val previewMessage = buildAnnotatedString {
+                        withStyle(
+                            style = SpanStyle(
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.extended.textSecondary,
+                            )
+                        ) {
+                            if (chat.lastMessageSenderUsername != null) {
+                                append(chat.lastMessageSenderUsername + ": ")
+                            }
                         }
+                        append(lastMessagePreview)
                     }
-                    append(lastMessagePreview)
+                    Text(
+                        text = previewMessage,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (isUnread) MaterialTheme.colorScheme.onSurface
+                                else MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontWeight = if (isUnread) FontWeight.SemiBold else FontWeight.Normal,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f)
+                    )
+                    if (isUnread) {
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .background(
+                                    color = MaterialTheme.colorScheme.primary,
+                                    shape = CircleShape
+                                )
+                        )
+                    }
                 }
-                Text(
-                    text = previewMessage,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
             }
         }
     }

@@ -19,7 +19,12 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
+import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlin.math.abs
+import kotlin.time.Clock.System.now
 
 class ProfileViewModel(
     private val chatParticipantRepository: ChatParticipantRepository,
@@ -60,6 +65,7 @@ class ProfileViewModel(
                 smoking = authInfo.user.smoking,
                 drinking = authInfo.user.drinking,
                 interests = authInfo.user.interests,
+                age = calculateAge(authInfo.user.birthDate),
                 profileCompletion = authInfo.user.profileCompletion(),
                 verificationStatus = authInfo.user.verificationStatus
             )
@@ -183,4 +189,18 @@ class ProfileViewModel(
             authInfo.copy(user = authInfo.user.copy(city = city, country = country))
         )
     }
+}
+
+private fun calculateAge(birthDate: String?): Int? {
+    if (birthDate == null) return null
+    return try {
+        val birth = LocalDate.parse(birthDate.substring(0, 10))
+        val today = now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+        var age = today.year - birth.year
+        if (today.monthNumber < birth.monthNumber ||
+            (today.monthNumber == birth.monthNumber && today.dayOfMonth < birth.dayOfMonth)) {
+            age--
+        }
+        age
+    } catch (e: Exception) { null }
 }

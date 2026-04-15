@@ -64,10 +64,11 @@ fun ChangePasswordScreen(
                 onToggleVisibilityClick = {
                     viewModel.onAction(ChangePasswordAction.OnToggleCurrentPasswordVisibility)
                 },
+                title = stringResource(Res.string.current_password),
                 placeholder = stringResource(Res.string.current_password),
-                isError = state.newPasswordError != null,
+                modifier = Modifier.fillMaxWidth()
             )
-            
+
             Spacer(modifier = Modifier.height(16.dp))
 
             ChirpPasswordTextField(
@@ -76,10 +77,12 @@ fun ChangePasswordScreen(
                 onToggleVisibilityClick = {
                     viewModel.onAction(ChangePasswordAction.OnToggleNewPasswordVisibility)
                 },
+                title = stringResource(Res.string.new_password),
                 placeholder = stringResource(Res.string.new_password),
                 isError = state.newPasswordError != null,
                 supportingText = state.newPasswordError?.asString()
-                    ?: stringResource(Res.string.password_hint)
+                    ?: stringResource(Res.string.password_hint),
+                modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(16.dp))

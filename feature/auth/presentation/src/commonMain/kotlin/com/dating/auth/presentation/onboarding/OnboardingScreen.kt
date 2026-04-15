@@ -1,5 +1,6 @@
 package com.dating.auth.presentation.onboarding
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,6 +15,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -82,7 +85,19 @@ fun OnboardingScreen(
     isGoogleLoading: Boolean = false
 ) {
     AuthSnackbarScaffold {
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colorStops = arrayOf(
+                            0.0f to MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                            0.4f to Color.Transparent,
+                            1.0f to MaterialTheme.colorScheme.primary.copy(alpha = 0.06f)
+                        )
+                    )
+                )
+        ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -92,23 +107,23 @@ fun OnboardingScreen(
             ) {
                 Spacer(modifier = Modifier.weight(1f))
 
-                AppBrandLogo(modifier = Modifier.size(80.dp))
+                AppBrandLogo(modifier = Modifier.size(96.dp))
 
                 Spacer(modifier = Modifier.height(32.dp))
 
                 Text(
                     text = stringResource(Res.string.welcome_to_chirp),
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Center
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
                     text = stringResource(Res.string.onboarding_body),
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                     textAlign = TextAlign.Center
                 )
 

@@ -35,6 +35,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -53,8 +54,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
@@ -129,7 +133,6 @@ import aura.feature.home.presentation.generated.resources.edit_profile_not_set
 import aura.feature.home.presentation.generated.resources.edit_profile_personal_info
 import aura.feature.home.presentation.generated.resources.edit_profile_personal_info_note
 import aura.feature.home.presentation.generated.resources.edit_profile_photos
-import aura.feature.home.presentation.generated.resources.edit_profile_save_success
 import aura.feature.home.presentation.generated.resources.edit_profile_smoking
 import aura.feature.home.presentation.generated.resources.edit_profile_smoking_never
 import aura.feature.home.presentation.generated.resources.edit_profile_smoking_regularly
@@ -158,7 +161,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun EditProfileScreen(
     onBack: () -> Unit,
@@ -167,7 +170,6 @@ fun EditProfileScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
-    val successMessage = stringResource(Res.string.edit_profile_save_success)
     val uploadManager: PhotoUploadManager = koinInject()
     val pendingSlots by uploadManager.pendingSlots.collectAsStateWithLifecycle()
 
@@ -223,8 +225,8 @@ fun EditProfileScreen(
 
     LaunchedEffect(state.showSuccessMessage) {
         if (state.showSuccessMessage) {
-            snackbarHostState.showSnackbar(successMessage)
             viewModel.onAction(EditProfileAction.OnDismissSuccessMessage)
+            onBack()
         }
     }
 
@@ -240,12 +242,12 @@ fun EditProfileScreen(
     )
 
     val lookingForOptions = listOf(
-        "LONG_TERM" to stringResource(Res.string.edit_profile_looking_for_long_term),
-        "SHORT_TERM" to stringResource(Res.string.edit_profile_looking_for_short_term),
-        "CASUAL_DATES" to stringResource(Res.string.edit_profile_looking_for_casual),
-        "HOOKUP" to stringResource(Res.string.edit_profile_looking_for_hookup),
-        "FRIENDS" to stringResource(Res.string.edit_profile_looking_for_friends),
-        "OPEN_TO_ANYTHING" to stringResource(Res.string.edit_profile_looking_for_open)
+        "Long term" to stringResource(Res.string.edit_profile_looking_for_long_term),
+        "Short term" to stringResource(Res.string.edit_profile_looking_for_short_term),
+        "Casual dates" to stringResource(Res.string.edit_profile_looking_for_casual),
+        "Hookup" to stringResource(Res.string.edit_profile_looking_for_hookup),
+        "Friends" to stringResource(Res.string.edit_profile_looking_for_friends),
+        "Open to anything" to stringResource(Res.string.edit_profile_looking_for_open)
     )
 
     val idealDateOptions = listOf(
@@ -282,13 +284,45 @@ fun EditProfileScreen(
     val heightAddLabel = stringResource(Res.string.edit_profile_height_add)
     val heightClearLabel = stringResource(Res.string.edit_profile_height_clear)
 
+    var hasUnsavedChanges by rememberSaveable { mutableStateOf(false) }
+    var showUnsavedChangesDialog by remember { mutableStateOf(false) }
+
+    fun change(action: EditProfileAction) {
+        hasUnsavedChanges = true
+        viewModel.onAction(action)
+    }
+
+    BackHandler(enabled = hasUnsavedChanges) {
+        showUnsavedChangesDialog = true
+    }
+
+    if (showUnsavedChangesDialog) {
+        AlertDialog(
+            onDismissRequest = { showUnsavedChangesDialog = false },
+            title = { Text("Discard changes?") },
+            text = { Text("You have unsaved changes. Are you sure you want to leave without saving?") },
+            confirmButton = {
+                TextButton(
+                    onClick = { showUnsavedChangesDialog = false; onBack() },
+                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                ) { Text("Discard") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showUnsavedChangesDialog = false }) { Text("Keep editing") }
+            }
+        )
+    }
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             AppCenterTopBar(
                 title = stringResource(Res.string.edit_profile_title),
-                onBack = onBack
+                onBack = {
+                    if (hasUnsavedChanges) showUnsavedChangesDialog = true
+                    else onBack()
+                }
             )
         },
         bottomBar = {
@@ -447,7 +481,7 @@ fun EditProfileScreen(
                         ChirpChip(
                             text = interestDisplayName(interest),
                             isSelected = state.selectedInterests.contains(interest),
-                            onClick = { viewModel.onAction(EditProfileAction.OnInterestToggled(interest)) }
+                            onClick = { change(EditProfileAction.OnInterestToggled(interest)) }
                         )
                     }
                 }
@@ -479,7 +513,7 @@ fun EditProfileScreen(
                             text = label,
                             isSelected = state.interestedIn == value,
                             onClick = {
-                                viewModel.onAction(
+                                change(
                                     EditProfileAction.OnInterestedInChanged(
                                         if (state.interestedIn == value) null else value
                                     )
@@ -503,7 +537,7 @@ fun EditProfileScreen(
                             text = label,
                             isSelected = state.lookingFor == value,
                             onClick = {
-                                viewModel.onAction(
+                                change(
                                     EditProfileAction.OnLookingForChanged(
                                         if (state.lookingFor == value) null else value
                                     )
@@ -527,7 +561,7 @@ fun EditProfileScreen(
                             text = label,
                             isSelected = state.idealDate == value,
                             onClick = {
-                                viewModel.onAction(
+                                change(
                                     EditProfileAction.OnIdealDateChanged(
                                         if (state.idealDate == value) null else value
                                     )
@@ -579,7 +613,7 @@ fun EditProfileScreen(
                     height = state.height,
                     addLabel = heightAddLabel,
                     clearLabel = heightClearLabel,
-                    onHeightChanged = { viewModel.onAction(EditProfileAction.OnHeightChanged(it)) }
+                    onHeightChanged = { change(EditProfileAction.OnHeightChanged(it)) }
                 )
                 val heightError = state.heightError
                 if (heightError != null) {
@@ -605,7 +639,7 @@ fun EditProfileScreen(
                             text = zodiac.lowercase().replaceFirstChar { it.uppercase() },
                             isSelected = state.zodiac == zodiac,
                             onClick = {
-                                viewModel.onAction(
+                                change(
                                     EditProfileAction.OnZodiacChanged(
                                         if (state.zodiac == zodiac) null else zodiac
                                     )
@@ -629,7 +663,7 @@ fun EditProfileScreen(
                             text = label,
                             isSelected = state.smoking == value,
                             onClick = {
-                                viewModel.onAction(
+                                change(
                                     EditProfileAction.OnSmokingChanged(
                                         if (state.smoking == value) null else value
                                     )
@@ -653,7 +687,7 @@ fun EditProfileScreen(
                             text = label,
                             isSelected = state.drinking == value,
                             onClick = {
-                                viewModel.onAction(
+                                change(
                                     EditProfileAction.OnDrinkingChanged(
                                         if (state.drinking == value) null else value
                                     )

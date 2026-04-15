@@ -43,6 +43,7 @@ import com.dating.home.presentation.emergency.sos.SosCountdownDialog
 import com.dating.home.presentation.features_onboarding.FeaturesOnboardingScreen
 import com.dating.home.presentation.home.swipe.FeedRoot
 import com.dating.home.presentation.matches.MatchesRoot
+import com.dating.home.presentation.matches.MatchesViewModel
 import com.dating.home.presentation.photo_onboarding.PhotoOnboardingScreen
 import com.dating.home.presentation.profile.profile.ProfileScreen
 import com.dating.home.presentation.profile_setup.ProfileSetupScreen
@@ -77,6 +78,8 @@ fun BottomNavigationContainer(
     val snackbarHostState = remember { SnackbarHostState() }
     val datesViewModel: DatesViewModel = koinViewModel()
     val datesState by datesViewModel.state.collectAsStateWithLifecycle()
+    val matchesViewModel: MatchesViewModel = koinViewModel()
+    val matchesState by matchesViewModel.state.collectAsStateWithLifecycle()
 
     // Show in-app notifications when background photo uploads complete
     LaunchedEffect(Unit) {
@@ -247,6 +250,10 @@ fun BottomNavigationContainer(
             BottomNavigationBar(
                 selectedSection = selectedSection,
                 sections = visibleSections,
+                badges = buildMap {
+                    val likesCount = matchesState.likes.size
+                    if (likesCount > 0) put(BottomNavSection.MATCHES, likesCount)
+                },
                 onSectionSelected = { section ->
                     selectedSection = section
                 }

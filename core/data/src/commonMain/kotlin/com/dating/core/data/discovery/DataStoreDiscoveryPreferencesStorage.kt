@@ -72,6 +72,17 @@ class DataStoreDiscoveryPreferencesStorage(
         }
     }
 
+    override suspend fun clear() {
+        dataStore.edit { prefs ->
+            prefs.remove(maxDistanceKey)
+            prefs.remove(showMeKey)
+            prefs.remove(minAgeKey)
+            prefs.remove(maxAgeKey)
+            prefs.remove(verifiedProfilesOnlyKey)
+            prefs.remove(completeProfilePromptShownKey)
+        }
+    }
+
     private fun Preferences.toDiscoverySettings(): DiscoverySettings {
         return DiscoverySettings(
             maxDistance = this[maxDistanceKey],

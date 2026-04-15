@@ -1,6 +1,8 @@
 package com.dating.home.presentation.home.bottom_navigation
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -22,6 +24,7 @@ fun BottomNavigationBar(
     selectedSection: BottomNavSection,
     onSectionSelected: (BottomNavSection) -> Unit,
     sections: List<BottomNavSection> = BottomNavSection.entries.toList(),
+    badges: Map<BottomNavSection, Int> = emptyMap(),
     modifier: Modifier = Modifier
 ) {
     NavigationBar(
@@ -29,18 +32,34 @@ fun BottomNavigationBar(
         containerColor = MaterialTheme.colorScheme.surface
     ) {
         sections.forEach { section ->
+            val badgeCount = badges[section] ?: 0
             NavigationBarItem(
                 selected = selectedSection == section,
                 onClick = { onSectionSelected(section) },
                 icon = {
-                    Icon(
-                        imageVector = if (selectedSection == section) {
-                            section.selectedIcon
-                        } else {
-                            section.unselectedIcon
-                        },
-                        contentDescription = bottomNavLabelText(section)
-                    )
+                    BadgedBox(
+                        badge = {
+                            if (badgeCount > 0) {
+                                Badge(
+                                    containerColor = MaterialTheme.colorScheme.error
+                                ) {
+                                    Text(
+                                        text = if (badgeCount > 99) "99+" else "$badgeCount",
+                                        style = MaterialTheme.typography.labelSmall
+                                    )
+                                }
+                            }
+                        }
+                    ) {
+                        Icon(
+                            imageVector = if (selectedSection == section) {
+                                section.selectedIcon
+                            } else {
+                                section.unselectedIcon
+                            },
+                            contentDescription = bottomNavLabelText(section)
+                        )
+                    }
                 },
                 label = {
                     Text(

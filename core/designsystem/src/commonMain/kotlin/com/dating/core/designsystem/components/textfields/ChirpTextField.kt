@@ -14,6 +14,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -37,6 +39,7 @@ fun ChirpTextField(
     inputTransformation: InputTransformation? = null,
     keyboardType: KeyboardType = KeyboardType.Text,
     onFocusChanged: (Boolean) -> Unit = {},
+    focusRequester: FocusRequester? = null,
 ) {
     ChirpTextFieldLayout(
         title = title,
@@ -70,7 +73,7 @@ fun ChirpTextField(
             ),
             cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
             interactionSource = interactionSource,
-            modifier = styleModifier,
+            modifier = if (focusRequester != null) styleModifier.focusRequester(focusRequester) else styleModifier,
             decorator = { innerBox ->
                 Box(
                     modifier = Modifier.fillMaxWidth(),

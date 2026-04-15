@@ -114,6 +114,8 @@ class StepsRegisterViewModel(
                     RegisterStep.IdealDate -> {
                         it.copy(canRegister = !isRegistering && idealDate != null)
                     }
+
+                    RegisterStep.Welcome -> it
                 }
             }
         }.launchIn(viewModelScope)
@@ -144,6 +146,16 @@ class StepsRegisterViewModel(
                 validateStep(RegisterStep.IdealDate)
             }
 
+            StepsRegisterAction.OnContinueClick -> {
+                viewModelScope.launch {
+                    if (isGoogleUser) {
+                        eventChannel.send(StepsRegisterEvent.GoogleSuccess)
+                    } else {
+                        eventChannel.send(StepsRegisterEvent.Success(state.value.registeredEmail))
+                    }
+                }
+            }
+
             StepsRegisterAction.OnInputTextFocusGain -> {
                 _state.update { it.copy(registrationError = null, usernameError = null) }
             }
@@ -159,6 +171,7 @@ class StepsRegisterViewModel(
                 RegisterStep.GenderInterest -> RegisterStep.LookingFor
                 RegisterStep.LookingFor -> RegisterStep.IdealDate
                 RegisterStep.IdealDate -> RegisterStep.IdealDate
+                RegisterStep.Welcome -> RegisterStep.Welcome
             }
             _state.update { it.copy(currentStep = nextStep) }
         }
@@ -166,6 +179,7 @@ class StepsRegisterViewModel(
 
     private fun onBackClick() {
         val currentStep = state.value.currentStep
+        if (currentStep == RegisterStep.Welcome) return
         if (currentStep == RegisterStep.BasicInfo) {
             viewModelScope.launch {
                 eventChannel.send(StepsRegisterEvent.OnBack)
@@ -209,8 +223,7 @@ class StepsRegisterViewModel(
                         idealDate = idealDate
                     )
                     .onSuccess {
-                        _state.update { it.copy(isRegistering = false) }
-                        eventChannel.send(StepsRegisterEvent.GoogleSuccess)
+                        _state.update { it.copy(isRegistering = false, currentStep = RegisterStep.Welcome) }
                     }
                     .onFailure { error ->
                         _state.update {
@@ -235,8 +248,7 @@ class StepsRegisterViewModel(
                     idealDate = idealDate
                 )
                 .onSuccess {
-                    _state.update { it.copy(isRegistering = false) }
-                    eventChannel.send(StepsRegisterEvent.Success(email))
+                    _state.update { it.copy(isRegistering = false, currentStep = RegisterStep.Welcome, registeredEmail = email) }
                 }
                 .onFailure { error ->
                     val registrationError = when (error) {
@@ -296,6 +308,8 @@ class StepsRegisterViewModel(
                 _state.update { it.copy(canRegister = hasIdealDate) }
                 hasIdealDate
             }
+
+            RegisterStep.Welcome -> true
         }
     }
 }

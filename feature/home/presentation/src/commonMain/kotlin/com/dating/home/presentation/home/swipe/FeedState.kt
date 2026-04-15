@@ -31,8 +31,11 @@ data class FeedItem(
     val userId: String,
     val username: String,
     val profilePictureUrl: String?,
+    val photoUrls: List<String> = emptyList(),
     val city: String?,
-    val country: String?
+    val country: String?,
+    val age: Int? = null,
+    val isVerified: Boolean = false
 )
 
 sealed interface FeedAction {
