@@ -31,6 +31,7 @@
     <string name="confirm_password">Confirmar contraseña</string>
     <string name="error_passwords_do_not_match">Las contraseñas no coinciden</string>
     <string name="error_invalid_email">Este correo electrónico no es válido</string>
+    <string name="error_email_already_registered">Este correo ya está registrado. Intenta iniciar sesión.</string>
     <string name="error_invalid_username">El nombre de usuario debe tener entre 3 y 20 caracteres</string>
     <string name="error_invalid_credentials">El correo o la contraseña son incorrectos</string>
     <string name="error_email_not_verified">No se puede iniciar sesión porque tu correo no está verificado</string>
@@ -45,6 +46,7 @@
     <string name="birth_date">Fecha de nacimiento</string>
     <string name="birth_date_placeholder">DD/MM/AAAA</string>
     <string name="error_underage">Debes tener al menos 18 años para registrarte</string>
+    <string name="error_too_old">Por favor introduce una fecha de nacimiento válida</string>
     <string name="gender">Género</string>
     <string name="interested_in">Interesado en</string>
     <string name="looking_for">Busco</string>

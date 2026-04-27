@@ -31,6 +31,7 @@
     <string name="confirm_password">Confirm Password</string>
     <string name="error_passwords_do_not_match">Passwords do not match</string>
     <string name="error_invalid_email">This is not a valid email</string>
+    <string name="error_email_already_registered">This email is already registered. Try logging in.</string>
     <string name="error_invalid_username">The username must be between 3 and 20 characters</string>
     <string name="error_invalid_credentials">The email or password is incorrect</string>
     <string name="error_email_not_verified">Unable to login because your email isn't verified</string>
@@ -45,6 +46,7 @@
     <string name="birth_date">Birth Date</string>
     <string name="birth_date_placeholder">DD/MM/YYYY</string>
     <string name="error_underage">You must be at least 18 years old to register</string>
+    <string name="error_too_old">Please enter a valid birth date</string>
     <string name="gender">Gender</string>
     <string name="interested_in">Interested In</string>
     <string name="looking_for">Looking For</string>

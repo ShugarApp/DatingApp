@@ -4,9 +4,13 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import aura.feature.auth.presentation.generated.resources.Res
+import aura.feature.auth.presentation.generated.resources.error_email_already_registered
 import aura.feature.auth.presentation.generated.resources.error_invalid_email
 import aura.feature.auth.presentation.generated.resources.error_invalid_password
 import aura.feature.auth.presentation.generated.resources.error_passwords_do_not_match
+import com.dating.core.domain.auth.AuthService
+import com.dating.core.domain.util.DataError
+import com.dating.core.domain.util.Result
 import com.dating.core.domain.validation.PasswordValidator
 import com.dating.core.presentation.util.UiText
 import com.dating.domain.EmailValidator
@@ -23,7 +27,9 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class RegisterCredentialsViewModel : ViewModel() {
+class RegisterCredentialsViewModel(
+    private val authService: AuthService
+) : ViewModel() {
 
     private val eventChannel = Channel<RegisterCredentialsEvent>()
     val events = eventChannel.receiveAsFlow()
@@ -108,21 +114,32 @@ class RegisterCredentialsViewModel : ViewModel() {
         val passwordValidation = PasswordValidator.validate(password)
         val doPasswordsMatch = confirmPassword == password
 
-        if (isEmailValid && passwordValidation.isValidPassword && doPasswordsMatch) {
-            viewModelScope.launch {
-                eventChannel.send(RegisterCredentialsEvent.OnNext(email, password))
-            }
-        } else {
-            val emailError = if (!isEmailValid) UiText.Resource(Res.string.error_invalid_email) else null
-            val passwordError = if (!passwordValidation.isValidPassword) UiText.Resource(Res.string.error_invalid_password) else null
-            val confirmPasswordError = if (!doPasswordsMatch) UiText.Resource(Res.string.error_passwords_do_not_match) else null
-
+        if (!isEmailValid || !passwordValidation.isValidPassword || !doPasswordsMatch) {
             _state.update {
                 it.copy(
-                    emailError = emailError,
-                    passwordError = passwordError,
-                    confirmPasswordError = confirmPasswordError
+                    emailError = if (!isEmailValid) UiText.Resource(Res.string.error_invalid_email) else null,
+                    passwordError = if (!passwordValidation.isValidPassword) UiText.Resource(Res.string.error_invalid_password) else null,
+                    confirmPasswordError = if (!doPasswordsMatch) UiText.Resource(Res.string.error_passwords_do_not_match) else null
                 )
+            }
+            return
+        }
+
+        viewModelScope.launch {
+            _state.update { it.copy(isCheckingEmail = true) }
+            val result = authService.checkEmailAvailability(email)
+            _state.update { it.copy(isCheckingEmail = false) }
+
+            when (result) {
+                is Result.Success -> eventChannel.send(RegisterCredentialsEvent.OnNext(email, password))
+                is Result.Failure -> {
+                    val emailError = if (result.error == DataError.Remote.CONFLICT) {
+                        UiText.Resource(Res.string.error_email_already_registered)
+                    } else {
+                        UiText.Resource(Res.string.error_invalid_email)
+                    }
+                    _state.update { it.copy(emailError = emailError) }
+                }
             }
         }
     }

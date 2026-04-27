@@ -82,6 +82,8 @@
     <string name="settings_location">Ubicación</string>
     <string name="settings_update_location">Actualizar ubicación</string>
     <string name="settings_location_updated">Ubicación actualizada con éxito</string>
+    <string name="settings_location_update_failed">No se pudo obtener la ubicación. Asegúrate de tener el GPS activado.</string>
+    <string name="settings_location_permission_denied">Permiso de ubicación denegado. Por favor, actívalo en los ajustes de la app.</string>
     <string name="settings_current_location">Mi ubicación actual</string>
     <string name="settings_max_distance">Distancia máxima</string>
     <string name="settings_100_km">100 km</string>

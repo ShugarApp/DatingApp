@@ -10,6 +10,8 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.text.input.InputTransformation
+import androidx.compose.foundation.text.input.TextFieldBuffer
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -244,8 +246,21 @@ fun StepsRegisterScreen(
     }
 }
 
+// ── Input Transformations ─────────────────────────────────────────────────────
+
+@ExperimentalFoundationApi
+private object NameInputTransformation : InputTransformation {
+    private const val MAX_LENGTH = 30
+    override fun TextFieldBuffer.transformInput() {
+        if (length > MAX_LENGTH) {
+            replace(MAX_LENGTH, length, "")
+        }
+    }
+}
+
 // ── Step Composables ──────────────────────────────────────────────────────────
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun BasicInfoStep(
     state: StepsRegisterState,
@@ -272,6 +287,7 @@ private fun BasicInfoStep(
             isError = state.usernameError != null,
             singleLine = true,
             imeAction = ImeAction.Done,
+            inputTransformation = NameInputTransformation,
             focusRequester = focusRequester,
             onFocusChanged = { onAction(StepsRegisterAction.OnInputTextFocusGain) },
             modifier = Modifier.fillMaxWidth()

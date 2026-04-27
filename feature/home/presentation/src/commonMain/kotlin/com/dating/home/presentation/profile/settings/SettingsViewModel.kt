@@ -161,9 +161,12 @@ class SettingsViewModel(
                 _state.update { it.copy(isUpdatingLocation = false, locationUpdateSuccess = success) }
                 if (success) {
                     _events.send(SettingsEvent.OnLocationUpdated)
+                } else {
+                    _events.send(SettingsEvent.OnLocationUpdateFailed)
                 }
             } else {
                 _state.update { it.copy(isUpdatingLocation = false, locationUpdateSuccess = false) }
+                _events.send(SettingsEvent.OnLocationUpdateFailed)
             }
         }
     }

@@ -63,6 +63,8 @@ import aura.feature.home.presentation.generated.resources.settings_account
 import aura.feature.home.presentation.generated.resources.settings_account_privacy
 import aura.feature.home.presentation.generated.resources.settings_discovery
 import aura.feature.home.presentation.generated.resources.settings_filters
+import aura.feature.home.presentation.generated.resources.settings_location_permission_denied
+import aura.feature.home.presentation.generated.resources.settings_location_update_failed
 import aura.feature.home.presentation.generated.resources.settings_location_updated
 import aura.feature.home.presentation.generated.resources.settings_update_location
 import aura.feature.home.presentation.generated.resources.settings_incognito_mode
@@ -88,6 +90,9 @@ import com.dating.core.designsystem.components.dialogs.DestructiveConfirmationDi
 import com.dating.core.designsystem.components.header.AppCenterTopBar
 import com.dating.core.designsystem.theme.extended
 import com.dating.core.domain.preferences.ThemePreference
+import com.dating.core.presentation.permissions.Permission
+import com.dating.core.presentation.permissions.PermissionState
+import com.dating.core.presentation.permissions.rememberPermissionController
 import com.dating.core.presentation.util.ObserveAsEvents
 import com.dating.core.presentation.util.rememberOpenNotificationSettings
 import kotlinx.coroutines.launch
@@ -113,13 +118,30 @@ fun SettingsScreen(
     val openNotificationSettings = rememberOpenNotificationSettings()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    val permissionController = rememberPermissionController()
     val locationUpdatedMessage = stringResource(Res.string.settings_location_updated)
+    val locationUpdateFailedMessage = stringResource(Res.string.settings_location_update_failed)
+    val locationPermissionDeniedMessage = stringResource(Res.string.settings_location_permission_denied)
+
+    val updateLocationWithPermission: () -> Unit = {
+        scope.launch {
+            val permState = permissionController.requestPermission(Permission.LOCATION)
+            if (permState == PermissionState.GRANTED) {
+                viewModel.onAction(SettingsAction.OnLocationClick)
+            } else {
+                snackbarHostState.showSnackbar(locationPermissionDeniedMessage)
+            }
+        }
+    }
 
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
             SettingsEvent.OnLogoutSuccess -> onLogout()
             SettingsEvent.OnLocationUpdated -> {
                 scope.launch { snackbarHostState.showSnackbar(locationUpdatedMessage) }
+            }
+            SettingsEvent.OnLocationUpdateFailed -> {
+                scope.launch { snackbarHostState.showSnackbar(locationUpdateFailedMessage) }
             }
             else -> Unit
         }
@@ -151,7 +173,7 @@ fun SettingsScreen(
                     icon = Icons.Default.LocationOn,
                     title = stringResource(Res.string.settings_update_location),
                     subtitle = if (state.isUpdatingLocation) "Updating..." else null,
-                    onClick = { viewModel.onAction(SettingsAction.OnLocationClick) }
+                    onClick = updateLocationWithPermission
                 )
                 AccessCardItem(
                     icon = Icons.Default.Tune,

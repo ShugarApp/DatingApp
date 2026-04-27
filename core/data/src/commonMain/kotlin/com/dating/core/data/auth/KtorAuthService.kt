@@ -29,6 +29,13 @@ import io.ktor.client.plugins.auth.providers.BearerAuthProvider
 
 class KtorAuthService(private val httpClient: HttpClient) : AuthService {
 
+    override suspend fun checkEmailAvailability(email: String): EmptyResult<DataError.Remote> {
+        return httpClient.post(
+            route = "/auth/check-email",
+            body = EmailRequest(email)
+        )
+    }
+
     override suspend fun login(
         email: String,
         password: String

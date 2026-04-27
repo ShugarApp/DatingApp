@@ -9,4 +9,5 @@ sealed interface SettingsEvent {
     data object OnNavigateToEmergencyContacts : SettingsEvent
     data object OnNavigateToEmergencyTutorial : SettingsEvent
     data object OnLocationUpdated : SettingsEvent
+    data object OnLocationUpdateFailed : SettingsEvent
 }

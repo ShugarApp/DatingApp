@@ -83,6 +83,8 @@
     <string name="settings_location">Location</string>
     <string name="settings_update_location">Update Location</string>
     <string name="settings_location_updated">Location updated successfully</string>
+    <string name="settings_location_update_failed">Could not get location. Make sure GPS is enabled.</string>
+    <string name="settings_location_permission_denied">Location permission denied. Please enable it in app settings.</string>
     <string name="settings_current_location">My Current Location</string>
     <string name="settings_max_distance">Maximum Distance</string>
     <string name="settings_100_km">100 km</string>
@@ -420,9 +422,9 @@
     <string name="photo_tips_tip4_title">Be authentic</string>
     <string name="photo_tips_tip4_desc">Avoid heavy filters or edits that significantly alter your appearance. Be yourself!</string>
     <string name="photo_tips_tip5_title">No hidden faces</string>
-    <string name="photo_tips_tip5_desc">Photos where your face is fully obscured don\'t count. Others need to see who they\'re talking to.</string>
+    <string name="photo_tips_tip5_desc">Photos where your face is fully obscured don't count. Others need to see who they're talking to.</string>
     <string name="photo_tips_tip6_title">Safe and respectful</string>
-    <string name="photo_tips_tip6_desc">No explicit, violent, or offensive content. Let\'s keep Aura a safe space for everyone.</string>
+    <string name="photo_tips_tip6_desc">No explicit, violent, or offensive content. Let's keep Aura a safe space for everyone.</string>
     <string name="photo_tips_got_it">Got it!</string>
 
     <!-- Profile Screen -->
@@ -570,7 +572,7 @@
     <string name="date_safety_checklist_section">Before You Go</string>
     <string name="date_safety_check_public">Is the venue public?</string>
     <string name="date_safety_check_public_desc">Choose cafés, restaurants, or busy parks</string>
-    <string name="date_safety_check_someone_knows">Does someone know where you\'re going?</string>
+    <string name="date_safety_check_someone_knows">Does someone know where you're going?</string>
     <string name="date_safety_check_someone_knows_desc">Let a friend or family member know the place and time</string>
     <string name="date_safety_check_battery">Is your phone charged?</string>
     <string name="date_safety_check_battery_desc">Bring your phone with at least 50% battery</string>
@@ -584,13 +586,13 @@
     <string name="date_safety_tip_2_title">Meet in public first</string>
     <string name="date_safety_tip_2_desc">First dates should always be in busy public places. Avoid isolated or private locations.</string>
     <string name="date_safety_tip_3_title">Use your own transport</string>
-    <string name="date_safety_tip_3_desc">Don\'t ride with someone you just met. Arrange your own transportation.</string>
+    <string name="date_safety_tip_3_desc">Don't ride with someone you just met. Arrange your own transportation.</string>
     <string name="date_safety_tip_4_title">Trust your instincts</string>
-    <string name="date_safety_tip_4_desc">If something feels off, it\'s okay to end the date. Your safety comes first.</string>
+    <string name="date_safety_tip_4_desc">If something feels off, it's okay to end the date. Your safety comes first.</string>
     <string name="date_safety_tip_5_title">Avoid sharing personal details</string>
-    <string name="date_safety_tip_5_desc">Don\'t share your address, workplace, or financial details on a first date.</string>
+    <string name="date_safety_tip_5_desc">Don't share your address, workplace, or financial details on a first date.</string>
     <string name="date_safety_tip_6_title">Watch your drink</string>
-    <string name="date_safety_tip_6_desc">Never leave your drink unattended. If something seems off, don\'t consume it.</string>
+    <string name="date_safety_tip_6_desc">Never leave your drink unattended. If something seems off, don't consume it.</string>
     <string name="date_safety_checklist_progress">%1$d of %2$d completed</string>
     <string name="date_safety_all_set">All set! Enjoy your date with confidence.</string>
 
@@ -628,7 +630,7 @@
     <string name="emergency_onboarding_step1_title">Your safety is our priority</string>
     <string name="emergency_onboarding_step1_desc">Aura includes an emergency feature that lets you quickly alert trusted contacts if you ever feel unsafe on a date.</string>
     <string name="emergency_onboarding_step2_title">Add trusted contacts</string>
-    <string name="emergency_onboarding_step2_desc">Add up to 5 people you trust. When SOS is triggered, they\'ll instantly receive your GPS location via SMS.</string>
+    <string name="emergency_onboarding_step2_desc">Add up to 5 people you trust. When SOS is triggered, they'll instantly receive your GPS location via SMS.</string>
     <string name="emergency_onboarding_step3_title">Activate SOS anywhere</string>
     <string name="emergency_onboarding_step3_desc">Tap the SOS button anytime, shake your phone 3 times, or press volume down 3× rapidly to trigger a silent 5-second countdown alert.</string>
     <string name="safety_center_hero_desc">Set up emergency contacts and explore our safety tools to stay protected on every date.</string>

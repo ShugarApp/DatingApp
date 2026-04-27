@@ -31,7 +31,6 @@ import aura.feature.auth.presentation.generated.resources.email_placeholder
 import aura.feature.auth.presentation.generated.resources.login
 import aura.feature.auth.presentation.generated.resources.next
 import aura.feature.auth.presentation.generated.resources.confirm_password
-import aura.feature.auth.presentation.generated.resources.error_passwords_do_not_match
 import aura.feature.auth.presentation.generated.resources.password
 import aura.feature.auth.presentation.generated.resources.password_hint
 import com.dating.core.designsystem.components.brand.AppBrandLogo
@@ -183,7 +182,8 @@ fun RegisterScreen(
             ChirpButton(
                 text = stringResource(Res.string.next),
                 onClick = { onAction(RegisterCredentialsAction.OnNextClick) },
-                enabled = state.canProceed,
+                enabled = state.canProceed && !state.isCheckingEmail,
+                isLoading = state.isCheckingEmail,
                 modifier = Modifier.fillMaxWidth()
             )
 

@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import aura.feature.auth.presentation.generated.resources.Res
 import aura.feature.auth.presentation.generated.resources.error_account_exists
 import aura.feature.auth.presentation.generated.resources.error_invalid_username
+import aura.feature.auth.presentation.generated.resources.error_too_old
 import aura.feature.auth.presentation.generated.resources.error_underage
 import com.dating.core.domain.auth.AuthService
 import com.dating.core.domain.auth.SessionStorage
@@ -98,9 +99,12 @@ class StepsRegisterViewModel(
 
                     RegisterStep.BirthDate -> {
                         val isFormatComplete = birthDate.length == 10
-                        val isAgeValid = isFormatComplete && isAtLeast18YearsOld(birthDate)
+                        val isUnderage = isFormatComplete && !isAtLeast18YearsOld(birthDate)
+                        val isTooOld = isFormatComplete && isOlderThan100Years(birthDate)
+                        val isAgeValid = isFormatComplete && !isUnderage && !isTooOld
                         val birthDateError = when {
-                            isFormatComplete && !isAgeValid -> UiText.Resource(Res.string.error_underage)
+                            isTooOld -> UiText.Resource(Res.string.error_too_old)
+                            isUnderage -> UiText.Resource(Res.string.error_underage)
                             else -> null
                         }
                         it.copy(canProceed = isAgeValid, birthDateError = birthDateError)
@@ -291,9 +295,12 @@ class StepsRegisterViewModel(
             RegisterStep.BirthDate -> {
                 val birthDate = currentState.birthDateTextState.text.toString()
                 val isFormatComplete = birthDate.length == 10
-                val isAgeValid = isFormatComplete && isAtLeast18YearsOld(birthDate)
+                val isUnderage = isFormatComplete && !isAtLeast18YearsOld(birthDate)
+                val isTooOld = isFormatComplete && isOlderThan100Years(birthDate)
+                val isAgeValid = isFormatComplete && !isUnderage && !isTooOld
                 val birthDateError = when {
-                    isFormatComplete && !isAgeValid -> UiText.Resource(Res.string.error_underage)
+                    isTooOld -> UiText.Resource(Res.string.error_too_old)
+                    isUnderage -> UiText.Resource(Res.string.error_underage)
                     else -> null
                 }
                 _state.update { it.copy(canProceed = isAgeValid, birthDateError = birthDateError) }
@@ -335,22 +342,32 @@ private fun String.toIsoDate(): String {
 }
 
 /**
- * Returns true if the date (DD/MM/YYYY) corresponds to someone who is at least 18 years old.
+ * Calculates the age in years from a DD/MM/YYYY date string. Returns null if the date is invalid.
  */
-private fun isAtLeast18YearsOld(birthDateStr: String): Boolean {
+private fun calculateAge(birthDateStr: String): Int? {
     val parts = birthDateStr.split("/")
-    if (parts.size != 3) return false
-    val day = parts[0].toIntOrNull() ?: return false
-    val month = parts[1].toIntOrNull() ?: return false
-    val year = parts[2].toIntOrNull() ?: return false
+    if (parts.size != 3) return null
+    val day = parts[0].toIntOrNull() ?: return null
+    val month = parts[1].toIntOrNull() ?: return null
+    val year = parts[2].toIntOrNull() ?: return null
     val birthDate = try {
         LocalDate(year, month, day)
     } catch (e: Exception) {
-        return false
+        return null
     }
     val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
     val age = today.year - birthDate.year
     val hasHadBirthdayThisYear = today.monthNumber > birthDate.monthNumber ||
         (today.monthNumber == birthDate.monthNumber && today.dayOfMonth >= birthDate.dayOfMonth)
-    return (if (hasHadBirthdayThisYear) age else age - 1) >= 18
+    return if (hasHadBirthdayThisYear) age else age - 1
+}
+
+private fun isAtLeast18YearsOld(birthDateStr: String): Boolean {
+    val age = calculateAge(birthDateStr) ?: return false
+    return age >= 18
+}
+
+private fun isOlderThan100Years(birthDateStr: String): Boolean {
+    val age = calculateAge(birthDateStr) ?: return false
+    return age > 100
 }

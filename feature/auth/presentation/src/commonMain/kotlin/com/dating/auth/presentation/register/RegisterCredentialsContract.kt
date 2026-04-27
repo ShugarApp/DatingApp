@@ -14,7 +14,8 @@ data class RegisterCredentialsState(
     val confirmPasswordTextState: TextFieldState = TextFieldState(),
     val confirmPasswordError: UiText? = null,
     val isConfirmPasswordVisible: Boolean = false,
-    val canProceed: Boolean = false
+    val canProceed: Boolean = false,
+    val isCheckingEmail: Boolean = false
 )
 
 sealed interface RegisterCredentialsAction {

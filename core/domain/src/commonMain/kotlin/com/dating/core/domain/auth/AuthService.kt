@@ -5,6 +5,8 @@ import com.dating.core.domain.util.EmptyResult
 import com.dating.core.domain.util.Result
 
 interface AuthService {
+    suspend fun checkEmailAvailability(email: String): EmptyResult<DataError.Remote>
+
     suspend fun login(
         email: String,
         password: String
