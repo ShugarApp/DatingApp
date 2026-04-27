@@ -6,6 +6,7 @@ import com.dating.core.data.dto.requests.ChangePasswordRequest
 import com.dating.core.data.dto.requests.CompleteProfileRequest
 import com.dating.core.data.dto.requests.EmailRequest
 import com.dating.core.data.dto.requests.GoogleLoginRequest
+import com.dating.core.data.dto.requests.GoogleRegisterRequest
 import com.dating.core.data.dto.requests.LoginRequest
 import com.dating.core.data.dto.requests.RefreshRequest
 import com.dating.core.data.dto.requests.RegisterRequest
@@ -75,6 +76,29 @@ class KtorAuthService(private val httpClient: HttpClient) : AuthService {
                 idealDate = idealDate
             )
         )
+    }
+
+    override suspend fun registerWithGoogle(
+        idToken: String,
+        username: String,
+        birthDate: String,
+        gender: String,
+        interestedIn: String,
+        lookingFor: String,
+        idealDate: String?
+    ): Result<AuthInfo, DataError.Remote> {
+        return httpClient.post<GoogleRegisterRequest, AuthInfoSerializable>(
+            route = "/auth/register/google",
+            body = GoogleRegisterRequest(
+                idToken = idToken,
+                username = username,
+                birthDate = birthDate,
+                gender = gender,
+                interestedIn = interestedIn,
+                lookingFor = lookingFor,
+                idealDate = idealDate
+            )
+        ).map { it.toDomain() }
     }
 
     override suspend fun completeProfile(

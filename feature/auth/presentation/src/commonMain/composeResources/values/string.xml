@@ -28,6 +28,8 @@
     <string name="password_hint">Use 9+ characters, at least one digit and one uppercase letter</string>
     <string name="error_account_exists">An account with that email or username already exists</string>
     <string name="error_invalid_password">Password must be at least 9 characters and include one digit and one uppercase letter</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="error_passwords_do_not_match">Passwords do not match</string>
     <string name="error_invalid_email">This is not a valid email</string>
     <string name="error_invalid_username">The username must be between 3 and 20 characters</string>
     <string name="error_invalid_credentials">The email or password is incorrect</string>
@@ -71,27 +73,34 @@
     <string name="continue_with_google">Continue with Google</string>
 
     <!-- Registration - Step 1 (Username) -->
-    <string name="what_is_your_name">¿Cómo te llamas?</string>
-    <string name="enter_your_name">Introduce tu nombre</string>
-    <string name="name_appearance_disclaimer">Este nombre aparecerá en tu perfil</string>
+    <string name="what_is_your_name">What's your name?</string>
+    <string name="enter_your_name">Enter your name</string>
+    <string name="name_appearance_disclaimer">This name will appear on your profile</string>
     <string name="everyone">Everyone</string>
 
     <!-- Registration - Step 5: Ideal Date -->
-    <string name="ideal_date">¿Cuál es tu cita ideal?</string>
-    <string name="ideal_date_section">Tipo de cita</string>
-    <string name="ideal_date_dinner">Cena romántica</string>
-    <string name="ideal_date_coffee">Café</string>
-    <string name="ideal_date_adventure">Aventura al aire libre</string>
-    <string name="ideal_date_cinema">Cine</string>
+    <string name="ideal_date">What's your ideal date?</string>
+    <string name="ideal_date_section">Date type</string>
+    <string name="ideal_date_dinner">Romantic dinner</string>
+    <string name="ideal_date_coffee">Coffee</string>
+    <string name="ideal_date_adventure">Outdoor adventure</string>
+    <string name="ideal_date_cinema">Cinema</string>
     <string name="ideal_date_picnic">Picnic</string>
-    <string name="ideal_date_travel">Viaje</string>
-    <string name="ideal_date_concert">Concierto</string>
-    <string name="ideal_date_museum">Museo o arte</string>
-    <string name="ideal_date_beach">Playa</string>
-    <string name="ideal_date_cooking">Cocinar juntos</string>
+    <string name="ideal_date_travel">Travel</string>
+    <string name="ideal_date_concert">Concert</string>
+    <string name="ideal_date_museum">Museum or art</string>
+    <string name="ideal_date_beach">Beach</string>
+    <string name="ideal_date_cooking">Cooking together</string>
 
     <!-- Registration - Welcome -->
-    <string name="register_welcome_title">¡Ya eres parte de Aura!</string>
-    <string name="register_welcome_subtitle">Tu perfil está listo. Empieza a conocer personas que comparten tu energía.</string>
-    <string name="register_welcome_cta">¡Vamos!</string>
+    <string name="register_welcome_title">You're now part of Aura!</string>
+    <string name="register_welcome_subtitle">Your profile is ready. Start meeting people who share your energy.</string>
+    <string name="register_welcome_cta">Let's go!</string>
+    <string name="error_google_sign_in_failed">Google Sign-In failed</string>
+
+    <!-- Abandon registration dialog -->
+    <string name="abandon_dialog_title">Abandon profile creation?</string>
+    <string name="abandon_dialog_description">If you leave now, your progress won't be saved and you'll need to start over.</string>
+    <string name="abandon_dialog_confirm">Yes, leave</string>
+    <string name="abandon_dialog_cancel">Keep going</string>
 </resources>

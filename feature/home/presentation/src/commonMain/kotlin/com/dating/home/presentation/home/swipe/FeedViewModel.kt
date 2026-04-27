@@ -96,8 +96,13 @@ class FeedViewModel(
         if (discoveryPreferences.isCompleteProfilePromptShown()) return
         val user = sessionStorage.observeAuthInfo().first()?.user ?: return
         if (user.profileCompletion() < 70) {
-            _state.update { it.copy(showCompleteProfileDialog = true) }
-            discoveryPreferences.setCompleteProfilePromptShown()
+            val dismissCount = discoveryPreferences.getCompleteProfileDismissCount()
+            if (dismissCount >= 2) {
+                discoveryPreferences.setCompleteProfilePromptShown()
+                _events.send(FeedEvent.NavigateToProfileSetup)
+            } else {
+                _state.update { it.copy(showCompleteProfileDialog = true) }
+            }
         }
     }
 
@@ -142,11 +147,15 @@ class FeedViewModel(
             FeedAction.OnCompleteProfileClick -> {
                 _state.update { it.copy(showCompleteProfileDialog = false) }
                 viewModelScope.launch {
-                    _events.send(FeedEvent.NavigateToEditProfile)
+                    discoveryPreferences.setCompleteProfilePromptShown()
+                    _events.send(FeedEvent.NavigateToProfileSetup)
                 }
             }
             FeedAction.OnDismissCompleteProfileDialog -> {
                 _state.update { it.copy(showCompleteProfileDialog = false) }
+                viewModelScope.launch {
+                    discoveryPreferences.incrementCompleteProfileDismissCount()
+                }
             }
             FeedAction.OnScreenResumed -> {
                 if (isInitialized) refreshPreferencesIfChanged()

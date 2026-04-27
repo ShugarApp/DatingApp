@@ -25,7 +25,12 @@ sealed interface AuthGraphRoutes {
     data class EmailVerification(val token: String) : AuthGraphRoutes
 
     @Serializable
-    data class StepsRegister(val email: String, val password: String = "", val isGoogleUser: Boolean = false) : AuthGraphRoutes
+    data class StepsRegister(
+        val email: String,
+        val password: String = "",
+        val isGoogleUser: Boolean = false,
+        val googleIdToken: String = ""
+    ) : AuthGraphRoutes
 
     @Serializable
     data object Onboarding : AuthGraphRoutes

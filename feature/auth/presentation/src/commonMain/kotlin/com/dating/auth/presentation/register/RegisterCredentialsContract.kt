@@ -11,6 +11,9 @@ data class RegisterCredentialsState(
     val isPasswordValid: Boolean = false,
     val passwordError: UiText? = null,
     val isPasswordVisible: Boolean = false,
+    val confirmPasswordTextState: TextFieldState = TextFieldState(),
+    val confirmPasswordError: UiText? = null,
+    val isConfirmPasswordVisible: Boolean = false,
     val canProceed: Boolean = false
 )
 
@@ -18,6 +21,7 @@ sealed interface RegisterCredentialsAction {
     data object OnLoginClick : RegisterCredentialsAction
     data object OnInputTextFocusGain : RegisterCredentialsAction
     data object OnTogglePasswordVisibilityClick : RegisterCredentialsAction
+    data object OnToggleConfirmPasswordVisibilityClick : RegisterCredentialsAction
     data object OnNextClick : RegisterCredentialsAction
     data object OnBackClick : RegisterCredentialsAction
 }

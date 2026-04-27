@@ -291,7 +291,7 @@ fun FeedScreen(
 
     if (state.showCompleteProfileDialog) {
         AlertDialog(
-            onDismissRequest = { onAction(FeedAction.OnDismissCompleteProfileDialog) },
+            onDismissRequest = {},
             icon = {
                 Icon(
                     imageVector = Icons.Default.Info,
@@ -638,7 +638,7 @@ private fun FilterBottomSheet(
                                     Gender.WOMEN -> stringResource(Res.string.feed_filter_gender_women)
                                     Gender.EVERYONE -> stringResource(Res.string.feed_filter_gender_everyone)
                                 },
-                                style = MaterialTheme.typography.bodyMedium,
+                                style = MaterialTheme.typography.labelMedium,
                                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                                 color = textColor
                             )
@@ -809,7 +809,7 @@ private fun FilterBottomSheet(
                     "${stringResource(Res.string.feed_filter_apply)} ($activeFilters)"
                 else
                     stringResource(Res.string.feed_filter_apply),
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.Bold
             )
         }

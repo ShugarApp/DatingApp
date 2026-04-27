@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import aura.feature.auth.presentation.generated.resources.Res
 import aura.feature.auth.presentation.generated.resources.error_invalid_email
 import aura.feature.auth.presentation.generated.resources.error_invalid_password
+import aura.feature.auth.presentation.generated.resources.error_passwords_do_not_match
 import com.dating.core.domain.validation.PasswordValidator
 import com.dating.core.presentation.util.UiText
 import com.dating.domain.EmailValidator
@@ -51,16 +52,22 @@ class RegisterCredentialsViewModel : ViewModel() {
         .map { password -> PasswordValidator.validate(password).isValidPassword }
         .distinctUntilChanged()
 
+    private val isConfirmPasswordMatchingFlow = combine(
+        snapshotFlow { state.value.passwordTextState.text.toString() },
+        snapshotFlow { state.value.confirmPasswordTextState.text.toString() }
+    ) { password, confirmPassword ->
+        confirmPassword.isNotEmpty() && confirmPassword == password
+    }.distinctUntilChanged()
+
     private fun observeValidationStates() {
-        combine(
-            isEmailValidFlow,
-            isPasswordValidFlow
-        ) { isEmailValid: Boolean, isPasswordValid: Boolean ->
+        combine(isEmailValidFlow, isPasswordValidFlow) { isEmailValid, isPasswordValid ->
+            isEmailValid to isPasswordValid
+        }.combine(isConfirmPasswordMatchingFlow) { (isEmailValid, isPasswordValid), isConfirmPasswordMatching ->
             _state.update {
                 it.copy(
                     isEmailValid = isEmailValid,
                     isPasswordValid = isPasswordValid,
-                    canProceed = isEmailValid && isPasswordValid
+                    canProceed = isEmailValid && isPasswordValid && isConfirmPasswordMatching
                 )
             }
         }.launchIn(viewModelScope)
@@ -81,6 +88,10 @@ class RegisterCredentialsViewModel : ViewModel() {
                 _state.update { it.copy(isPasswordVisible = !it.isPasswordVisible) }
             }
 
+            RegisterCredentialsAction.OnToggleConfirmPasswordVisibilityClick -> {
+                _state.update { it.copy(isConfirmPasswordVisible = !it.isConfirmPasswordVisible) }
+            }
+
             RegisterCredentialsAction.OnInputTextFocusGain -> {
                 clearErrors()
             }
@@ -91,22 +102,26 @@ class RegisterCredentialsViewModel : ViewModel() {
         val currentState = state.value
         val email = currentState.emailTextState.text.toString()
         val password = currentState.passwordTextState.text.toString()
+        val confirmPassword = currentState.confirmPasswordTextState.text.toString()
 
         val isEmailValid = EmailValidator.validate(email)
         val passwordValidation = PasswordValidator.validate(password)
+        val doPasswordsMatch = confirmPassword == password
 
-        if (isEmailValid && passwordValidation.isValidPassword) {
+        if (isEmailValid && passwordValidation.isValidPassword && doPasswordsMatch) {
             viewModelScope.launch {
                 eventChannel.send(RegisterCredentialsEvent.OnNext(email, password))
             }
         } else {
             val emailError = if (!isEmailValid) UiText.Resource(Res.string.error_invalid_email) else null
             val passwordError = if (!passwordValidation.isValidPassword) UiText.Resource(Res.string.error_invalid_password) else null
+            val confirmPasswordError = if (!doPasswordsMatch) UiText.Resource(Res.string.error_passwords_do_not_match) else null
 
             _state.update {
                 it.copy(
                     emailError = emailError,
-                    passwordError = passwordError
+                    passwordError = passwordError,
+                    confirmPasswordError = confirmPasswordError
                 )
             }
         }
@@ -116,7 +131,8 @@ class RegisterCredentialsViewModel : ViewModel() {
         _state.update {
             it.copy(
                 emailError = null,
-                passwordError = null
+                passwordError = null,
+                confirmPasswordError = null
             )
         }
     }

@@ -135,6 +135,7 @@ fun BottomNavigationContainer(
     // null = not yet loaded from DataStore, true/false = loaded value
     var hasSeenFeaturesOnboarding by rememberSaveable { mutableStateOf<Boolean?>(null) }
     var hasSeenProfileSetup by rememberSaveable { mutableStateOf<Boolean?>(null) }
+    var showProfileSetupFast by rememberSaveable { mutableStateOf(false) }
     // Track if features onboarding was just completed this session,
     // so we skip profile setup until the next app launch.
     var justCompletedFeaturesOnboarding by rememberSaveable { mutableStateOf(false) }
@@ -235,9 +236,12 @@ fun BottomNavigationContainer(
     }
 
     // Show profile setup wizard on the next app launch (not in the same session as features onboarding)
-    if (hasSeenProfileSetup == false && !justCompletedFeaturesOnboarding) {
+    if ((hasSeenProfileSetup == false && !justCompletedFeaturesOnboarding) || showProfileSetupFast) {
         ProfileSetupFastScreen(
-            onComplete = { hasSeenProfileSetup = true },
+            onComplete = {
+                hasSeenProfileSetup = true
+                showProfileSetupFast = false
+            },
             modifier = modifier
         )
         return
@@ -270,6 +274,7 @@ fun BottomNavigationContainer(
                     FeedRoot(
                         onNavigateToProfile = onNavigateToProfile,
                         onNavigateToEditProfile = onEditProfile,
+                        onNavigateToProfileSetup = { showProfileSetupFast = true },
                         onNavigateToMatches = { selectedSection = BottomNavSection.MATCHES },
                         swipedUserId = swipedUserId,
                         swipedIsDislike = swipedIsDislike,

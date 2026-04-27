@@ -408,6 +408,22 @@
     <string name="photo_onboarding_subtitle">Upload at least 2 photos to start discovering people near you. Show your best side!</string>
     <string name="photo_onboarding_continue">Continue</string>
     <string name="photo_onboarding_photos_count">%1$d / 2 required photos</string>
+    <string name="photo_tips_button">Photo tips</string>
+    <string name="photo_tips_title">Photo tips</string>
+    <string name="photo_tips_subtitle">Help us keep Aura safe and free of fake profiles</string>
+    <string name="photo_tips_tip1_title">Show your face clearly</string>
+    <string name="photo_tips_tip1_desc">At least one photo must show your face fully visible. No hats, sunglasses, or masks covering it.</string>
+    <string name="photo_tips_tip2_title">Use recent photos</string>
+    <string name="photo_tips_tip2_desc">Upload photos taken within the last 2 years. Outdated photos mislead your matches.</string>
+    <string name="photo_tips_tip3_title">Solo shots first</string>
+    <string name="photo_tips_tip3_desc">Your main photo should be just you. Group shots make it hard to know who you are.</string>
+    <string name="photo_tips_tip4_title">Be authentic</string>
+    <string name="photo_tips_tip4_desc">Avoid heavy filters or edits that significantly alter your appearance. Be yourself!</string>
+    <string name="photo_tips_tip5_title">No hidden faces</string>
+    <string name="photo_tips_tip5_desc">Photos where your face is fully obscured don\'t count. Others need to see who they\'re talking to.</string>
+    <string name="photo_tips_tip6_title">Safe and respectful</string>
+    <string name="photo_tips_tip6_desc">No explicit, violent, or offensive content. Let\'s keep Aura a safe space for everyone.</string>
+    <string name="photo_tips_got_it">Got it!</string>
 
     <!-- Profile Screen -->
     <string name="safety_center_manage_contacts">Manage Emergency Contacts</string>

@@ -61,14 +61,14 @@ fun OnboardingRoot(
     onLoginClick: () -> Unit,
     onCreateAccountClick: () -> Unit,
     onGoogleSuccess: () -> Unit,
-    onGoogleNewUser: (email: String) -> Unit,
+    onGoogleNewUser: (idToken: String) -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
             OnboardingEvent.GoogleSuccess -> onGoogleSuccess()
-            is OnboardingEvent.GoogleNewUser -> onGoogleNewUser(event.email)
+            is OnboardingEvent.GoogleNewUser -> onGoogleNewUser(event.idToken)
         }
     }
 

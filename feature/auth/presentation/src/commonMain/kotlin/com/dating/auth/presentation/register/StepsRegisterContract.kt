@@ -10,6 +10,7 @@ data class StepsRegisterState(
     val isUsernameValid: Boolean = false,
     val usernameError: UiText? = null,
     val nameTextState: TextFieldState = TextFieldState(),
+    val showAbandonDialog: Boolean = false,
 
     // Step 2: Birth Date
     val birthDateTextState: TextFieldState = TextFieldState(),
@@ -41,6 +42,8 @@ sealed interface StepsRegisterAction {
     data object OnNextClick : StepsRegisterAction
     data object OnBackClick : StepsRegisterAction
     data object OnContinueClick : StepsRegisterAction
+    data object OnConfirmAbandon : StepsRegisterAction
+    data object OnDismissAbandonDialog : StepsRegisterAction
     data class OnGenderSelect(val gender: String) : StepsRegisterAction
     data class OnInterestSelect(val interest: String) : StepsRegisterAction
     data class OnLookingForSelect(val lookingFor: String) : StepsRegisterAction
@@ -51,4 +54,5 @@ sealed interface StepsRegisterEvent {
     data class Success(val email: String) : StepsRegisterEvent
     data object GoogleSuccess : StepsRegisterEvent
     data object OnBack : StepsRegisterEvent
+    data object NavigateToLogin : StepsRegisterEvent
 }

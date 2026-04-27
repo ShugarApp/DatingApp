@@ -30,12 +30,12 @@ fun NavGraphBuilder.authGraph(
                     navController.navigate(AuthGraphRoutes.Register)
                 },
                 onGoogleSuccess = onLoginSuccess,
-                onGoogleNewUser = { email ->
+                onGoogleNewUser = { idToken ->
                     navController.navigate(
                         AuthGraphRoutes.StepsRegister(
-                            email = email,
-                            password = "",
-                            isGoogleUser = true
+                            email = "",
+                            isGoogleUser = true,
+                            googleIdToken = idToken
                         )
                     )
                 }
@@ -44,12 +44,12 @@ fun NavGraphBuilder.authGraph(
         composable<AuthGraphRoutes.Login> {
             LoginRoot(
                 onLoginSuccess = onLoginSuccess,
-                onGoogleNewUser = { email ->
+                onGoogleNewUser = { idToken ->
                     navController.navigate(
                         AuthGraphRoutes.StepsRegister(
-                            email = email,
-                            password = "",
-                            isGoogleUser = true
+                            email = "",
+                            isGoogleUser = true,
+                            googleIdToken = idToken
                         )
                     ) {
                         popUpTo(AuthGraphRoutes.Login) {
@@ -99,6 +99,14 @@ fun NavGraphBuilder.authGraph(
                 onGoogleRegisterSuccess = onLoginSuccess,
                 onBackClick = {
                     navController.popBackStack()
+                },
+                onNavigateToLogin = {
+                    navController.navigate(AuthGraphRoutes.Onboarding) {
+                        popUpTo(AuthGraphRoutes.Graph) {
+                            inclusive = false
+                        }
+                        launchSingleTop = true
+                    }
                 }
             )
         }

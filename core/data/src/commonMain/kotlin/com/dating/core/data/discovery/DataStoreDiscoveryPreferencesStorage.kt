@@ -24,6 +24,7 @@ class DataStoreDiscoveryPreferencesStorage(
     private val maxAgeKey = intPreferencesKey("discovery_max_age")
     private val verifiedProfilesOnlyKey = booleanPreferencesKey("discovery_verified_profiles_only")
     private val completeProfilePromptShownKey = booleanPreferencesKey("complete_profile_prompt_shown")
+    private val completeProfileDismissCountKey = intPreferencesKey("complete_profile_dismiss_count")
 
     override fun observe(): Flow<DiscoverySettings> {
         return dataStore.data.map { prefs -> prefs.toDiscoverySettings() }
@@ -72,6 +73,16 @@ class DataStoreDiscoveryPreferencesStorage(
         }
     }
 
+    override suspend fun getCompleteProfileDismissCount(): Int {
+        return dataStore.data.first()[completeProfileDismissCountKey] ?: 0
+    }
+
+    override suspend fun incrementCompleteProfileDismissCount() {
+        dataStore.edit { prefs ->
+            prefs[completeProfileDismissCountKey] = (prefs[completeProfileDismissCountKey] ?: 0) + 1
+        }
+    }
+
     override suspend fun clear() {
         dataStore.edit { prefs ->
             prefs.remove(maxDistanceKey)
@@ -80,6 +91,7 @@ class DataStoreDiscoveryPreferencesStorage(
             prefs.remove(maxAgeKey)
             prefs.remove(verifiedProfilesOnlyKey)
             prefs.remove(completeProfilePromptShownKey)
+            prefs.remove(completeProfileDismissCountKey)
         }
     }
 

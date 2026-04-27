@@ -42,12 +42,12 @@ class OnboardingViewModel(
             authService
                 .loginWithGoogle(idToken)
                 .onSuccess { result ->
-                    sessionStorage.set(result.authInfo)
                     _state.update { it.copy(isGoogleLoading = false) }
 
                     if (result.isNewUser) {
-                        eventChannel.send(OnboardingEvent.GoogleNewUser(result.authInfo.user.email))
+                        eventChannel.send(OnboardingEvent.GoogleNewUser(idToken))
                     } else {
+                        sessionStorage.set(result.authInfo!!)
                         eventChannel.send(OnboardingEvent.GoogleSuccess)
                     }
                 }
@@ -66,7 +66,7 @@ data class OnboardingState(
 
 sealed interface OnboardingEvent {
     data object GoogleSuccess : OnboardingEvent
-    data class GoogleNewUser(val email: String) : OnboardingEvent
+    data class GoogleNewUser(val idToken: String) : OnboardingEvent
 }
 
 sealed interface OnboardingAction {

@@ -41,6 +41,16 @@ interface AuthService {
 
     suspend fun loginWithGoogle(idToken: String): Result<GoogleAuthResult, DataError.Remote>
 
+    suspend fun registerWithGoogle(
+        idToken: String,
+        username: String,
+        birthDate: String,
+        gender: String,
+        interestedIn: String,
+        lookingFor: String,
+        idealDate: String? = null
+    ): Result<AuthInfo, DataError.Remote>
+
     suspend fun completeProfile(
         username: String,
         birthDate: String,

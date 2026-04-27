@@ -30,6 +30,8 @@ import aura.feature.auth.presentation.generated.resources.email
 import aura.feature.auth.presentation.generated.resources.email_placeholder
 import aura.feature.auth.presentation.generated.resources.login
 import aura.feature.auth.presentation.generated.resources.next
+import aura.feature.auth.presentation.generated.resources.confirm_password
+import aura.feature.auth.presentation.generated.resources.error_passwords_do_not_match
 import aura.feature.auth.presentation.generated.resources.password
 import aura.feature.auth.presentation.generated.resources.password_hint
 import com.dating.core.designsystem.components.brand.AppBrandLogo
@@ -146,7 +148,7 @@ fun RegisterScreen(
                 title = stringResource(Res.string.password),
                 supportingText = state.passwordError?.asString() ?: stringResource(Res.string.password_hint),
                 isError = state.passwordError != null,
-                imeAction = ImeAction.Done,
+                imeAction = ImeAction.Next,
                 onFocusChanged = {
                     onAction(RegisterCredentialsAction.OnInputTextFocusGain)
                 },
@@ -154,6 +156,25 @@ fun RegisterScreen(
                     onAction(RegisterCredentialsAction.OnTogglePasswordVisibilityClick)
                 },
                 isPasswordVisible = state.isPasswordVisible,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            ChirpPasswordTextField(
+                state = state.confirmPasswordTextState,
+                placeholder = stringResource(Res.string.confirm_password),
+                title = stringResource(Res.string.confirm_password),
+                supportingText = state.confirmPasswordError?.asString(),
+                isError = state.confirmPasswordError != null,
+                imeAction = ImeAction.Done,
+                onFocusChanged = {
+                    onAction(RegisterCredentialsAction.OnInputTextFocusGain)
+                },
+                onToggleVisibilityClick = {
+                    onAction(RegisterCredentialsAction.OnToggleConfirmPasswordVisibilityClick)
+                },
+                isPasswordVisible = state.isConfirmPasswordVisible,
                 modifier = Modifier.fillMaxWidth()
             )
 

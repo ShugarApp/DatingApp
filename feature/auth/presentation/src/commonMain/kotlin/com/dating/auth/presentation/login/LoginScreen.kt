@@ -52,7 +52,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun LoginRoot(
     viewModel: LoginViewModel = koinViewModel(),
     onLoginSuccess: () -> Unit,
-    onGoogleNewUser: (email: String) -> Unit,
+    onGoogleNewUser: (idToken: String) -> Unit,
     onForgotPasswordClick: () -> Unit,
     onCreateAccountClick: () -> Unit,
     onBackClick: () -> Unit
@@ -62,7 +62,7 @@ fun LoginRoot(
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
             LoginEvent.Success -> onLoginSuccess()
-            is LoginEvent.SuccessNewUser -> onGoogleNewUser(event.email)
+            is LoginEvent.SuccessNewUser -> onGoogleNewUser(event.idToken)
             LoginEvent.OnBack -> onBackClick()
         }
     }

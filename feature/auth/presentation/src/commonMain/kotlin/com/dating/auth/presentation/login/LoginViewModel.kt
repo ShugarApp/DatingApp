@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import aura.feature.auth.presentation.generated.resources.Res
 import aura.feature.auth.presentation.generated.resources.error_email_not_verified
+import aura.feature.auth.presentation.generated.resources.error_google_sign_in_failed
 import aura.feature.auth.presentation.generated.resources.error_invalid_credentials
 import com.dating.core.domain.auth.AuthService
 import com.dating.core.domain.auth.SessionStorage
@@ -56,7 +57,7 @@ class LoginViewModel(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000L),
-            initialValue = LoginState()
+            initialValue = _state.value
         )
 
     private val isRegisteringFlow = state
@@ -82,7 +83,7 @@ class LoginViewModel(
             LoginAction.OnGoogleSignInError -> {
                 _state.update {
                     it.copy(
-                        error = UiText.DynamicString("Google Sign-In failed"),
+                        error = UiText.Resource(Res.string.error_google_sign_in_failed),
                         isGoogleLoading = false
                     )
                 }
@@ -113,13 +114,12 @@ class LoginViewModel(
             authService
                 .loginWithGoogle(idToken)
                 .onSuccess { result ->
-                    sessionStorage.set(result.authInfo)
-
                     _state.update { it.copy(isGoogleLoading = false) }
 
                     if (result.isNewUser) {
-                        eventChannel.send(LoginEvent.SuccessNewUser(result.authInfo.user.email))
+                        eventChannel.send(LoginEvent.SuccessNewUser(idToken))
                     } else {
+                        sessionStorage.set(result.authInfo!!)
                         eventChannel.send(LoginEvent.Success)
                     }
                 }

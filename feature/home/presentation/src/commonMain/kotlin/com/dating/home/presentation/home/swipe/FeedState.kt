@@ -64,5 +64,6 @@ sealed interface FeedAction {
 sealed interface FeedEvent {
     data class NavigateToProfile(val userId: String, val imageUrl: String?) : FeedEvent
     data object NavigateToEditProfile : FeedEvent
+    data object NavigateToProfileSetup : FeedEvent
     data object NavigateToMatches : FeedEvent
 }

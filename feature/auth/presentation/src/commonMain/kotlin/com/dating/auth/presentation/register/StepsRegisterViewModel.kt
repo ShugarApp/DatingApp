@@ -9,6 +9,7 @@ import aura.feature.auth.presentation.generated.resources.error_account_exists
 import aura.feature.auth.presentation.generated.resources.error_invalid_username
 import aura.feature.auth.presentation.generated.resources.error_underage
 import com.dating.core.domain.auth.AuthService
+import com.dating.core.domain.auth.SessionStorage
 import com.dating.core.domain.util.DataError
 import com.dating.core.domain.util.onFailure
 import com.dating.core.domain.util.onSuccess
@@ -33,12 +34,14 @@ import kotlinx.coroutines.launch
 
 class StepsRegisterViewModel(
     private val authService: AuthService,
+    private val sessionStorage: SessionStorage,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val email: String = checkNotNull(savedStateHandle["email"])
+    private val email: String = savedStateHandle["email"] ?: ""
     private val password: String = savedStateHandle["password"] ?: ""
     private val isGoogleUser: Boolean = savedStateHandle["isGoogleUser"] ?: false
+    private val googleIdToken: String = savedStateHandle["googleIdToken"] ?: ""
 
     private val eventChannel = Channel<StepsRegisterEvent>()
     val events = eventChannel.receiveAsFlow()
@@ -156,6 +159,15 @@ class StepsRegisterViewModel(
                 }
             }
 
+            StepsRegisterAction.OnConfirmAbandon -> {
+                _state.update { it.copy(showAbandonDialog = false) }
+                viewModelScope.launch { eventChannel.send(StepsRegisterEvent.NavigateToLogin) }
+            }
+
+            StepsRegisterAction.OnDismissAbandonDialog -> {
+                _state.update { it.copy(showAbandonDialog = false) }
+            }
+
             StepsRegisterAction.OnInputTextFocusGain -> {
                 _state.update { it.copy(registrationError = null, usernameError = null) }
             }
@@ -181,9 +193,7 @@ class StepsRegisterViewModel(
         val currentStep = state.value.currentStep
         if (currentStep == RegisterStep.Welcome) return
         if (currentStep == RegisterStep.BasicInfo) {
-            viewModelScope.launch {
-                eventChannel.send(StepsRegisterEvent.OnBack)
-            }
+            _state.update { it.copy(showAbandonDialog = true) }
         } else {
             val previousStep = when (currentStep) {
                 RegisterStep.BirthDate -> RegisterStep.BasicInfo
@@ -212,9 +222,9 @@ class StepsRegisterViewModel(
             val idealDate = state.value.selectedIdealDate
 
             if (isGoogleUser) {
-                // Google users are already registered, complete their profile
                 authService
-                    .completeProfile(
+                    .registerWithGoogle(
+                        idToken = googleIdToken,
                         username = username,
                         birthDate = birthDate,
                         gender = gender ?: "",
@@ -222,7 +232,8 @@ class StepsRegisterViewModel(
                         lookingFor = lookingFor ?: "",
                         idealDate = idealDate
                     )
-                    .onSuccess {
+                    .onSuccess { authInfo ->
+                        sessionStorage.set(authInfo)
                         _state.update { it.copy(isRegistering = false, currentStep = RegisterStep.Welcome) }
                     }
                     .onFailure { error ->

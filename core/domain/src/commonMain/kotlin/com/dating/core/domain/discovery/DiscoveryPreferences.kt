@@ -30,5 +30,7 @@ interface DiscoveryPreferencesStorage {
     suspend fun updateVerifiedProfilesOnly(enabled: Boolean)
     suspend fun isCompleteProfilePromptShown(): Boolean
     suspend fun setCompleteProfilePromptShown()
+    suspend fun getCompleteProfileDismissCount(): Int
+    suspend fun incrementCompleteProfileDismissCount()
     suspend fun clear()
 }

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+    <string name="file">Archivo</string>
+    <string name="new_window">Nueva ventana</string>
+    <string name="app_theme">Tema de la app</string>
+
+    <string name="blocked_suspended_title">Cuenta suspendida</string>
+    <string name="blocked_suspended_desc">Tu cuenta ha sido suspendida temporalmente por violar nuestras normas de la comunidad. Si crees que es un error, contacta con nuestro equipo de soporte.</string>
+    <string name="blocked_banned_title">Cuenta bloqueada</string>
+    <string name="blocked_banned_desc">Tu cuenta ha sido bloqueada permanentemente por incumplimientos graves de nuestras normas de la comunidad. Esta decisión es definitiva.</string>
+    <string name="blocked_deleted_title">Cuenta eliminada</string>
+    <string name="blocked_deleted_desc">Tu cuenta ha sido eliminada. Todos tus datos han sido borrados y no pueden recuperarse.</string>
+    <string name="blocked_contact_support">Si necesitas ayuda, contacta con support@aura.com</string>
+    <string name="blocked_logout">Cerrar sesión</string>
+</resources>

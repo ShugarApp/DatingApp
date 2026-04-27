@@ -80,12 +80,15 @@ fun User.toSerializable(): UserSerializable {
 }
 
 fun GoogleAuthInfoSerializable.toDomain(): GoogleAuthResult {
-    return GoogleAuthResult(
-        authInfo = AuthInfo(
+    val authInfo = if (accessToken != null && refreshToken != null && user != null) {
+        AuthInfo(
             accessToken = accessToken,
             refreshToken = refreshToken,
             user = user.toDomain()
-        ),
+        )
+    } else null
+    return GoogleAuthResult(
+        authInfo = authInfo,
         isNewUser = isNewUser
     )
 }

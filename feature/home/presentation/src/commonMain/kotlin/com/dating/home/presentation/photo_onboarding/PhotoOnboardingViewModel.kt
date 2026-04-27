@@ -53,13 +53,13 @@ class PhotoOnboardingViewModel(
             val authInfo = sessionStorage.observeAuthInfo().firstOrNull()
             val cachedPhotos = authInfo?.user?.photos ?: emptyList()
             _state.update {
-                it.copy(photos = List(4) { i -> cachedPhotos.getOrNull(i) })
+                it.copy(photos = List(6) { i -> cachedPhotos.getOrNull(i) })
             }
             // Sync with server to get the latest photos and status
             userService.getMyProfile()
                 .onSuccess { user ->
                     _state.update {
-                        it.copy(photos = List(4) { i -> user.photos.getOrNull(i) })
+                        it.copy(photos = List(6) { i -> user.photos.getOrNull(i) })
                     }
                     if (authInfo != null) {
                         sessionStorage.set(authInfo.copy(user = user))

@@ -72,6 +72,10 @@ import aura.feature.auth.presentation.generated.resources.interest_short_term
 import aura.feature.auth.presentation.generated.resources.interested_in
 import aura.feature.auth.presentation.generated.resources.looking_for
 import aura.feature.auth.presentation.generated.resources.name_appearance_disclaimer
+import aura.feature.auth.presentation.generated.resources.abandon_dialog_cancel
+import aura.feature.auth.presentation.generated.resources.abandon_dialog_confirm
+import aura.feature.auth.presentation.generated.resources.abandon_dialog_description
+import aura.feature.auth.presentation.generated.resources.abandon_dialog_title
 import aura.feature.auth.presentation.generated.resources.next
 import aura.feature.auth.presentation.generated.resources.enter_your_name
 import aura.feature.auth.presentation.generated.resources.register
@@ -80,6 +84,7 @@ import aura.feature.auth.presentation.generated.resources.register_welcome_subti
 import aura.feature.auth.presentation.generated.resources.register_welcome_title
 import aura.feature.auth.presentation.generated.resources.what_is_your_name
 import com.dating.core.designsystem.components.buttons.ChirpButton
+import com.dating.core.designsystem.components.dialogs.DestructiveConfirmationDialog
 import com.dating.core.designsystem.components.header.RegisterTopBar
 import com.dating.core.designsystem.components.layouts.AuthSnackbarScaffold
 import com.dating.core.designsystem.components.textfields.ChirpTextField
@@ -94,7 +99,8 @@ fun StepsRegisterRoot(
     viewModel: StepsRegisterViewModel = koinViewModel(),
     onRegisterSuccess: (String) -> Unit,
     onGoogleRegisterSuccess: () -> Unit = {},
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onNavigateToLogin: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -104,6 +110,7 @@ fun StepsRegisterRoot(
             is StepsRegisterEvent.Success -> onRegisterSuccess(event.email)
             StepsRegisterEvent.GoogleSuccess -> onGoogleRegisterSuccess()
             StepsRegisterEvent.OnBack -> onBackClick()
+            StepsRegisterEvent.NavigateToLogin -> onNavigateToLogin()
         }
     }
 
@@ -121,6 +128,18 @@ fun StepsRegisterScreen(
     onAction: (StepsRegisterAction) -> Unit,
     snackbarHostState: SnackbarHostState
 ) {
+    if (state.showAbandonDialog) {
+        DestructiveConfirmationDialog(
+            title = stringResource(Res.string.abandon_dialog_title),
+            description = stringResource(Res.string.abandon_dialog_description),
+            confirmButtonText = stringResource(Res.string.abandon_dialog_confirm),
+            cancelButtonText = stringResource(Res.string.abandon_dialog_cancel),
+            onConfirmClick = { onAction(StepsRegisterAction.OnConfirmAbandon) },
+            onCancelClick = { onAction(StepsRegisterAction.OnDismissAbandonDialog) },
+            onDismiss = { onAction(StepsRegisterAction.OnDismissAbandonDialog) }
+        )
+    }
+
     AuthSnackbarScaffold(
         topBar = {
             if (state.currentStep != RegisterStep.Welcome) {
