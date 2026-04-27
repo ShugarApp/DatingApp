@@ -24,14 +24,6 @@
 		</dict>
 	</array>
 	<key>UIBackgroundModes</key>
-	<array>
-		<string>remote-notification</string>
-	</array>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>Aura necesita acceso al micrófono para grabar mensajes de audio.</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Aura usa tu ubicación para mostrarte personas cercanas.</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Aura usa tu ubicación para mostrarte personas cercanas.</string>
+	<array/>
 </dict>
 </plist>

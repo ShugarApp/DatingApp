@@ -11,6 +11,8 @@ import aura.feature.auth.presentation.generated.resources.error_too_old
 import aura.feature.auth.presentation.generated.resources.error_underage
 import com.dating.core.domain.auth.AuthService
 import com.dating.core.domain.auth.SessionStorage
+import com.dating.core.domain.discovery.DiscoveryPreferencesStorage
+import com.dating.core.domain.discovery.Gender
 import com.dating.core.domain.util.DataError
 import com.dating.core.domain.util.onFailure
 import com.dating.core.domain.util.onSuccess
@@ -36,7 +38,8 @@ import kotlinx.coroutines.launch
 class StepsRegisterViewModel(
     private val authService: AuthService,
     private val sessionStorage: SessionStorage,
-    private val savedStateHandle: SavedStateHandle
+    private val savedStateHandle: SavedStateHandle,
+    private val discoveryPreferences: DiscoveryPreferencesStorage
 ) : ViewModel() {
 
     private val email: String = savedStateHandle["email"] ?: ""
@@ -238,6 +241,7 @@ class StepsRegisterViewModel(
                     )
                     .onSuccess { authInfo ->
                         sessionStorage.set(authInfo)
+                        discoveryPreferences.updateShowMe(interestToGender(interest))
                         _state.update { it.copy(isRegistering = false, currentStep = RegisterStep.Welcome) }
                     }
                     .onFailure { error ->
@@ -263,6 +267,7 @@ class StepsRegisterViewModel(
                     idealDate = idealDate
                 )
                 .onSuccess {
+                    discoveryPreferences.updateShowMe(interestToGender(interest))
                     _state.update { it.copy(isRegistering = false, currentStep = RegisterStep.Welcome, registeredEmail = email) }
                 }
                 .onFailure { error ->
@@ -330,6 +335,12 @@ class StepsRegisterViewModel(
             RegisterStep.Welcome -> true
         }
     }
+}
+
+private fun interestToGender(interest: String?): Gender = when (interest?.uppercase()) {
+    "MALE" -> Gender.MEN
+    "EVERYONE" -> Gender.EVERYONE
+    else -> Gender.WOMEN
 }
 
 /**

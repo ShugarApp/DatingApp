@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		C3E800272E698DB5004ADEC0 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = C3E800262E698DB5004ADEC0 /* FirebaseMessaging */; };
 		A1B200032E698DB5004ADEC0 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = A1B200022E698DB5004ADEC0 /* GoogleSignIn */; };
+		C3E800272E698DB5004ADEC0 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = C3E800262E698DB5004ADEC0 /* FirebaseMessaging */; };
 		FA1100022E698DB5004ADEC0 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = FA1100012E698DB5004ADEC0 /* FirebaseCrashlytics */; };
 /* End PBXBuildFile section */
 
@@ -317,11 +317,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = iosApp/iosApp.entitlements;
+				CODE_SIGN_ENTITLEMENTS = iosApp/iosAppDebug.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
-				DEVELOPMENT_TEAM = F6AQB8RC46;
+				DEVELOPMENT_TEAM = 8YKB57M9X2;
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -329,6 +329,9 @@
 				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = iosApp/Info.plist;
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Aura usa tu ubicación para mostrarte personas cercanas.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Aura usa tu ubicación para mostrarte personas cercanas.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Aura necesita acceso al micrófono para grabar mensajes de audio.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -340,6 +343,7 @@
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.dating.aura;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -365,6 +369,9 @@
 				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = iosApp/Info.plist;
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Aura usa tu ubicación para mostrarte personas cercanas.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Aura usa tu ubicación para mostrarte personas cercanas.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Aura necesita acceso al micrófono para grabar mensajes de audio.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -406,14 +413,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		C3E800252E698DB5004ADEC0 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 12.2.0;
-			};
-		};
 		A1B200012E698DB5004ADEC0 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
@@ -422,18 +421,26 @@
 				minimumVersion = 8.0.0;
 			};
 		};
+		C3E800252E698DB5004ADEC0 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.2.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		C3E800262E698DB5004ADEC0 /* FirebaseMessaging */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C3E800252E698DB5004ADEC0 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseMessaging;
-		};
 		A1B200022E698DB5004ADEC0 /* GoogleSignIn */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = A1B200012E698DB5004ADEC0 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
 			productName = GoogleSignIn;
+		};
+		C3E800262E698DB5004ADEC0 /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C3E800252E698DB5004ADEC0 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
 		};
 		FA1100012E698DB5004ADEC0 /* FirebaseCrashlytics */ = {
 			isa = XCSwiftPackageProductDependency;
