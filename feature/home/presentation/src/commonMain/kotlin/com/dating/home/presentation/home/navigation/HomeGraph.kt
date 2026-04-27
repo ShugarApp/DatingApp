@@ -27,6 +27,7 @@ import com.dating.home.presentation.profile.settings.SettingsScreen
 import com.dating.home.presentation.profile.settings.blocked.BlockedUsersScreen
 import com.dating.home.presentation.detail.ProfileDetailScreen
 import com.dating.home.presentation.chat.chat_detail.ChatDetailRoot
+import com.dating.home.presentation.profile.settings.changepassword.ChangePasswordScreen
 import com.dating.home.presentation.profile.verification.VerificationScreen
 
 fun NavGraphBuilder.homeGraph(
@@ -257,7 +258,7 @@ fun NavGraphBuilder.homeGraph(
         }
 
         composable<HomeGraphRoutes.ChangePasswordRoute> {
-            com.dating.home.presentation.profile.settings.changepassword.ChangePasswordScreen(
+            ChangePasswordScreen(
                 onBack = { navController.popBackStack() }
             )
         }

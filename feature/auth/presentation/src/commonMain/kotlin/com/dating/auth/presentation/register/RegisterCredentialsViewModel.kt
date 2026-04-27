@@ -130,16 +130,12 @@ class RegisterCredentialsViewModel(
             val result = authService.checkEmailAvailability(email)
             _state.update { it.copy(isCheckingEmail = false) }
 
-            when (result) {
-                is Result.Success -> eventChannel.send(RegisterCredentialsEvent.OnNext(email, password))
-                is Result.Failure -> {
-                    val emailError = if (result.error == DataError.Remote.CONFLICT) {
-                        UiText.Resource(Res.string.error_email_already_registered)
-                    } else {
-                        UiText.Resource(Res.string.error_invalid_email)
-                    }
-                    _state.update { it.copy(emailError = emailError) }
+            when {
+                result is Result.Success -> eventChannel.send(RegisterCredentialsEvent.OnNext(email, password))
+                result is Result.Failure && result.error == DataError.Remote.CONFLICT -> {
+                    _state.update { it.copy(emailError = UiText.Resource(Res.string.error_email_already_registered)) }
                 }
+                else -> eventChannel.send(RegisterCredentialsEvent.OnNext(email, password))
             }
         }
     }

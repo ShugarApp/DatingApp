@@ -25,10 +25,12 @@ import aura.feature.home.presentation.generated.resources.sos_sent
 import com.dating.core.domain.auth.SessionStorage
 import com.dating.core.domain.auth.UserStatus
 import com.dating.core.domain.preferences.OnboardingPreferences
-import com.dating.home.domain.emergency.ShakeDetector
-import com.dating.home.domain.emergency.VolumeButtonEventBus
+import com.dating.core.presentation.permissions.Permission
+import com.dating.core.presentation.permissions.rememberPermissionController
 import com.dating.home.domain.emergency.EmergencyContactRepository
 import com.dating.home.domain.emergency.EmergencySettingsStorage
+import com.dating.home.domain.emergency.ShakeDetector
+import com.dating.home.domain.emergency.VolumeButtonEventBus
 import com.dating.home.domain.upload.PhotoUploadEvent
 import com.dating.home.domain.upload.PhotoUploadManager
 import com.dating.home.presentation.chat.chat_list_detail.ChatListDetailAdaptiveLayout
@@ -157,6 +159,24 @@ fun BottomNavigationContainer(
         }
     }
 
+    // If DataStore was cleared (e.g. app reinstall) but the server profile already has data,
+    // skip the profile setup wizard automatically.
+    LaunchedEffect(hasSeenProfileSetup, authInfo) {
+        if (hasSeenProfileSetup == false && authInfo != null) {
+            val user = authInfo!!.user
+            val profileAlreadySetUp = user.bio != null ||
+                user.interests.isNotEmpty() ||
+                user.lookingFor != null ||
+                user.interestedIn != null ||
+                user.jobTitle != null ||
+                user.smoking != null ||
+                user.drinking != null
+            if (profileAlreadySetUp) {
+                hasSeenProfileSetup = true
+            }
+        }
+    }
+
     // Emergency feature
     val emergencySettingsStorage: EmergencySettingsStorage = koinInject()
     val emergencySettings by emergencySettingsStorage.observe().collectAsStateWithLifecycle(null)
@@ -168,6 +188,12 @@ fun BottomNavigationContainer(
     val isEmergencyEnabled = emergencySettings?.isEnabled == true
     val hasContacts = emergencyContacts.isNotEmpty()
     val showPanicButton = isEmergencyEnabled && hasContacts
+
+    // Request location permission on first home entry
+    val permissionController = rememberPermissionController()
+    LaunchedEffect(Unit) {
+        permissionController.requestPermission(Permission.LOCATION)
+    }
 
     // Request SMS permission as soon as emergency feature is active
     val smsPermissionLauncher = rememberSmsPermissionLauncher { /* result handled by OS */ }
@@ -208,12 +234,15 @@ fun BottomNavigationContainer(
         }
     }
 
-    // Show full-screen photo onboarding if user status is PENDING
-    if (userStatus == UserStatus.PENDING) {
+    // Show full-screen photo onboarding if user has no photos yet.
+    // Google users are created with ACTIVE status (email already verified) so we also
+    // check for empty photos to ensure all new users go through the photo upload step.
+    val user = authInfo?.user
+    if (user != null && (userStatus == UserStatus.PENDING || user.photos.isEmpty())) {
         PhotoOnboardingScreen(
             onComplete = {
                 // No-op: the screen will automatically dismiss when session updates
-                // with status ACTIVE, causing the check to pass
+                // with photos, causing the check to pass
             },
             modifier = modifier
         )
