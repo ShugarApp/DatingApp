@@ -22,8 +22,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.LocationOn
@@ -68,8 +70,6 @@ import aura.feature.home.presentation.generated.resources.features_onboarding_sa
 import aura.feature.home.presentation.generated.resources.features_onboarding_skip
 import com.dating.core.designsystem.components.buttons.AppButtonStyle
 import com.dating.core.designsystem.components.buttons.ChirpButton
-import com.dating.core.designsystem.theme.extended
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 
@@ -259,9 +259,10 @@ private fun OnboardingPageContent(
 
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
                 .padding(horizontal = 32.dp)
-                .padding(top = 120.dp, bottom = 200.dp),
+                .padding(top = 120.dp, bottom = 240.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {

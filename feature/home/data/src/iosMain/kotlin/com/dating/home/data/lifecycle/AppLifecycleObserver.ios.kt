@@ -1,9 +1,11 @@
 package com.dating.home.data.lifecycle
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.withContext
 import platform.Foundation.NSNotificationCenter
 import platform.Foundation.NSOperationQueue
 import platform.UIKit.UIApplication
@@ -13,13 +15,15 @@ import platform.UIKit.UIApplicationState
 
 actual class AppLifecycleObserver {
     actual val isInForeground: Flow<Boolean> = callbackFlow {
-        val currentState = UIApplication.sharedApplication.applicationState
-        val isCurrentlyInForeground = when(currentState) {
-            UIApplicationState.UIApplicationStateActive -> true
-            // App itself is active, but could be that notification center is dragged down
-            // or there's an ongoing phone call
-            UIApplicationState.UIApplicationStateInactive -> true
-            else -> false
+        val isCurrentlyInForeground = withContext(Dispatchers.Main) {
+            val currentState = UIApplication.sharedApplication.applicationState
+            when(currentState) {
+                UIApplicationState.UIApplicationStateActive -> true
+                // App itself is active, but could be that notification center is dragged down
+                // or there's an ongoing phone call
+                UIApplicationState.UIApplicationStateInactive -> true
+                else -> false
+            }
         }
         send(isCurrentlyInForeground)
 

@@ -6,7 +6,6 @@ import com.dating.core.domain.auth.SessionStorage
 import com.dating.core.domain.auth.VerificationStatus
 import com.dating.core.domain.auth.profileCompletion
 import com.dating.core.domain.discovery.DiscoveryPreferencesStorage
-import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime

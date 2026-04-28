@@ -49,8 +49,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -81,6 +86,9 @@ fun MatchesScreen(
     onAction: (MatchesAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val coroutineScope = rememberCoroutineScope()
+    val pagerState = rememberPagerState(pageCount = { 2 })
+
     Scaffold(modifier = modifier) { paddingValues ->
         Column(
             modifier = Modifier
@@ -93,11 +101,22 @@ fun MatchesScreen(
                     .padding(start = 16.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                val currentTab = if (pagerState.currentPage == 0) MatchesTab.MATCHES else MatchesTab.LIKES
                 MatchesTabSwitcher(
-                    selectedTab = state.selectedTab,
+                    selectedTab = currentTab,
                     matchesCount = state.matches.size,
                     likesCount = state.likes.size,
-                    onTabSelected = { onAction(MatchesAction.OnTabSelected(it)) },
+                    onTabSelected = { tab ->
+                        coroutineScope.launch {
+                            try {
+                                pagerState.animateScrollToPage(if (tab == MatchesTab.MATCHES) 0 else 1)
+                            } catch (e: CancellationException) {
+                                throw e
+                            } catch (e: Exception) {
+                                // ignore animation errors
+                            }
+                        }
+                    },
                     modifier = Modifier.weight(1f)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
@@ -110,73 +129,76 @@ fun MatchesScreen(
                 }
             }
 
-            val currentItems = when (state.selectedTab) {
-                MatchesTab.MATCHES -> state.matches
-                MatchesTab.LIKES -> state.likes
-            }
-
             PullToRefreshBox(
-                isRefreshing = state.isLoading && currentItems.isNotEmpty(),
+                isRefreshing = state.isLoading && (state.matches.isNotEmpty() || state.likes.isNotEmpty()),
                 onRefresh = { onAction(MatchesAction.OnRefresh) },
                 modifier = Modifier.fillMaxSize()
             ) {
-                if (state.error != null && currentItems.isEmpty() && !state.isLoading) {
-                    ErrorMatchesState(
-                        errorMessage = state.error.asString(),
-                        onRetry = { onAction(MatchesAction.OnRefresh) }
-                    )
-                } else if (currentItems.isEmpty() && !state.isLoading) {
-                    when (state.selectedTab) {
-                        MatchesTab.MATCHES -> EmptyMatchesState()
-                        MatchesTab.LIKES -> EmptyLikesState()
-                    }
-                } else if (state.viewMode == MatchesViewMode.GRID) {
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(2),
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(12.dp),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        items(items = currentItems, key = { it.id }) { match ->
-                            when (state.selectedTab) {
-                                MatchesTab.MATCHES -> MatchPhotoCard(
-                                    match = match,
-                                    onClick = { onAction(MatchesAction.OnMatchClick(match.id, match.profilePictureUrl)) },
-                                    onLongClick = { onAction(MatchesAction.OnDeleteMatchClick(match)) },
-                                    onStartChat = { onAction(MatchesAction.OnStartChat(match.id)) },
-                                    isChatLoading = state.isCreatingChat
-                                )
-                                MatchesTab.LIKES -> LikePhotoCard(
-                                    match = match,
-                                    onClick = { onAction(MatchesAction.OnLikeClick(match.id, match.profilePictureUrl)) },
-                                    onLike = { onAction(MatchesAction.OnLikeUser(match.id)) },
-                                    onDislike = { onAction(MatchesAction.OnDislikeUser(match.id)) }
-                                )
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier.fillMaxSize()
+                ) { page ->
+                    val tabForPage = if (page == 0) MatchesTab.MATCHES else MatchesTab.LIKES
+                    val currentItems = if (page == 0) state.matches else state.likes
+
+                    if (state.error != null && currentItems.isEmpty() && !state.isLoading) {
+                        ErrorMatchesState(
+                            errorMessage = state.error.asString(),
+                            onRetry = { onAction(MatchesAction.OnRefresh) }
+                        )
+                    } else if (currentItems.isEmpty() && !state.isLoading) {
+                        when (tabForPage) {
+                            MatchesTab.MATCHES -> EmptyMatchesState()
+                            MatchesTab.LIKES -> EmptyLikesState()
+                        }
+                    } else if (state.viewMode == MatchesViewMode.GRID) {
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(2),
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(12.dp),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            items(items = currentItems, key = { it.id }) { match ->
+                                when (tabForPage) {
+                                    MatchesTab.MATCHES -> MatchPhotoCard(
+                                        match = match,
+                                        onClick = { onAction(MatchesAction.OnMatchClick(match.id, match.profilePictureUrl)) },
+                                        onLongClick = { onAction(MatchesAction.OnDeleteMatchClick(match)) },
+                                        onStartChat = { onAction(MatchesAction.OnStartChat(match.id)) },
+                                        isChatLoading = state.isCreatingChat
+                                    )
+                                    MatchesTab.LIKES -> LikePhotoCard(
+                                        match = match,
+                                        onClick = { onAction(MatchesAction.OnLikeClick(match.id, match.profilePictureUrl)) },
+                                        onLike = { onAction(MatchesAction.OnLikeUser(match.id)) },
+                                        onDislike = { onAction(MatchesAction.OnDislikeUser(match.id)) }
+                                    )
+                                }
                             }
                         }
-                    }
-                } else {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        items(items = currentItems, key = { it.id }) { match ->
-                            when (state.selectedTab) {
-                                MatchesTab.MATCHES -> MatchListCard(
-                                    match = match,
-                                    onClick = { onAction(MatchesAction.OnMatchClick(match.id, match.profilePictureUrl)) },
-                                    onLongClick = { onAction(MatchesAction.OnDeleteMatchClick(match)) },
-                                    onStartChat = { onAction(MatchesAction.OnStartChat(match.id)) },
-                                    isChatLoading = state.isCreatingChat
-                                )
-                                MatchesTab.LIKES -> LikeListCard(
-                                    match = match,
-                                    onClick = { onAction(MatchesAction.OnLikeClick(match.id, match.profilePictureUrl)) },
-                                    onLike = { onAction(MatchesAction.OnLikeUser(match.id)) },
-                                    onDislike = { onAction(MatchesAction.OnDislikeUser(match.id)) }
-                                )
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            items(items = currentItems, key = { it.id }) { match ->
+                                when (tabForPage) {
+                                    MatchesTab.MATCHES -> MatchListCard(
+                                        match = match,
+                                        onClick = { onAction(MatchesAction.OnMatchClick(match.id, match.profilePictureUrl)) },
+                                        onLongClick = { onAction(MatchesAction.OnDeleteMatchClick(match)) },
+                                        onStartChat = { onAction(MatchesAction.OnStartChat(match.id)) },
+                                        isChatLoading = state.isCreatingChat
+                                    )
+                                    MatchesTab.LIKES -> LikeListCard(
+                                        match = match,
+                                        onClick = { onAction(MatchesAction.OnLikeClick(match.id, match.profilePictureUrl)) },
+                                        onLike = { onAction(MatchesAction.OnLikeUser(match.id)) },
+                                        onDislike = { onAction(MatchesAction.OnDislikeUser(match.id)) }
+                                    )
+                                }
                             }
                         }
                     }
